@@ -1,7 +1,7 @@
 import { ZONES } from '../three/zones.js'
 import { partnerList } from '../config/partners.js'
 
-export function TopBar({ partner, zoneName, onSummon, onSwitchPartner }) {
+export function TopBar({ partner, zoneId, zoneName, onSummon, onSwitchPartner, onGo }) {
   return (
     <header className="topbar">
       <div className="topbar__brand">
@@ -11,6 +11,20 @@ export function TopBar({ partner, zoneName, onSummon, onSwitchPartner }) {
           {partner.demo && <em className="tag-demo">예시 지점</em>}
           {partner.owner && <em className="tag-owner">{partner.owner} {partner.ownerTitle}</em>}
         </span>
+      </div>
+
+      <div className="topbar__zones" aria-label="존 이동">
+        {ZONES.map((z) => (
+          <button
+            key={z.id}
+            type="button"
+            className={`zonetab ${z.id === zoneId ? 'is-active' : ''}`}
+            onClick={() => onGo(z.id)}
+          >
+            <span>{z.no}</span>
+            {z.short}
+          </button>
+        ))}
       </div>
 
       <div className="topbar__zone">

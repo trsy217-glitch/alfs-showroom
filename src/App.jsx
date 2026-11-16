@@ -100,7 +100,7 @@ export default function App() {
         />
       </div>
 
-      <TopBar partner={partner} zoneName={zone.name} onSummon={summon} onSwitchPartner={switchPartner} />
+      <TopBar partner={partner} zoneId={zoneId} zoneName={zone.name} onSummon={summon} onSwitchPartner={switchPartner} onGo={goZone} />
       <Hint show={hint && ready && !assistantOpen} />
 
       <div className="cta-stack">
