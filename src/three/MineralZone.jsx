@@ -1,13 +1,16 @@
 import { useMemo } from 'react'
 import { mineralProduct, won } from '../config/catalog.js'
-import { panelTexture, plaqueTexture } from './textures.js'
-import { Panel, PhotoPanel, Clickable, Bottle, ShadowDisc, Glow } from './parts.jsx'
+import { panelTexture, plaqueTexture, signTexture } from './textures.js'
+import { Panel, Clickable, CutoutStand, ShadowDisc, Glow, LedStrip } from './parts.jsx'
 import { P } from './palette.js'
 import { useTextSize } from '../lib/textSize.js'
+import { Pendant, Plant, SlatWall, useOak, useStone } from './furniture.jsx'
 
-// ── ② 오륜미네랄 시그니처 존 (중앙 원형 아일랜드 · 1,000ml) ──────
+// ── ② 오륜미네랄 전시대 — 스톤 테이블 위 누끼 병 진열 (1,000ml) ──
 export function MineralZone({ partner, onSelect }) {
   const ts = useTextSize()
+  const oak = useOak({ repeat: [2, 1], color: P.oakMid })
+  const stone = useStone({ color: '#ffffff' })
 
   const price = useMemo(
     () =>
@@ -22,6 +25,20 @@ export function MineralZone({ partner, onSelect }) {
     [partner, ts],
   )
 
+  const brand = useMemo(
+    () =>
+      signTexture({
+        key: 'sign-mineral',
+        brand: 'AL.F.S  SIGNATURE',
+        title: '오륜미네랄',
+        sub: '유디아미네랄 · 충북 보은 | 물에 10~30배 희석해 마시는 1,000ml 원액',
+        accent: partner.accent,
+        theme: 'light',
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [partner, ts],
+  )
+
   const factLeft = useMemo(
     () =>
       panelTexture({
@@ -30,7 +47,7 @@ export function MineralZone({ partner, onSelect }) {
         lines: ['식품유형: 기타가공품', '내용량: 1,000ml 1병', '섭취: 원액을 물에 10~30배 희석', '보관: 실온 (직사광선을 피함)'],
         accent: partner.accent,
         titleSize: 52,
-        lineSize: 38,
+        lineSize: 40,
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [partner, ts],
@@ -45,106 +62,106 @@ export function MineralZone({ partner, onSelect }) {
         accent: partner.accent,
         footer: '수상·특허 이력은 제조사 유디아미네랄의 것입니다',
         titleSize: 52,
-        lineSize: 36,
+        lineSize: 38,
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [partner, ts],
   )
 
   return (
-    <group position={[0, 0, 4]}>
-      {/* 원형 아일랜드 + 시그니처 병 (하나의 클릭 영역) */}
-      <Clickable onClick={() => onSelect(mineralProduct)} hoverScale={1.012}>
-        <ShadowDisc radius={4.4} opacity={0.42} />
-        <Glow radius={5.2} opacity={0.3} />
-        <mesh position={[0, 0.09, 0]}>
-          <cylinderGeometry args={[3.5, 3.6, 0.18, 64]} />
-          <meshStandardMaterial color="#f7efe1" roughness={0.22} metalness={0.22} />
-        </mesh>
-        <mesh position={[0, 0.2, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[3.34, 3.46, 64]} />
-          <meshStandardMaterial color={P.brass} emissive={P.goldSoft} emissiveIntensity={0.5} metalness={0.8} roughness={0.25} toneMapped={false} />
-        </mesh>
-        <mesh position={[0, 0.33, 0]}>
-          <cylinderGeometry args={[2.62, 2.72, 0.3, 64]} />
-          <meshStandardMaterial color={P.stoneTop} roughness={0.26} metalness={0.16} />
-        </mesh>
-        <mesh position={[0, 0.5, 0]}>
-          <cylinderGeometry args={[1.16, 1.22, 0.12, 48]} />
-          <meshStandardMaterial color={P.stone} roughness={0.28} metalness={0.28} />
-        </mesh>
-        <mesh position={[0, 1.02, 0]}>
-          <cylinderGeometry args={[1.0, 1.06, 0.98, 48]} />
-          <meshStandardMaterial color="#fffdf7" roughness={0.2} metalness={0.2} />
-        </mesh>
-        <mesh position={[0, 1.52, 0]}>
-          <cylinderGeometry args={[1.12, 1.12, 0.045, 48]} />
-          <meshStandardMaterial color={P.brass} roughness={0.14} metalness={0.7} />
-        </mesh>
+    <group position={[-2.8, 0, 1.4]}>
+      {/* 원형 스톤 아일랜드 — 오크 받침 + 트라버틴 상판 */}
+      <ShadowDisc radius={1.8} opacity={0.32} />
+      <Glow radius={2.6} opacity={0.2} />
+      <mesh position={[0, 0.32, 0]}>
+        <cylinderGeometry args={[0.62, 0.7, 0.64, 40]} />
+        <meshStandardMaterial {...oak} />
+      </mesh>
+      <mesh position={[0, 0.67, 0]}>
+        <cylinderGeometry args={[0.96, 1.0, 0.08, 56]} />
+        <meshStandardMaterial {...stone} />
+      </mesh>
+      <mesh position={[0, 0.725, 0]}>
+        <cylinderGeometry args={[0.94, 0.94, 0.02, 56]} />
+        <meshStandardMaterial color={P.stoneTop} roughness={0.32} metalness={0.08} />
+      </mesh>
+      <mesh position={[0, 0.05, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[1.46, 1.52, 64]} />
+        <meshStandardMaterial color={P.oakDark} roughness={0.6} />
+      </mesh>
 
-        {/* 시그니처 병 */}
-        <Bottle
-          position={[0, 1.55, 0]}
-          height={2.0}
-          radius={0.44}
-          body="#f2f7ef"
-          cap="#e9d6ab"
-          label={{ name: '오륜미네랄', volume: '1,000ml' }}
-          labelAccent={partner.accent}
-        />
-      </Clickable>
+      {/* 누끼로 딴 1,000ml 병 — 아크릴 스탠드에 세워 진열 */}
+      <mesh position={[0, 0.78, 0]}>
+        <cylinderGeometry args={[0.44, 0.48, 0.06, 40]} />
+        <meshStandardMaterial color={P.stone} roughness={0.38} metalness={0.08} />
+      </mesh>
+      <CutoutStand
+        url="/images/cutout/mineral-1000.webp"
+        height={1.08}
+        position={[0, 0.81, 0]}
+        rotation={[0, 0.06, 0]}
+        lean={0.02}
+        shadowWidth={1.2}
+        onClick={() => onSelect(mineralProduct)}
+      />
 
-      {/* 뒤쪽 백라이트 포스터 (실물 사진) */}
-      <group position={[0, 2.9, -3.4]}>
-        <mesh position={[0, 0, -0.08]}>
-          <boxGeometry args={[4.5, 4.5, 0.14]} />
-          <meshStandardMaterial color="#fbf4e6" roughness={0.4} metalness={0.18} />
-        </mesh>
-        <mesh position={[0, 0, -0.02]}>
-          <boxGeometry args={[4.62, 4.62, 0.04]} />
-          <meshStandardMaterial color={P.brass} roughness={0.28} metalness={0.72} />
-        </mesh>
-        <PhotoPanel url="/images/oryun-poster.webp" width={3.7} height={3.7} position={[0, 0, 0.02]} frame={false} />
-        <mesh position={[0, -2.35, 0.02]}>
-          <boxGeometry args={[4.5, 0.03, 0.16]} />
-          <meshStandardMaterial color={P.gold} emissive={P.goldSoft} emissiveIntensity={0.5} metalness={0.7} roughness={0.28} toneMapped={false} />
-        </mesh>
-      </group>
+      {/* 위에서 떨어지는 따뜻한 펜던트 */}
+      <Pendant position={[0, 3.15, 0]} drop={1.0} radius={0.3} />
 
-      {/* 좌우 포인트 조명 기둥 */}
-      {[-6.5, 6.5].map((x) => (
-        <mesh key={x} position={[x, 2.3, 1.4]}>
-          <boxGeometry args={[0.05, 4.4, 0.05]} />
-          <meshStandardMaterial color={P.brass} emissive={P.goldSoft} emissiveIntensity={0.35} metalness={0.8} toneMapped={false} />
-        </mesh>
-      ))}
-
-      {/* 설명 패널 (좌 / 우) */}
-      <group position={[-3.25, 1.9, 2.55]} rotation={[0, 0.62, 0]}>
-        <mesh>
-          <boxGeometry args={[2.05, 1.5, 0.08]} />
-          <meshStandardMaterial color="#fdf8ee" roughness={0.38} metalness={0.14} />
-        </mesh>
-        <Panel texture={factLeft} width={1.95} height={1.36} position={[0, 0, 0.06]} />
-      </group>
-      <group position={[3.25, 1.9, 2.55]} rotation={[0, -0.62, 0]}>
-        <mesh>
-          <boxGeometry args={[2.05, 1.5, 0.08]} />
-          <meshStandardMaterial color="#fdf8ee" roughness={0.38} metalness={0.14} />
-        </mesh>
-        <Panel texture={factRight} width={1.95} height={1.36} position={[0, 0, 0.06]} />
-      </group>
-
-      {/* 받침대 앞 가격 명판 — 누르면 상세 */}
-      <group position={[0, 0, 1.3]}>
-        <Clickable onClick={() => onSelect(mineralProduct)} hoverScale={1.06}>
-          <mesh position={[0, 1.12, 0]} rotation={[-0.28, 0, 0]}>
-            <boxGeometry args={[1.46, 0.46, 0.07]} />
-            <meshStandardMaterial color="#fffdf8" roughness={0.3} metalness={0.22} />
+      {/* 뒤쪽 오크 슬랫 파티션 + 존 간판 */}
+      <group position={[0, 0, -2.6]}>
+        <SlatWall position={[0, 0, 0]} width={4.8} height={3.15} gap={0.22} color={P.oakLight} />
+        <LedStrip position={[0, 0.12, 0.14]} size={[4.4, 0.02, 0.03]} intensity={1.1} />
+        <group position={[0, 2.16, 0.14]}>
+          <mesh position={[0, 0, -0.03]}>
+            <boxGeometry args={[3.1, 0.94, 0.06]} />
+            <meshStandardMaterial color="#fbf5e8" roughness={0.45} metalness={0.1} />
           </mesh>
-          <Panel texture={price} width={1.4} height={0.44} position={[0, 1.12, 0.05]} rotation={[-0.28, 0, 0]} />
+          <Panel texture={brand} width={3.0} height={0.86} position={[0, 0, 0.02]} />
+        </group>
+      </group>
+
+      {/* 가격 명판 — 앞쪽 이젤 */}
+      <group position={[0, 0, 1.62]} rotation={[-0.36, 0, 0]}>
+        <Clickable onClick={() => onSelect(mineralProduct)} hoverScale={1.05}>
+          <mesh position={[0, 0.92, 0]}>
+            <boxGeometry args={[0.96, 0.36, 0.04]} />
+            <meshStandardMaterial color="#fbf5e8" roughness={0.4} metalness={0.12} />
+          </mesh>
+          <Panel texture={price} width={0.9} height={0.32} position={[0, 0.92, 0.025]} />
+          <mesh position={[0, 0.62, -0.05]} rotation={[0.22, 0, 0]}>
+            <boxGeometry args={[0.05, 0.5, 0.04]} />
+            <meshStandardMaterial color={P.oakDark} roughness={0.6} />
+          </mesh>
         </Clickable>
       </group>
+
+      {/* 좌우 설명 카드 — 테이블 옆에 비스듬히 */}
+      <group position={[-1.35, 0, 1.0]} rotation={[0, 0.72, 0]}>
+        <mesh position={[0, 0.62, 0]}>
+          <boxGeometry args={[0.04, 1.2, 0.04]} />
+          <meshStandardMaterial color={P.oakDark} roughness={0.6} />
+        </mesh>
+        <mesh position={[0, 1.02, 0]} rotation={[0, 0, 0.06]}>
+          <boxGeometry args={[0.86, 0.56, 0.035]} />
+          <meshStandardMaterial color="#fbf5e8" roughness={0.45} />
+        </mesh>
+        <Panel texture={factLeft} width={0.81} height={0.51} position={[0, 1.02, 0.022]} rotation={[0, 0, 0.06]} />
+      </group>
+      <group position={[1.35, 0, 1.0]} rotation={[0, -0.72, 0]}>
+        <mesh position={[0, 0.62, 0]}>
+          <boxGeometry args={[0.04, 1.2, 0.04]} />
+          <meshStandardMaterial color={P.oakDark} roughness={0.6} />
+        </mesh>
+        <mesh position={[0, 1.02, 0]} rotation={[0, 0, -0.06]}>
+          <boxGeometry args={[0.86, 0.56, 0.035]} />
+          <meshStandardMaterial color="#fbf5e8" roughness={0.45} />
+        </mesh>
+        <Panel texture={factRight} width={0.81} height={0.51} position={[0, 1.02, 0.022]} rotation={[0, 0, -0.06]} />
+      </group>
+
+      {/* 옆 화분 */}
+      <Plant position={[2.5, 0, 2.3]} scale={0.78} />
     </group>
   )
 }

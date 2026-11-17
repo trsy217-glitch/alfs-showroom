@@ -171,12 +171,124 @@ export function ZoneMarker({ zone, active, onGo }) {
           onGo(zone.id)
         }}
       >
-        <circleGeometry args={[0.62, 40]} />
+        <circleGeometry args={[0.46, 40]} />
         <meshBasicMaterial map={tex} transparent opacity={active || hover ? 1 : 0.86} toneMapped={false} depthWrite={false} />
       </mesh>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.002, 0]}>
-        <ringGeometry args={[0.6, 0.66, 40]} />
+        <ringGeometry args={[0.44, 0.49, 40]} />
         <meshBasicMaterial color={active ? P.gold : P.stoneEdge} transparent opacity={0.9} toneMapped={false} />
+      </mesh>
+    </group>
+  )
+}
+
+// ── 제품 누끼(투명 컷아웃) 진열 ──────────────────────────────
+// 실물 사진의 배경을 투명하게 따 둔 PNG/WebP 를, 아크릴 스탠드에 세워
+// 원목·스톤 테이블 위에 입체감 있게 놓습니다. (바닥 접지 그림자 + 살짝 기울임)
+export function CutoutStand({
+  url,
+  height = 0.5,
+  position = [0, 0, 0],
+  rotation = [0, 0, 0],
+  lean = 0.04,
+  onClick,
+  shadowWidth = 1,
+}) {
+  return (
+    <Suspense fallback={null}>
+      <CutoutInner url={url} height={height} position={position} rotation={rotation} lean={lean} onClick={onClick} shadowWidth={shadowWidth} />
+    </Suspense>
+  )
+}
+
+function CutoutInner({ url, height, position, rotation, lean, onClick, shadowWidth }) {
+  const base = useLoader(THREE.TextureLoader, url)
+  const [hover, setHover] = useState(false)
+  const tex = useMemo(() => {
+    const t = base.clone()
+    t.colorSpace = THREE.SRGBColorSpace
+    t.anisotropy = 8
+    t.needsUpdate = true
+    return t
+  }, [base])
+
+  const img = base.image
+  const ratio = img && img.width && img.height ? img.width / img.height : 0.4
+  const width = height * ratio
+  const shadow = useMemo(() => shadowTexture(), [])
+
+  return (
+    <group
+      position={position}
+      rotation={[rotation[0], rotation[1], rotation[2]]}
+      onPointerOver={(e) => {
+        if (!onClick) return
+        e.stopPropagation()
+        setHover(true)
+        document.body.style.cursor = 'pointer'
+      }}
+      onPointerOut={() => {
+        if (!onClick) return
+        setHover(false)
+        document.body.style.cursor = 'auto'
+      }}
+      onClick={(e) => {
+        if (!onClick) return
+        e.stopPropagation()
+        if (interaction.moved) return
+        onClick()
+      }}
+    >
+      {/* 접지 그림자 */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.004, 0]}>
+        <planeGeometry args={[width * 1.5 * shadowWidth, width * 0.62 * shadowWidth]} />
+        <meshBasicMaterial map={shadow} transparent opacity={0.5} depthWrite={false} />
+      </mesh>
+
+      {/* 아크릴 스탠드 — 받침 판 + 뒤판 */}
+      <mesh position={[0, 0.006, 0]}>
+        <boxGeometry args={[width * 0.52, 0.012, 0.16]} />
+        <meshStandardMaterial color="#ffffff" transparent opacity={0.34} roughness={0.08} metalness={0.1} />
+      </mesh>
+      <mesh position={[0, height * 0.4, -0.012]} rotation={[lean, 0, 0]}>
+        <boxGeometry args={[width * 0.92, height * 0.8, 0.006]} />
+        <meshStandardMaterial color="#fffaf0" transparent opacity={0.16} roughness={0.06} metalness={0.05} />
+      </mesh>
+
+      {/* 누끼 제품 */}
+      <group rotation={[lean, 0, 0]}>
+        <mesh position={[0, height / 2 + 0.02, 0]}>
+          <planeGeometry args={[width, height]} />
+          <meshBasicMaterial map={tex} transparent alphaTest={0.42} toneMapped={false} side={THREE.DoubleSide} />
+        </mesh>
+        {hover && (
+          <mesh position={[0, height / 2 + 0.02, -0.02]}>
+            <planeGeometry args={[width * 1.12, height * 1.06]} />
+            <meshBasicMaterial color={P.goldSoft} transparent opacity={0.22} toneMapped={false} />
+          </mesh>
+        )}
+        {/* 금속 이름 클립 */}
+        <mesh position={[0, 0.024, 0.045]}>
+          <boxGeometry args={[width * 0.34, 0.02, 0.02]} />
+          <meshStandardMaterial color={P.brass} metalness={0.8} roughness={0.28} />
+        </mesh>
+      </group>
+    </group>
+  )
+}
+
+// 간접 LED 라인 — 발광 띠 + 부드러운 번짐
+export function LedStrip({ position, size = [2, 0.02, 0.03], color = P.led, intensity = 1 }) {
+  const glow = useMemo(() => glowTexture(), [])
+  return (
+    <group position={position}>
+      <mesh>
+        <boxGeometry args={size} />
+        <meshBasicMaterial color={color} toneMapped={false} />
+      </mesh>
+      <mesh position={[0, -Math.max(size[0], size[2]) * 0.18, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[Math.max(size[0], size[2]) * 1.6, Math.max(size[0], size[2]) * 1.2]} />
+        <meshBasicMaterial map={glow} transparent opacity={0.12 * intensity} depthWrite={false} blending={THREE.AdditiveBlending} />
       </mesh>
     </group>
   )

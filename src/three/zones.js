@@ -1,5 +1,6 @@
-// 존 정의 — 카메라 프리셋 + 바닥 마커 위치
-// 프리셋은 target(바라보는 점)과 spherical(theta, phi, radius)로 표현합니다.
+// 존 정의 — 넓은 홀(26×22)의 5구역
+//  · 카메라 프리셋은 target(바라보는 점) + spherical(theta, phi, radius)
+//  · 01 로비 / 02 오륜미네랄 / 03 효소세상 / 04 성분·체험 / 05 파트너 라운지
 
 export const ZONES = [
   {
@@ -7,76 +8,98 @@ export const ZONES = [
     no: 1,
     name: '웰컴 로비',
     short: '로비',
-    desc: '지점 안내 · 명패',
-    target: [0, 1.45, 15.0],
-    radius: 8.2,
-    theta: 0,
+    desc: '지점 안내 · 상담 매니저',
+    target: [1.2, 1.5, 4.0],
+    theta: -0.05,
     phi: 1.5,
-    marker: [0, 0.02, 19.4],
-    bounds: [-7.6, 7.6, 10, 26],
+    radius: 6.2,
+    marker: [-0.6, 0.02, 8.9],
+    bounds: [-12, 12, 4, 10.5],
   },
   {
     id: 'mineral',
     no: 2,
-    name: '오륜미네랄 존',
+    name: '오륜미네랄 전시대',
     short: '오륜미네랄',
-    desc: '중앙 시그니처 · 1,000ml',
-    target: [0, 1.55, 4],
-    radius: 8.4,
-    theta: 0,
-    phi: 1.48,
-    marker: [0, 0.02, 8.4],
-    bounds: [-7.6, 7.6, -1, 10],
+    desc: '시그니처 · 1,000ml',
+    target: [-2.8, 1.34, 1.3],
+    theta: 0.06,
+    phi: 1.45,
+    radius: 6.0,
+    marker: [-4.4, 0.02, 4.4],
+    bounds: [-8, 3, -2, 6],
   },
   {
     id: 'enzyme',
     no: 3,
-    name: '효소세상 · 데일리 케어 존',
+    name: '효소세상 컬렉션',
     short: '효소세상',
-    desc: '6종 진열',
-    target: [0, 1.86, -11.9],
-    radius: 7.6,
-    theta: 0,
+    desc: '누끼 진열 6종',
+    target: [-10.6, 1.22, 0.0],
+    theta: 0.95,
     phi: 1.5,
-    marker: [0, 0.02, -5.6],
-    bounds: [-7.6, 7.6, -15, -5],
+    radius: 5.2,
+    marker: [-8.4, 0.02, 1.2],
+    bounds: [-12, -4, -6, 5],
   },
   {
-    id: 'simulator',
+    id: 'experience',
     no: 4,
-    name: '고객 루틴 시뮬레이터 존',
-    short: '루틴 시뮬레이터',
-    desc: '3문항 → 세트 추천',
-    target: [0, 1.45, -21.4],
-    radius: 6.8,
-    theta: 0,
-    phi: 1.52,
-    marker: [0, 0.02, -17.4],
-    bounds: [-7.2, 7.2, -28, -13],
+    name: '성분 · 체험 존',
+    short: '성분·체험',
+    desc: '성분 안내 · 루틴 진단',
+    target: [0, 1.5, -8.4],
+    theta: 0.02,
+    phi: 1.5,
+    radius: 6.7,
+    marker: [0, 0.02, -4.6],
+    bounds: [-7, 7, -10.5, -2],
+  },
+  {
+    id: 'lounge',
+    no: 5,
+    name: '파트너 라운지',
+    short: '라운지',
+    desc: '우드 라운지 · 상담',
+    target: [10.0, 1.3, 2.6],
+    theta: -1.95,
+    phi: 1.51,
+    radius: 7.7,
+    marker: [5.2, 0.02, 3.4],
+    bounds: [3, 12, -3, 8],
   },
 ]
 
 export const zoneById = (id) => ZONES.find((z) => z.id === id) ?? ZONES[0]
 
-// 효소세상 진열대 x 좌표 (EnzymeZone 과 같은 값)
-export const ENZYME_X = [-4.4, -2.64, -0.88, 0.88, 2.64, 4.4]
+// 효소세상 진열대 위 제품 z 좌표 (EnzymeZone 과 같은 값)
+export const ENZYME_Z = [2.45, 1.25, 0.05, -1.15, -2.35, -3.55]
+export const ENZYME_X = -11.05
+
+// 오륜미네랄 시그니처 병 위치
+export const MINERAL_POS = [-2.8, 0.9, 1.35]
 
 // 상품을 눌렀을 때 카메라가 부드럽게 다가가는 위치
 export function productFocus(product, narrow = false) {
   if (!product) return null
-  const detail = { theta: 0, phi: 1.42, radius: narrow ? 4.6 : 3.9 }
   if (product.zone === 'mineral') {
-    return { ...detail, target: [narrow ? 0 : 0.55, narrow ? 1.9 : 1.6, 4], radius: narrow ? 7.0 : 6.2 }
+    return {
+      target: [-2.8, narrow ? 1.55 : 1.45, 1.35],
+      theta: narrow ? 0.06 : 0.12,
+      phi: narrow ? 1.44 : 1.42,
+      radius: narrow ? 3.2 : 2.9,
+    }
   }
   const i = ['fit30', 'fit3', 'bioenergy', 'zymogen', 'cleanbiome', 'cleanbiome1'].indexOf(product.id)
-  const x = ENZYME_X[i >= 0 ? i : 3]
+  const z = ENZYME_Z[i >= 0 ? i : 3]
   return {
-    ...detail,
-    target: [x + (narrow ? 0 : 0.75), narrow ? 2.0 : 1.9, -12.1],
-    radius: narrow ? 3.9 : 3.3,
+    target: [ENZYME_X + 0.25, 1.06, z],
+    theta: narrow ? 1.3 : 1.24,
+    phi: 1.42,
+    radius: narrow ? 2.9 : 2.5,
   }
 }
 
-// 상담 직원(서연)이 서 있는 자리 — 웰컴 로비 안내 데스크 옆
-export const CONCIERGE_POS = [1.85, 0, 16.9]
-export const CONCIERGE_ROT = -0.22
+// 상담 매니저 서연이 서 있는 자리 — 로비 안내 데스크 옆
+export const CONCIERGE_POS = [2.7, 0, 6.3]
+export const CONCIERGE_ROT = -0.4

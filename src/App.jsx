@@ -9,6 +9,7 @@ import { Joystick } from './ui/Joystick.jsx'
 import { ProductPanel } from './ui/ProductPanel.jsx'
 import { AssistantDrawer } from './ui/AssistantDrawer.jsx'
 import { SimulatorPanel } from './ui/SimulatorPanel.jsx'
+import { StaffMenu } from './ui/StaffMenu.jsx'
 
 const readPartnerCode = () => {
   if (typeof window === 'undefined') return DEFAULT_PARTNER
@@ -33,8 +34,10 @@ export default function App() {
   const [product, setProduct] = useState(null)
   const [messages, setMessages] = useState([])
   const [assistantOpen, setAssistantOpen] = useState(false)
+  const [staffMenu, setStaffMenu] = useState(false)
+  const [nearStaff, setNearStaff] = useState(false)
+  const [greeting, setGreeting] = useState(false)
   const [simOpen, setSimOpen] = useState(false)
-  const [summoned, setSummoned] = useState(false)
   const [ready, setReady] = useState(false)
   const [hint, setHint] = useState(true)
   const textSize = useTextSize()
@@ -61,6 +64,17 @@ export default function App() {
     return () => window.clearTimeout(t)
   }, [])
 
+  // 입장 인사 — 카브제처럼 잠깐 "어서오세요" 안내가 떠오릅니다
+  useEffect(() => {
+    if (!ready) return undefined
+    const a = window.setTimeout(() => setGreeting(true), 500)
+    const b = window.setTimeout(() => setGreeting(false), 4200)
+    return () => {
+      window.clearTimeout(a)
+      window.clearTimeout(b)
+    }
+  }, [ready])
+
   const goZone = useCallback((id) => {
     setProduct(null)
     setZoneId(id)
@@ -80,20 +94,17 @@ export default function App() {
   }, [])
 
   const summon = useCallback(() => {
-    setSummoned(true)
-    setAssistantOpen(true)
+    setStaffMenu(true)
   }, [])
 
   const closeAssistant = useCallback(() => {
     setAssistantOpen(false)
-    setSummoned(false)
   }, [])
 
   const ask = useCallback(
     (question) => {
       const q = String(question || '').trim()
       if (!q) return
-      setSummoned(true)
       setAssistantOpen(true)
       const r = respond(q, partner)
       setMessages((prev) => [
@@ -115,12 +126,12 @@ export default function App() {
           zoneId={zoneId}
           glideKey={glideKey}
           focus={focus}
-          summoned={summoned}
           talking={assistantOpen}
           onGo={goZone}
           onSelect={openProduct}
           onSummon={summon}
           onOpenSimulator={() => setSimOpen(true)}
+          onNearStaff={setNearStaff}
           onReady={() => window.setTimeout(() => setReady(true), 120)}
         />
       </div>
@@ -135,7 +146,7 @@ export default function App() {
         textSize={textSize}
         onTextSize={setTextSize}
       />
-      <Hint show={hint && ready && !assistantOpen} />
+      <Hint show={hint && ready && !assistantOpen && !staffMenu} />
 
       <Joystick />
 
@@ -147,7 +158,25 @@ export default function App() {
 
       <ChapterBar zoneId={zoneId} onGo={goZone} />
 
+      {greeting && <div className="greet-tip" data-testid="greet-tip">어서오세요. {partner.name}입니다.</div>}
+
+      {nearStaff && !staffMenu && !assistantOpen && !product && (
+        <button type="button" className="staff-prompt" onClick={summon} data-testid="staff-prompt">
+          <span className="staff-prompt__dot" aria-hidden="true" />
+          서연에게 말 걸기
+        </button>
+      )}
+
       <ProductPanel product={product} partner={partner} onClose={() => setProduct(null)} onAsk={ask} onGo={goZone} />
+
+      <StaffMenu
+        partner={partner}
+        open={staffMenu}
+        onClose={() => setStaffMenu(false)}
+        onAsk={ask}
+        onOpenSimulator={() => setSimOpen(true)}
+        onOpenProduct={openProduct}
+      />
 
       <AssistantDrawer
         partner={partner}

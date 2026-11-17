@@ -1465,11 +1465,374 @@ body {
     top: 100px;
     font-size: calc(11.5px * var(--t));
   }
+
+  .chapter__label small {
+    display: none;
+  }
+
+  .chapter {
+    min-height: 52px;
+  }
+
+  .greet-tip {
+    top: calc(112px + env(safe-area-inset-top, 0px));
+    font-size: calc(12px * var(--t));
+  }
+
+  .staff-prompt {
+    bottom: calc(74px + var(--safe-b));
+  }
+
+  .cta-stack {
+    display: none;
+  }
+
+  .chapter {
+    padding: 6px 2px;
+  }
+
+  .chapter__no {
+    width: 21px;
+    height: 21px;
+    font-size: calc(11px * var(--t));
+  }
+
+  .chapter__label b {
+    font-size: calc(10.5px * var(--t));
+  }
+
+}
+
+@keyframes sheetUp {
+  from {
+    transform: translateY(26px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ── 상담 매니저 메뉴 · 입장 인사 · 말 걸기 ─────────── */
+/* 카브제 팝업스토어의 점원처럼: 점원에게 다가가면 [말 걸기], 누르면 "무엇을 도와드릴까요?" */
+.greet-tip {
+  position: absolute;
+  top: calc(74px + env(safe-area-inset-top, 0px));
+  left: 50%;
+  z-index: 19;
+  transform: translateX(-50%);
+  padding: 9px 17px;
+  border-radius: 999px;
+  background: rgba(255, 253, 248, 0.94);
+  border: 1px solid rgba(176, 141, 87, 0.3);
+  box-shadow: var(--shadow-sm);
+  font-size: calc(13px * var(--t));
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+  animation: greetIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  pointer-events: none;
+}
+
+@keyframes greetIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.staff-prompt {
+  position: absolute;
+  left: 50%;
+  bottom: calc(92px + var(--safe-b));
+  z-index: 22;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 19px;
+  border-radius: 999px;
+  border: 1px solid rgba(176, 141, 87, 0.38);
+  background: rgba(255, 253, 248, 0.96);
+  box-shadow: var(--shadow);
+  font: inherit;
+  font-size: calc(13px * var(--t));
+  font-weight: 700;
+  color: var(--ink);
+  cursor: pointer;
+  animation: greetIn 0.32s ease both;
+}
+
+.staff-prompt:hover {
+  border-color: rgba(176, 141, 87, 0.65);
+}
+
+.staff-prompt__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #7fa36a;
+  box-shadow: 0 0 0 4px rgba(127, 163, 106, 0.18);
+}
+
+.staffsheet {
+  position: absolute;
+  inset: 0;
+  z-index: 26;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  padding: calc(66px + env(safe-area-inset-top, 0px)) 16px 16px;
+  pointer-events: none;
+}
+
+.staffsheet__scrim {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  background: rgba(47, 37, 28, 0.14);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.staffsheet__panel {
+  position: relative;
+  z-index: 1;
+  pointer-events: auto;
+  width: min(430px, 100%);
+  max-height: calc(100vh - 110px);
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #fffdf7, #f8f1e4);
+  border: 1px solid rgba(176, 141, 87, 0.28);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  animation: sheetUp 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.staffsheet__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 14px 12px;
+  border-bottom: 1px solid var(--line-soft);
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.staffsheet__avatar img {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(176, 141, 87, 0.45);
+}
+
+.staffsheet__who {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  flex: 1;
+}
+
+.staffsheet__who b {
+  font-size: calc(15px * var(--t));
+  letter-spacing: -0.01em;
+}
+
+.staffsheet__who small {
+  font-size: calc(11.5px * var(--t));
+  color: var(--muted);
+}
+
+.staffsheet__pill {
+  flex: none;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: rgba(74, 58, 40, 0.07);
+  color: var(--muted);
+  font-size: calc(10.5px * var(--t));
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.staffsheet__pill.is-on {
+  background: rgba(127, 163, 106, 0.18);
+  color: #4d663d;
+}
+
+.staffsheet__rows {
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  overflow-y: auto;
+}
+
+.staffsheet__rows--products {
+  max-height: min(54vh, 460px);
+}
+
+.srow {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  padding: 11px 10px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  font: inherit;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+
+.srow:hover {
+  background: rgba(176, 141, 87, 0.1);
+}
+
+.srow__ic {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: rgba(176, 141, 87, 0.13);
+  color: var(--gold-deep);
+  font-size: 14px;
+}
+
+.srow__tx {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  flex: 1;
+}
+
+.srow__tx b {
+  font-size: calc(13.5px * var(--t));
+  font-weight: 700;
+}
+
+.srow__tx small {
+  font-size: calc(11.5px * var(--t));
+  color: var(--muted);
+}
+
+.srow__chev {
+  flex: none;
+  color: var(--muted);
+  font-size: calc(15px * var(--t));
+  line-height: 1;
+}
+
+.srow--back {
+  padding: 8px 10px;
+  gap: 8px;
+  color: var(--gold-deep);
+}
+
+.srow--product {
+  padding: 5px 8px;
+  gap: 6px;
+}
+
+.srow__main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  padding: 4px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  color: var(--ink);
+}
+
+.srow__thumb {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 9px;
+  background: #fff;
+  border: 1px solid var(--line-soft);
+  overflow: hidden;
+}
+
+.srow__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.srow__mini {
+  flex: none;
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(176, 141, 87, 0.38);
+  background: #fffdf8;
+  color: var(--gold-deep);
+  font: inherit;
+  font-size: calc(11px * var(--t));
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.staffsheet__note {
+  margin: 6px 12px 8px;
+  font-size: calc(11px * var(--t));
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.staffsheet__foot {
+  flex: none;
+  padding: 10px 14px;
+  background: rgba(74, 58, 40, 0.045);
+  border-top: 1px solid var(--line-soft);
+  font-size: calc(10.5px * var(--t));
+  line-height: 1.45;
+  color: var(--muted);
+  text-align: center;
 }
 
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.001s !important;
     transition-duration: 0.001s !important;
+  }
+}
+
+/* ── 좁은 화면용 상담 메뉴 (아래에서 올라오는 시트) ── */
+@media (max-width: 760px) {
+  .staffsheet {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .staffsheet__panel {
+    width: 100%;
+    max-height: 82vh;
+    border-radius: 20px 20px 0 0;
+  }
+
+  .staffsheet__rows--products {
+    max-height: 48vh;
   }
 }

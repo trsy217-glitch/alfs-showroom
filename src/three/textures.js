@@ -8,20 +8,32 @@ import { getTextScale } from '../lib/textSize.js'
 // ─────────────────────────────────────────────────────────────
 
 const C = {
-  paper: '#fffdf8',
-  ivory: '#fbf6ea',
-  sand: '#f4ecdd',
-  line: 'rgba(74,58,40,0.14)',
-  ink: '#2c251e',
-  inkSoft: '#4a4038',
-  muted: '#8a7c6b',
-  gold: '#b08d57',
-  goldSoft: '#dcc79f',
-  goldDeep: '#8c6e3e',
-  espresso: '#3b2f26',
+  paper: '#fffdf7',
+  ivory: '#fbf5e8',
+  sand: '#f3ead9',
+  line: 'rgba(80,62,42,0.14)',
+  ink: '#2f2822',
+  inkSoft: '#4b4038',
+  muted: '#8b7d6c',
+  gold: '#a8854f',
+  goldSoft: '#dcc7a1',
+  goldDeep: '#86683c',
+  espresso: '#3a3027',
 }
 
 const cache = new Map()
+let cacheScale = getTextScale()
+
+// 글자 크기가 바뀌면 이전 배율로 만든 텍스처는 더 이상 쓰이지 않습니다.
+// (캐시에 두 배로 쌓여 GPU 메모리를 잡아먹지 않도록 정리합니다)
+function syncScale() {
+  const scale = getTextScale()
+  if (scale !== cacheScale) {
+    for (const tex of cache.values()) tex.dispose()
+    cache.clear()
+    cacheScale = scale
+  }
+}
 
 export const KFONT =
   "'Pretendard','Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic','맑은 고딕',system-ui,sans-serif"
@@ -30,6 +42,7 @@ export const KFONT_SERIF = "'Cormorant Garamond','Didot','Nanum Myeongjo',Georgi
 const FS = (n) => Math.max(9, Math.round(n * getTextScale()))
 
 export function makeTexture(key, w, h, draw) {
+  syncScale()
   const k = `${getTextScale()}::${key}`
   if (cache.has(k)) return cache.get(k)
   const canvas = document.createElement('canvas')
@@ -530,6 +543,342 @@ export function staffBadgeTexture({ key, name, role, accent = C.gold }) {
     ctx.fillText('눌러서 상담', w - 46, 168)
     ctx.textAlign = 'left'
     void nameSize
+  })
+}
+
+// ─────────────────────────────────────────────────────────────
+// 우드 · 크림 라운지 톤을 위한 재질 텍스처 (2026-11-17 재구축)
+// ─────────────────────────────────────────────────────────────
+
+// 바닥 — 밝은 내추럴 오크 플랭크 (결 방향은 z축)
+export function oakFloorTexture() {
+  return makeTexture('oak-floor', 1024, 1024, (ctx, w, h) => {
+    ctx.fillStyle = '#cfae86'
+    ctx.fillRect(0, 0, w, h)
+    const cols = 4
+    const pw = w / cols
+    for (let c = 0; c < cols; c += 1) {
+      const x0 = c * pw
+      // 플랭크 한 장의 기본 색
+      const base = 0.92 + Math.random() * 0.12
+      ctx.fillStyle = `rgba(${Math.round(202 * base)},${Math.round(180 * base)},${Math.round(150 * base)},1)`
+      ctx.fillRect(x0, 0, pw, h)
+      // 결
+      for (let i = 0; i < 26; i += 1) {
+        const x = x0 + 6 + Math.random() * (pw - 12)
+        ctx.beginPath()
+        ctx.moveTo(x, -20)
+        let xx = x
+        for (let y = 0; y <= h + 20; y += 48) {
+          xx += (Math.random() - 0.5) * 7
+          ctx.lineTo(xx, y)
+        }
+        ctx.strokeStyle = `rgba(132,108,80,${0.035 + Math.random() * 0.06})`
+        ctx.lineWidth = 0.7 + Math.random() * 1.6
+        ctx.stroke()
+      }
+      // 옹이
+      for (let i = 0; i < 2; i += 1) {
+        const kx = x0 + 20 + Math.random() * (pw - 40)
+        const ky = Math.random() * h
+        const r = 5 + Math.random() * 9
+        const g = ctx.createRadialGradient(kx, ky, 1, kx, ky, r)
+        g.addColorStop(0, 'rgba(120,84,50,0.5)')
+        g.addColorStop(1, 'rgba(120,84,50,0)')
+        ctx.fillStyle = g
+        ctx.beginPath()
+        ctx.arc(kx, ky, r, 0, 7)
+        ctx.fill()
+      }
+      // 이음선
+      ctx.fillStyle = 'rgba(120,96,68,0.42)'
+      ctx.fillRect(x0 - 1.2, 0, 2.4, h)
+      ctx.fillStyle = 'rgba(255,248,236,0.14)'
+      ctx.fillRect(x0 + 2, 0, 1.4, h)
+    }
+    // 플랭크 끝 이음 (번갈아)
+    for (let c = 0; c < cols; c += 1) {
+      const y = ((c * 0.37 + 0.15) % 1) * h
+      ctx.fillStyle = 'rgba(112,82,52,0.4)'
+      ctx.fillRect(c * pw, y, pw, 3)
+    }
+    // 전체 미세 결
+    for (let i = 0; i < 1400; i += 1) {
+      ctx.fillStyle = `rgba(120,90,60,${0.01 + Math.random() * 0.03})`
+      ctx.fillRect(Math.random() * w, Math.random() * h, 1.6, 3 + Math.random() * 6)
+    }
+  })
+}
+
+// 벽 — 크림 미장(플라스터)
+export function plasterTexture() {
+  return makeTexture('plaster', 512, 512, (ctx, w, h) => {
+    const g = ctx.createLinearGradient(0, 0, 0, h)
+    g.addColorStop(0, '#f7efe2')
+    g.addColorStop(0.55, '#f2e8d9')
+    g.addColorStop(1, '#ece0ce')
+    ctx.fillStyle = g
+    ctx.fillRect(0, 0, w, h)
+    for (let i = 0; i < 5200; i += 1) {
+      const a = 0.012 + Math.random() * 0.03
+      ctx.fillStyle = Math.random() < 0.5 ? `rgba(255,252,244,${a})` : `rgba(150,128,102,${a * 0.8})`
+      ctx.fillRect(Math.random() * w, Math.random() * h, 1 + Math.random() * 2.4, 1 + Math.random() * 2.4)
+    }
+  })
+}
+
+// 오크 목재 (세로 결) — 가구·선반·패널
+export function oakGrainTexture() {
+  return makeTexture('oak-grain', 512, 512, (ctx, w, h) => {
+    ctx.fillStyle = '#cba97e'
+    ctx.fillRect(0, 0, w, h)
+    for (let i = 0; i < 70; i += 1) {
+      const x = Math.random() * w
+      ctx.beginPath()
+      ctx.moveTo(x, -10)
+      let xx = x
+      for (let y = 0; y <= h + 10; y += 40) {
+        xx += (Math.random() - 0.5) * 6
+        ctx.lineTo(xx, y)
+      }
+      ctx.strokeStyle = `rgba(140,104,66,${0.05 + Math.random() * 0.1})`
+      ctx.lineWidth = 0.6 + Math.random() * 1.8
+      ctx.stroke()
+    }
+    for (let i = 0; i < 2000; i += 1) {
+      ctx.fillStyle = `rgba(255,244,226,${0.02 + Math.random() * 0.05})`
+      ctx.fillRect(Math.random() * w, Math.random() * h, 1.6, 2.6)
+    }
+  })
+}
+
+// 트라버틴 계열 베이지 스톤 (상판)
+export function stoneTexture() {
+  return makeTexture('stone', 512, 512, (ctx, w, h) => {
+    ctx.fillStyle = '#eee5d6'
+    ctx.fillRect(0, 0, w, h)
+    for (let i = 0; i < 90; i += 1) {
+      const x = Math.random() * w
+      const y = Math.random() * h
+      const r = 8 + Math.random() * 60
+      const g = ctx.createRadialGradient(x, y, 0, x, y, r)
+      g.addColorStop(0, `rgba(206,188,163,${0.1 + Math.random() * 0.16})`)
+      g.addColorStop(1, 'rgba(206,188,163,0)')
+      ctx.fillStyle = g
+      ctx.beginPath()
+      ctx.arc(x, y, r, 0, 7)
+      ctx.fill()
+    }
+    for (let i = 0; i < 40; i += 1) {
+      ctx.strokeStyle = `rgba(176,154,126,${0.06 + Math.random() * 0.1})`
+      ctx.lineWidth = 0.8 + Math.random() * 1.4
+      ctx.beginPath()
+      ctx.moveTo(Math.random() * w, Math.random() * h)
+      ctx.lineTo(Math.random() * w, Math.random() * h)
+      ctx.stroke()
+    }
+  })
+}
+
+// 크림 린넨 패브릭 (소파·쿠션)
+export function linenTexture() {
+  return makeTexture('linen', 512, 512, (ctx, w, h) => {
+    ctx.fillStyle = '#e8dcc6'
+    ctx.fillRect(0, 0, w, h)
+    for (let y = 0; y < h; y += 3) {
+      ctx.fillStyle = `rgba(255,250,238,${0.16 + Math.random() * 0.1})`
+      ctx.fillRect(0, y, w, 1.4)
+    }
+    for (let x = 0; x < w; x += 3) {
+      ctx.fillStyle = `rgba(190,170,140,${0.06 + Math.random() * 0.08})`
+      ctx.fillRect(x, 0, 1.2, h)
+    }
+    for (let i = 0; i < 1500; i += 1) {
+      ctx.fillStyle = `rgba(160,140,112,${Math.random() * 0.06})`
+      ctx.fillRect(Math.random() * w, Math.random() * h, 2, 2)
+    }
+  })
+}
+
+// 울 러그 — 도톰한 직조 + 테두리
+export function woolTexture() {
+  return makeTexture('wool', 1024, 1024, (ctx, w, h) => {
+    ctx.fillStyle = '#e9dfcc'
+    ctx.fillRect(0, 0, w, h)
+    for (let i = 0; i < 9000; i += 1) {
+      const x = Math.random() * w
+      const y = Math.random() * h
+      ctx.fillStyle = Math.random() < 0.5 ? `rgba(255,250,238,${0.05 + Math.random() * 0.12})` : `rgba(178,158,130,${0.03 + Math.random() * 0.09})`
+      ctx.fillRect(x, y, 2 + Math.random() * 5, 1 + Math.random() * 2)
+    }
+    for (let y = 0; y < h; y += 26) {
+      ctx.fillStyle = 'rgba(190,172,146,0.05)'
+      ctx.fillRect(0, y, w, 10)
+    }
+    // 테두리 띠
+    ctx.strokeStyle = 'rgba(196,176,146,0.5)'
+    ctx.lineWidth = 16
+    ctx.strokeRect(26, 26, w - 52, h - 52)
+    ctx.strokeStyle = 'rgba(255,250,240,0.4)'
+    ctx.lineWidth = 4
+    ctx.strokeRect(46, 46, w - 92, h - 92)
+  })
+}
+
+// 책장 한 칸의 책등 — 크림 · 우드 · 차콜 · 세이지 톤
+export function booksTexture({ key = 'books', seed = 1, count = 26 } = {}) {
+  return makeTexture(`${key}-${seed}`, 1200, 300, (ctx, w, h) => {
+    let rand = seed * 9301 + 49297
+    const rnd = () => {
+      rand = (rand * 9301 + 49297) % 233280
+      return rand / 233280
+    }
+    ctx.clearRect(0, 0, w, h)
+    const palette = ['#d9c9ae', '#b7a184', '#8d7a62', '#4b423a', '#6d7a63', '#a9744f', '#e5d9c4', '#3d3a37', '#c3ab86', '#8f9a86']
+    let x = 0
+    while (x < w) {
+      const bw = 12 + rnd() * 26
+      const gapH = 6 + rnd() * 40
+      const bh = h - gapH - 4
+      const col = palette[Math.floor(rnd() * palette.length)]
+      ctx.fillStyle = col
+      ctx.fillRect(x, h - bh - 2, bw - 2, bh)
+      // 책등의 세로 띠 · 글자 느낌
+      ctx.fillStyle = 'rgba(255,250,240,0.28)'
+      ctx.fillRect(x + 2, h - bh + 12, bw - 6, 2)
+      ctx.fillStyle = 'rgba(255,250,240,0.2)'
+      ctx.fillRect(x + 2, h - bh + 30, bw - 8, 1.6)
+      ctx.fillStyle = 'rgba(0,0,0,0.12)'
+      ctx.fillRect(x + bw - 3.5, h - bh - 2, 1.6, bh)
+      x += bw
+    }
+    // 아랫면 그늘
+    const g = ctx.createLinearGradient(0, h - 24, 0, h)
+    g.addColorStop(0, 'rgba(60,44,30,0)')
+    g.addColorStop(1, 'rgba(60,44,30,0.35)')
+    ctx.fillStyle = g
+    ctx.fillRect(0, h - 24, w, 24)
+  })
+}
+
+// 추상 수묵 아트 (라운지 액자)
+export function artTexture({ key = 'art', variant = 0 } = {}) {
+  return makeTexture(key, 900, 1080, (ctx, w, h) => {
+    ctx.fillStyle = '#f6efe1'
+    ctx.fillRect(0, 0, w, h)
+    const seed = variant + 3
+    let rand = seed * 7919
+    const rnd = () => {
+      rand = (rand * 9301 + 49297) % 233280
+      return rand / 233280
+    }
+    for (let i = 0; i < 9; i += 1) {
+      const x = w * (0.18 + rnd() * 0.62)
+      const y = h * (0.2 + rnd() * 0.55)
+      const r = 60 + rnd() * 190
+      const g = ctx.createRadialGradient(x, y, 2, x, y, r)
+      const dark = rnd() < 0.55
+      g.addColorStop(0, dark ? `rgba(58,52,46,${0.1 + rnd() * 0.16})` : `rgba(150,120,92,${0.08 + rnd() * 0.12})`)
+      g.addColorStop(1, 'rgba(58,52,46,0)')
+      ctx.fillStyle = g
+      ctx.beginPath()
+      ctx.arc(x, y, r, 0, 7)
+      ctx.fill()
+    }
+    // 붓 터치
+    for (let i = 0; i < 26; i += 1) {
+      ctx.beginPath()
+      const x = w * (0.2 + rnd() * 0.6)
+      const y = h * (0.2 + rnd() * 0.6)
+      ctx.moveTo(x, y)
+      ctx.bezierCurveTo(x + rnd() * 120, y + rnd() * 60, x + rnd() * 160, y + rnd() * 90, x + rnd() * 200, y + rnd() * 120)
+      ctx.strokeStyle = rnd() < 0.6 ? `rgba(72,64,56,${0.05 + rnd() * 0.12})` : `rgba(158,104,66,${0.05 + rnd() * 0.1})`
+      ctx.lineWidth = 2 + rnd() * 16
+      ctx.lineCap = 'round'
+      ctx.stroke()
+    }
+    // 종이 질감
+    for (let i = 0; i < 2400; i += 1) {
+      ctx.fillStyle = `rgba(120,104,86,${Math.random() * 0.04})`
+      ctx.fillRect(Math.random() * w, Math.random() * h, 2, 2)
+    }
+  })
+}
+
+// 창밖 정원 — 하늘 · 숲 · 잔디 (큰 통창 너머 배경)
+export function foliageTexture() {
+  return makeTexture('foliage', 1600, 1000, (ctx, w, h) => {
+    // 하늘
+    const sky = ctx.createLinearGradient(0, 0, 0, h * 0.55)
+    sky.addColorStop(0, '#eef1e2')
+    sky.addColorStop(0.6, '#e4ead2')
+    sky.addColorStop(1, '#d9e2c2')
+    ctx.fillStyle = sky
+    ctx.fillRect(0, 0, w, h)
+    // 잔디
+    const grass = ctx.createLinearGradient(0, h * 0.62, 0, h)
+    grass.addColorStop(0, '#9aa96f')
+    grass.addColorStop(1, '#7d8f57')
+    ctx.fillStyle = grass
+    ctx.fillRect(0, h * 0.62, w, h * 0.38)
+
+    // 먼 숲 (진한 초록 덩어리)
+    const bands = [
+      { y: 0.58, col: '#8ea172', r: [70, 190], n: 46 },
+      { y: 0.52, col: '#6f8657', r: [50, 150], n: 60 },
+      { y: 0.44, col: '#5b7247', r: [30, 110], n: 70 },
+      { y: 0.34, col: '#4a6039', r: [16, 70], n: 90 },
+    ]
+    for (const b of bands) {
+      for (let i = 0; i < b.n; i += 1) {
+        const x = Math.random() * w
+        const y = h * b.y + (Math.random() - 0.5) * h * 0.16
+        const r = b.r[0] + Math.random() * (b.r[1] - b.r[0])
+        const g = ctx.createRadialGradient(x, y, 1, x, y, r)
+        g.addColorStop(0, b.col)
+        g.addColorStop(0.65, b.col)
+        g.addColorStop(1, 'rgba(74,96,57,0)')
+        ctx.globalAlpha = 0.55 + Math.random() * 0.35
+        ctx.fillStyle = g
+        ctx.beginPath()
+        ctx.arc(x, y, r, 0, 7)
+        ctx.fill()
+      }
+    }
+    ctx.globalAlpha = 1
+
+    // 나무 줄기 몇 그루
+    for (let i = 0; i < 7; i += 1) {
+      const x = w * (0.07 + Math.random() * 0.86)
+      const top = h * (0.18 + Math.random() * 0.2)
+      ctx.fillStyle = 'rgba(96,78,58,0.55)'
+      ctx.fillRect(x, top, 8 + Math.random() * 14, h * 0.62 - top)
+      for (let k = 0; k < 5; k += 1) {
+        const cx = x + (Math.random() - 0.5) * 160
+        const cy = top + Math.random() * 120
+        const r = 40 + Math.random() * 80
+        const g = ctx.createRadialGradient(cx, cy, 1, cx, cy, r)
+        g.addColorStop(0, 'rgba(74,96,57,0.85)')
+        g.addColorStop(1, 'rgba(74,96,57,0)')
+        ctx.fillStyle = g
+        ctx.beginPath()
+        ctx.arc(cx, cy, r, 0, 7)
+        ctx.fill()
+      }
+    }
+
+    // 잔디 위 빛 · 그림자
+    for (let i = 0; i < 90; i += 1) {
+      const x = Math.random() * w
+      const y = h * (0.62 + Math.random() * 0.38)
+      ctx.fillStyle = `rgba(255,250,214,${0.03 + Math.random() * 0.07})`
+      ctx.fillRect(x, y, 30 + Math.random() * 90, 6 + Math.random() * 14)
+    }
+    const sun = ctx.createRadialGradient(w * 0.66, h * 0.12, 10, w * 0.66, h * 0.12, w * 0.45)
+    sun.addColorStop(0, 'rgba(255,250,226,0.85)')
+    sun.addColorStop(1, 'rgba(255,250,226,0)')
+    ctx.fillStyle = sun
+    ctx.fillRect(0, 0, w, h)
   })
 }
 

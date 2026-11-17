@@ -1,45 +1,25 @@
 import { useMemo } from 'react'
 import { enzymeProducts, won } from '../config/catalog.js'
 import { panelTexture, plaqueTexture, signTexture } from './textures.js'
-import { Panel, PhotoPanel, Clickable, Bottle, ShadowDisc } from './parts.jsx'
+import { Panel, Clickable, CutoutStand, ShadowDisc, LedStrip } from './parts.jsx'
 import { P } from './palette.js'
 import { useTextSize } from '../lib/textSize.js'
-import { ENZYME_X as X_POS } from './zones.js'
+import { ENZYME_Z, ENZYME_X } from './zones.js'
+import { Plant, SlatWall, Vase, useOak, useStone } from './furniture.jsx'
 
-function Pouch({ position, color = '#f8f1e2', accent = P.gold, label }) {
-  const ts = useTextSize()
-  const tex = useMemo(
-    () =>
-      plaqueTexture({
-        key: `pouch-${label?.name}-${label?.volume}`,
-        name: label?.name ?? '',
-        price: label?.volume ?? '',
-        note: '',
-        accent,
-      }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [label, accent, ts],
-  )
-  return (
-    <group position={position}>
-      <mesh position={[0, 0.34, 0]}>
-        <boxGeometry args={[0.5, 0.66, 0.18]} />
-        <meshStandardMaterial color={color} roughness={0.55} metalness={0.05} />
-      </mesh>
-      <mesh position={[0, 0.66, 0]}>
-        <boxGeometry args={[0.44, 0.03, 0.11]} />
-        <meshStandardMaterial color={P.brass} metalness={0.6} roughness={0.3} />
-      </mesh>
-      <mesh position={[0, 0.35, 0.093]}>
-        <planeGeometry args={[0.44, 0.26]} />
-        <meshBasicMaterial map={tex} transparent toneMapped={false} />
-      </mesh>
-    </group>
-  )
+// ── ③ 효소세상 컬렉션 — 오크 진열 벤치 위 누끼 6종 ─────────────────
+const CUTOUT = {
+  fit30: { url: '/images/cutout/fit30.webp', h: 0.6 },
+  fit3: { url: '/images/cutout/fit3.webp', h: 0.58 },
+  bioenergy: { url: '/images/cutout/bioenergy.webp', h: 0.55 },
+  zymogen: { url: '/images/cutout/zymogen.webp', h: 0.42 },
+  cleanbiome: { url: '/images/cutout/cleanbiome6.webp', h: 0.6 },
+  cleanbiome1: { url: '/images/cutout/cleanbiome1.webp', h: 0.48 },
 }
 
-function Display({ product, x, partner, onSelect }) {
+function ProductStand({ product, partner, z, onSelect }) {
   const ts = useTextSize()
+  const meta = CUTOUT[product.id] ?? CUTOUT.fit30
   const plaque = useMemo(
     () =>
       plaqueTexture({
@@ -52,67 +32,36 @@ function Display({ product, x, partner, onSelect }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [product, partner, ts],
   )
-  const isPouch = /포|3일/.test(product.volume) && !/병/.test(product.volume)
 
   return (
-    <group position={[x, 0, -12.4]}>
-      <Clickable onClick={() => onSelect(product)} hoverScale={1.03}>
-        <mesh position={[0, 0.74, 0.15]}>
-          <boxGeometry args={[0.95, 0.14, 0.95]} />
-          <meshStandardMaterial color="#fbf4e7" roughness={0.28} metalness={0.22} />
+    <group position={[ENZYME_X, 0.845, z]}>
+      <CutoutStand
+        url={meta.url}
+        height={meta.h}
+        rotation={[0, Math.PI / 2, 0]}
+        lean={0.03}
+        shadowWidth={0.95}
+        onClick={() => onSelect(product)}
+      />
+      {/* 앞쪽 이름표 — 진열대 끝에 살짝 기울여 세운 카드 */}
+      <group position={[0.5, 0.0, 0.02]} rotation={[0, Math.PI / 2, 0]}>
+        <mesh position={[0, 0.15, -0.05]} rotation={[-0.62, 0, 0]}>
+          <boxGeometry args={[0.52, 0.22, 0.02]} />
+          <meshStandardMaterial color="#fbf5e8" roughness={0.45} metalness={0.1} />
         </mesh>
-        <mesh position={[0, 0.815, 0.15]}>
-          <boxGeometry args={[0.97, 0.006, 0.97]} />
-          <meshStandardMaterial color={P.brass} metalness={0.85} roughness={0.24} />
-        </mesh>
-
-        {/* 제품 실물 사진 (갤러리 벽) */}
-        <group position={[0, 2.12, -0.62]}>
-          <mesh position={[0, 0, -0.05]}>
-            <boxGeometry args={[1.5, 1.5, 0.08]} />
-            <meshStandardMaterial color="#fdf8ee" roughness={0.4} metalness={0.18} />
-          </mesh>
-          <PhotoPanel url={product.image} width={1.38} height={1.38} position={[0, 0, 0]} frame={false} />
-          <mesh position={[0, -0.72, 0.02]}>
-            <boxGeometry args={[1.42, 0.018, 0.02]} />
-            <meshStandardMaterial color={P.brass} emissive={P.goldSoft} emissiveIntensity={0.45} metalness={0.8} roughness={0.25} />
-          </mesh>
-        </group>
-
-        {/* 실물 병/파우치 */}
-        {isPouch ? (
-          <Pouch position={[0, 0.82, 0.2]} label={{ name: product.name, volume: product.badge }} accent={partner.accent} />
-        ) : (
-          <Bottle
-            position={[0, 0.82, 0.2]}
-            height={0.62}
-            radius={0.145}
-            body={product.id === 'zymogen' ? '#e6eee6' : '#f3f7f1'}
-            cap={product.id === 'zymogen' ? '#8c6e3e' : '#e9d6ab'}
-            label={{ name: product.name, volume: product.badge }}
-            labelAccent={partner.accent}
-            drop={false}
-            glow={false}
-          />
-        )}
-
-        {/* 이름 · 가격 명판 */}
-        <group position={[0, 1.11, 0.78]} rotation={[-0.3, 0, 0]}>
-          <mesh position={[0, 0, -0.02]}>
-            <boxGeometry args={[1.42, 0.46, 0.04]} />
-            <meshStandardMaterial color="#fffdf8" roughness={0.32} metalness={0.2} />
-          </mesh>
-          <Panel texture={plaque} width={1.36} height={0.44} position={[0, 0, 0.012]} />
-        </group>
-      </Clickable>
-      <ShadowDisc radius={0.85} position={[0, 0.012, 0.35]} opacity={0.34} />
+        <Panel texture={plaque} width={0.49} height={0.195} position={[0, 0.153, -0.037]} rotation={[-0.62, 0, 0]} />
+      </group>
     </group>
   )
 }
 
-// ── ③ 효소세상 · 데일리 케어 존 (6종 갤러리 월) ──────────────────
 export function EnzymeZone({ partner, onSelect }) {
   const ts = useTextSize()
+  const oak = useOak({ repeat: [3, 1], color: P.oakLight })
+  const oakDark = useOak({ repeat: [1, 1], color: P.oakMid })
+  const stone = useStone({ color: '#ffffff' })
+  const benchLen = 7.6
+  const benchZ = -0.4
 
   const sign = useMemo(
     () =>
@@ -120,7 +69,7 @@ export function EnzymeZone({ partner, onSelect }) {
         key: 'sign-enzyme',
         brand: 'AL.F.S  COLLECTION',
         title: '효소세상 · 데일리 케어',
-        sub: '발효 효소 6종 진열 · 섭취 방법은 제품 라벨을 따릅니다',
+        sub: '발효 효소 6종 · 진열된 제품을 누르면 구성과 가격이 열립니다',
         accent: partner.accent,
         theme: 'light',
       }),
@@ -136,7 +85,7 @@ export function EnzymeZone({ partner, onSelect }) {
         lines: [
           '가격은 alfs.kr 판매가와 같습니다.',
           '효소세상 6종은 50,000원 이상 무료배송입니다.',
-          '제품 사진을 누르면 구성·용량·배송비를 보고 주문으로 넘어갈 수 있습니다.',
+          '제품을 누르면 구성·용량·배송비를 보고 주문으로 넘어갈 수 있습니다.',
         ],
         accent: partner.accent,
         footer: '효능·진단 표현 없이 구성과 용량만 표시합니다',
@@ -149,63 +98,71 @@ export function EnzymeZone({ partner, onSelect }) {
 
   return (
     <group>
-      {/* 갤러리 월 (제품 뒤 크림 석재 패널) */}
-      <mesh position={[0, 2.0, -13.5]}>
-        <boxGeometry args={[11.4, 3.9, 0.16]} />
-        <meshStandardMaterial color="#fdf8ec" roughness={0.48} metalness={0.08} />
-      </mesh>
-      <mesh position={[0, 0.12, -13.4]}>
-        <boxGeometry args={[11.4, 0.04, 0.22]} />
-        <meshStandardMaterial color={P.gold} emissive={P.goldSoft} emissiveIntensity={0.5} metalness={0.7} toneMapped={false} />
-      </mesh>
-
-      {/* 롱 플린스 */}
-      <mesh position={[0, 0.28, -12.4]}>
-        <boxGeometry args={[10.6, 0.56, 1.9]} />
-        <meshStandardMaterial color="#f8f0e2" roughness={0.28} metalness={0.18} />
-      </mesh>
-      <mesh position={[0, 0.56, -12.4]}>
-        <boxGeometry args={[10.8, 0.04, 2.0]} />
-        <meshStandardMaterial color={P.stoneTop} roughness={0.14} metalness={0.35} />
-      </mesh>
-      <mesh position={[0, 0.2, -11.44]}>
-        <boxGeometry args={[10.6, 0.028, 0.03]} />
-        <meshStandardMaterial color={P.brass} emissive={P.goldSoft} emissiveIntensity={0.35} metalness={0.8} toneMapped={false} />
-      </mesh>
-      {X_POS.map((x) => (
-        <mesh key={`div-${x}`} position={[x + 0.875, 0.3, -12.4]}>
-          <boxGeometry args={[0.018, 0.62, 1.86]} />
-          <meshStandardMaterial color="#e8dbc4" roughness={0.5} metalness={0.2} transparent opacity={0.5} />
+      {/* 오크 진열 벤치 */}
+      <group position={[ENZYME_X, 0, benchZ]}>
+        <ShadowDisc radius={4.4} opacity={0.3} />
+        <mesh position={[0, 0.39, 0]}>
+          <boxGeometry args={[1.02, 0.78, benchLen]} />
+          <meshStandardMaterial {...oak} />
         </mesh>
+        <mesh position={[0, 0.8, 0]}>
+          <boxGeometry args={[1.12, 0.05, benchLen + 0.1]} />
+          <meshStandardMaterial {...stone} />
+        </mesh>
+        <mesh position={[0, 0.045, 0]}>
+          <boxGeometry args={[0.86, 0.09, benchLen - 0.3]} />
+          <meshStandardMaterial color={P.oakDeep} roughness={0.6} />
+        </mesh>
+        {/* 앞면 세로 결 패널 + 얇은 홈 */}
+        {[-2.3, -0.8, 0.8, 2.3].map((z) => (
+          <mesh key={z} position={[0.515, 0.39, z]}>
+            <boxGeometry args={[0.012, 0.76, 0.02]} />
+            <meshStandardMaterial color={P.oakDeep} roughness={0.55} />
+          </mesh>
+        ))}
+        <LedStrip position={[0.53, 0.755, 0]} size={[0.03, 0.02, benchLen - 0.2]} intensity={1.1} />
+      </group>
+
+      {/* 누끼 제품 6종 */}
+      {enzymeProducts.map((product, i) => (
+        <ProductStand key={product.id} product={product} partner={partner} z={ENZYME_Z[i]} onSelect={onSelect} />
+      ))}
+
+      {/* 뒷벽 — 오크 슬랫 패널 (어두운 등판 사이로 결이 보입니다) */}
+      <SlatWall position={[-12.7, 0, benchZ]} rotation={[0, Math.PI / 2, 0]} width={benchLen + 0.6} height={3.15} gap={0.3} color={P.oakLight} />
+      <group position={[-12.4, 0, benchZ]}>
+        {/* 위 선반 */}
+        <mesh position={[0, 2.44, 0]}>
+          <boxGeometry args={[0.46, 0.07, benchLen - 0.6]} />
+          <meshStandardMaterial {...oakDark} />
+        </mesh>
+        <LedStrip position={[0.02, 2.39, 0]} size={[0.04, 0.02, benchLen - 0.8]} intensity={1.1} />
+      </group>
+
+      {/* 선반 위 소품 */}
+      {[-2.4, -0.6, 1.4, 2.8].map((z, i) => (
+        <group key={z} position={[-12.5, 2.475, benchZ + z]}>
+          {i % 2 === 0 ? <Vase position={[0, 0, 0]} scale={0.9} color={i === 0 ? '#e6d9c2' : '#d9cbb4'} /> : <Plant position={[0, 0, 0]} scale={0.45} />}
+        </group>
       ))}
 
       {/* 존 간판 */}
-      <group position={[0, 3.7, -14.4]}>
-        <mesh position={[0, 0, -0.05]}>
-          <boxGeometry args={[6.05, 1.85, 0.1]} />
-          <meshStandardMaterial color="#fbf3e4" roughness={0.38} metalness={0.2} />
-        </mesh>
-        <Panel texture={sign} width={5.95} height={1.77} position={[0, 0, 0.03]} />
-      </group>
-
-      {enzymeProducts.map((product, i) => (
-        <Display key={product.id} product={product} x={X_POS[i]} partner={partner} onSelect={onSelect} />
-      ))}
-
-      {/* 벽면 안내 패널 */}
-      <group position={[8.75, 2.15, -9.6]} rotation={[0, -Math.PI / 2, 0]}>
+      <group position={[-12.62, 3.28, benchZ - 1.1]} rotation={[0, Math.PI / 2, 0]}>
         <mesh>
-          <boxGeometry args={[3.2, 1.5, 0.08]} />
-          <meshStandardMaterial color="#fdf8ee" roughness={0.42} metalness={0.15} />
+          <boxGeometry args={[4.0, 1.24, 0.08]} />
+          <meshStandardMaterial color="#fbf5e8" roughness={0.45} metalness={0.12} />
         </mesh>
-        <Panel texture={notice} width={3.05} height={1.35} position={[0, 0, 0.05]} />
+        <Panel texture={sign} width={3.9} height={1.16} position={[0, 0, 0.05]} />
       </group>
 
-      {/* 통로 바닥 강조 */}
-      <mesh position={[0, 0.005, -8.2]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[8.6, 5.4]} />
-        <meshStandardMaterial color="#fffdf7" roughness={0.35} transparent opacity={0.4} />
-      </mesh>
+      {/* 통로 쪽 안내 패널 */}
+      <group position={[-12.7, 2.0, 5.0]} rotation={[0, Math.PI / 2, 0]}>
+        <mesh>
+          <boxGeometry args={[2.6, 1.3, 0.06]} />
+          <meshStandardMaterial {...oakDark} />
+        </mesh>
+        <Panel texture={notice} width={2.48} height={1.2} position={[0, 0, 0.04]} />
+      </group>
     </group>
   )
 }

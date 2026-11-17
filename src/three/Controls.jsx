@@ -17,7 +17,7 @@ const smootherstep = (t) => t * t * t * (t * (t * 6 - 15) + 10)
 // 경계를 넘을 때 잘라내지 않고 완만하게 눌러 주는 경계 (프레임 간 불연속 없음)
 const softClamp = (v, min, max) => (v < min ? min + (v - min) * 0.22 : v > max ? max + (v - max) * 0.22 : v)
 
-const LIMIT = { x: 7.4, zMin: -27.5, zMax: 25.6, yMin: 0.95, yMax: 5.6 }
+const LIMIT = { x: 12.1, zMin: -10.1, zMax: 10.2, yMin: 0.95, yMax: 4.35 }
 const WALK_SPEED = 2.9
 
 export function CameraRig({ zone, glideKey, focus }) {

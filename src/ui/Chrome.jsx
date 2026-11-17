@@ -117,7 +117,7 @@ export function Hint({ show }) {
   if (!show) return null
   return (
     <div className="hint">
-      화면을 드래그해 둘러보세요 · 마커·챕터 버튼으로 부드럽게 이동 · W A S D / 조이스틱으로 걷기
+      화면을 드래그해 둘러보세요 · 챕터 버튼으로 부드럽게 이동 · W A S D / 조이스틱으로 걷기 · 가까이 가면 서연에게 말을 걸 수 있어요
     </div>
   )
 }
@@ -131,7 +131,7 @@ export function LoadingScreen({ done }) {
         <div className="loading__bar">
           <span />
         </div>
-        <div className="loading__sub">밝은 크림 갤러리를 준비하고 있습니다</div>
+        <div className="loading__sub">오크 우드 라운지를 준비하고 있습니다</div>
       </div>
     </div>
   )

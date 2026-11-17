@@ -6,7 +6,8 @@ import { Hall, Lights } from './Hall.jsx'
 import { LobbyZone } from './LobbyZone.jsx'
 import { MineralZone } from './MineralZone.jsx'
 import { EnzymeZone } from './EnzymeZone.jsx'
-import { SimulatorZone } from './SimulatorZone.jsx'
+import { ExperienceZone } from './ExperienceZone.jsx'
+import { LoungeZone } from './LoungeZone.jsx'
 import { Concierge } from './Concierge.jsx'
 import { ZoneMarker } from './parts.jsx'
 import { ZONES, zoneById } from './zones.js'
@@ -23,6 +24,7 @@ export function ShowroomCanvas({
   onSelect,
   onSummon,
   onOpenSimulator,
+  onNearStaff,
   onReady,
 }) {
   const zone = useMemo(() => zoneById(zoneId), [zoneId])
@@ -31,16 +33,16 @@ export function ShowroomCanvas({
     <Canvas
       dpr={[1, 1.75]}
       gl={{ antialias: true, powerPreference: 'high-performance', alpha: false }}
-      camera={{ position: [0, 1.9, 24.2], fov: 52, near: 0.1, far: 150 }}
+      camera={{ position: [0, 1.95, 10.2], fov: 52, near: 0.1, far: 150 }}
       onCreated={({ gl }) => {
         gl.toneMapping = THREE.ACESFilmicToneMapping
-        gl.toneMappingExposure = 0.9
+        gl.toneMappingExposure = 1.02
         gl.outputColorSpace = THREE.SRGBColorSpace
         onReady?.()
       }}
     >
       <color attach="background" args={[P.bg]} />
-      <fog attach="fog" args={[P.fog, 62, 132]} />
+      <fog attach="fog" args={[P.fog, 42, 96]} />
       <ResponsiveCamera />
       <CameraRig zone={zone} glideKey={glideKey} focus={focus} />
       <Lights accent={partner.accent} accentSoft={partner.accentSoft} />
@@ -50,8 +52,9 @@ export function ShowroomCanvas({
         <LobbyZone partner={partner} onSummon={onSummon} />
         <MineralZone partner={partner} onSelect={onSelect} />
         <EnzymeZone partner={partner} onSelect={onSelect} />
-        <SimulatorZone partner={partner} onOpenSimulator={onOpenSimulator} />
-        <Concierge partner={partner} onSummon={onSummon} talking={talking} />
+        <ExperienceZone partner={partner} onOpenSimulator={onOpenSimulator} />
+        <LoungeZone partner={partner} />
+        <Concierge partner={partner} onSummon={onSummon} talking={talking} onNear={onNearStaff} />
       </Suspense>
 
       {ZONES.map((z) => (
