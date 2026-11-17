@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { panelTexture, screenTexture, signTexture } from './textures.js'
+import { panelTexture, screenTexture } from './textures.js'
 import { Panel, Clickable, ShadowDisc, LedStrip } from './parts.jsx'
 import { P } from './palette.js'
 import { useTextSize } from '../lib/textSize.js'
@@ -71,20 +71,6 @@ export function ExperienceZone({ partner, onOpenSimulator }) {
     [partner, ts],
   )
 
-  const sign = useMemo(
-    () =>
-      signTexture({
-        key: 'sign-experience',
-        brand: 'AL.F.S  TASTE & LEARN',
-        title: '성분 · 체험 존',
-        sub: '성분을 읽고, 한 잔으로 맛을 확인하고, 3문항으로 루틴을 진단합니다',
-        accent: partner.accent,
-        theme: 'light',
-      }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [partner, ts],
-  )
-
   return (
     <group>
       {/* 스톤 시음 바 */}
@@ -141,15 +127,6 @@ export function ExperienceZone({ partner, onOpenSimulator }) {
           <Panel texture={p.tex} width={2.6} height={1.32} position={[0, 0, 0.02]} />
         </group>
       ))}
-
-      {/* 존 간판 */}
-      <group position={[-0.9, 3.6, -10.56]}>
-        <mesh>
-          <boxGeometry args={[5.6, 1.2, 0.08]} />
-          <meshStandardMaterial color="#fbf5e8" roughness={0.45} metalness={0.12} />
-        </mesh>
-        <Panel texture={sign} width={5.5} height={1.12} position={[0, 0, 0.05]} />
-      </group>
 
       {/* 루틴 진단 키오스크 */}
       <group position={[4.3, 0, -8.4]} rotation={[0, -0.55, 0]}>
