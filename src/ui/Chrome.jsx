@@ -1,7 +1,33 @@
 import { ZONES } from '../three/zones.js'
 import { partnerList } from '../config/partners.js'
 
-export function TopBar({ partner, zoneId, zoneName, onSummon, onSwitchPartner, onGo }) {
+// 글자 크기 선택 — 보통 / 크게 (누르는 즉시 UI·3D 라벨·상담창이 함께 커집니다)
+export function TextSizeToggle({ value, onChange }) {
+  return (
+    <div className="textsize" role="group" aria-label="글자 크기" data-testid="textsize">
+      <button
+        type="button"
+        className={`textsize__btn ${value === 'normal' ? 'is-on' : ''}`}
+        aria-pressed={value === 'normal'}
+        onClick={() => onChange('normal')}
+        data-testid="textsize-normal"
+      >
+        <span className="ga" aria-hidden="true">가</span>보통
+      </button>
+      <button
+        type="button"
+        className={`textsize__btn ${value === 'large' ? 'is-on' : ''}`}
+        aria-pressed={value === 'large'}
+        onClick={() => onChange('large')}
+        data-testid="textsize-large"
+      >
+        <span className="ga" aria-hidden="true">가</span>크게
+      </button>
+    </div>
+  )
+}
+
+export function TopBar({ partner, zoneId, zoneName, onSummon, onSwitchPartner, onGo, textSize, onTextSize }) {
   return (
     <header className="topbar">
       <div className="topbar__brand">
@@ -33,12 +59,18 @@ export function TopBar({ partner, zoneId, zoneName, onSummon, onSwitchPartner, o
       </div>
 
       <div className="topbar__actions">
-        <button type="button" className="btn btn--ghost" onClick={() => onSwitchPartner('hq')} hidden={partner.code === 'hq'} style={partner.code === 'hq' ? { display: 'none' } : undefined}>
+        <button
+          type="button"
+          className="btn btn--ghost"
+          onClick={() => onSwitchPartner('hq')}
+          hidden={partner.code === 'hq'}
+          style={partner.code === 'hq' ? { display: 'none' } : undefined}
+        >
           본사 쇼룸
         </button>
         <label className="partner-select">
           <span>지점</span>
-          <select value={partner.code} onChange={(e) => onSwitchPartner(e.target.value)} aria-label="파트너샵 선택">
+          <select value={partner.code} onChange={(e) => onSwitchPartner(e.target.value)} aria-label="파트너샵 선택" data-testid="partner-select">
             {partnerList.map((p) => (
               <option key={p.code} value={p.code}>
                 {p.name}
@@ -47,11 +79,12 @@ export function TopBar({ partner, zoneId, zoneName, onSummon, onSwitchPartner, o
             ))}
           </select>
         </label>
+        <TextSizeToggle value={textSize} onChange={onTextSize} />
         <button type="button" className="btn btn--accent" data-testid="summon-btn" onClick={onSummon}>
           <span className="btn__icon" aria-hidden="true">
-            👤
+            ✦
           </span>
-          상담 직원 부르기
+          상담 매니저 부르기
         </button>
       </div>
     </header>
@@ -84,7 +117,7 @@ export function Hint({ show }) {
   if (!show) return null
   return (
     <div className="hint">
-      화면을 드래그해 둘러보고, 바닥 마커나 번호 버튼을 눌러 이동하세요
+      화면을 드래그해 둘러보세요 · 마커·챕터 버튼으로 부드럽게 이동 · W A S D / 조이스틱으로 걷기
     </div>
   )
 }
@@ -98,7 +131,7 @@ export function LoadingScreen({ done }) {
         <div className="loading__bar">
           <span />
         </div>
-        <div className="loading__sub">화이트 랩 갤러리를 준비하고 있습니다</div>
+        <div className="loading__sub">밝은 크림 갤러리를 준비하고 있습니다</div>
       </div>
     </div>
   )

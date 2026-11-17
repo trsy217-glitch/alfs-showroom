@@ -22,11 +22,11 @@ export function AssistantDrawer({ partner, open, onClose, messages, onAsk, onOpe
   return (
     <aside className={`drawer ${open ? 'is-open' : ''}`} aria-hidden={!open} data-testid="assistant-drawer">
       <div className="drawer__head">
-        <span className="avatar" style={{ background: partner.accent }}>
-          직원
+        <span className="avatar">
+          <img src="/images/staff/concierge-face.png" alt="상담 매니저 서연" />
         </span>
         <div className="drawer__titles">
-          <b>AI 상담 직원</b>
+          <b>상담 매니저 서연</b>
           <small>
             {partner.name}
             {partner.owner ? ` · ${partner.owner} ${partner.ownerTitle}` : ''}
@@ -38,10 +38,10 @@ export function AssistantDrawer({ partner, open, onClose, messages, onAsk, onOpe
       </div>
 
       <div className="drawer__body" ref={bodyRef} data-testid="assistant-messages">
-        <div className="chat-notice">AI가 답변합니다 · 진단·처방이 아닙니다 · 섭취 방법은 제품 라벨을 따릅니다</div>
+        <div className="chat-notice">AI 상담이 답변합니다 · 진단·처방이 아닙니다 · 섭취 방법은 제품 라벨을 따릅니다</div>
         {messages.map((m, i) => (
           <div key={i} className={`msg msg--${m.role}`}>
-            {m.role === 'staff' && <span className="msg__who">{partner.shortName}</span>}
+            {m.role === 'staff' && <span className="msg__who">서연 · {partner.shortName}</span>}
             <div className="msg__bubble">{m.text}</div>
             {m.products?.length > 0 && (
               <div className="msg__products">

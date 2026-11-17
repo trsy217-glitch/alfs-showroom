@@ -66,7 +66,7 @@ export function ProductPanel({ product, partner, onClose, onAsk, onGo }) {
             {copied ? '복사했습니다 ✓' : '주문 요약 복사'}
           </button>
           <button type="button" className="btn btn--ghost" onClick={() => onAsk(`${product.name} 자세히 알려줘`)}>
-            상담 직원에게 묻기
+            서연에게 묻기
           </button>
         </div>
         <button type="button" className="btn btn--link" onClick={() => onGo(product.zone)}>

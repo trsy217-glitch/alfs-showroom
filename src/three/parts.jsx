@@ -3,6 +3,7 @@ import * as THREE from 'three'
 import { useLoader } from '@react-three/fiber'
 import { markerTexture, shadowTexture, glowTexture, bottleLabelTexture } from './textures.js'
 import { interaction } from './interaction.js'
+import { P } from './palette.js'
 
 // ── 공통 3D 부품 ─────────────────────────────────────────────
 
@@ -32,15 +33,15 @@ export function Panel({ texture, width, height, position, rotation = [0, 0, 0], 
   return (
     <mesh position={position} rotation={rotation}>
       <planeGeometry args={[width, height]} />
-      <meshBasicMaterial map={texture} transparent opacity={opacity} toneMapped={false} side={THREE.FrontSide} />
+      <meshBasicMaterial map={texture} transparent opacity={opacity} toneMapped={false} side={THREE.DoubleSide} />
     </mesh>
   )
 }
 
-// 실물 제품 사진 패널 (aspect 유지해서 잘라 넣기)
+// 실물 제품 사진 패널 (aspect 유지해서 잘라 넣기) — 아이보리 매트 + 골드 라인
 export function PhotoPanel({ url, width, height, position, rotation = [0, 0, 0], frame = true, radius = 0.04 }) {
   return (
-    <Suspense fallback={<FrameBox width={width} height={height} position={position} rotation={rotation} color="#e2e8f0" />}>
+    <Suspense fallback={<FrameBox width={width} height={height} position={position} rotation={rotation} color="#f1e7d5" />}>
       <PhotoInner url={url} width={width} height={height} position={position} rotation={rotation} frame={frame} radius={radius} />
     </Suspense>
   )
@@ -51,7 +52,7 @@ function PhotoInner({ url, width, height, position, rotation, frame, radius }) {
   const tex = useMemo(() => {
     const t = base.clone()
     t.colorSpace = THREE.SRGBColorSpace
-    t.anisotropy = 4
+    t.anisotropy = 8
     const img = base.image
     if (img && img.width && img.height) {
       const ta = img.width / img.height
@@ -73,25 +74,31 @@ function PhotoInner({ url, width, height, position, rotation, frame, radius }) {
   return (
     <group position={position} rotation={rotation}>
       {frame && (
-        <mesh position={[0, 0, -0.03]}>
-          <boxGeometry args={[width + 0.12, height + 0.12, 0.06]} />
-          <meshStandardMaterial color="#e4eaee" roughness={0.45} metalness={0.2} />
-        </mesh>
+        <>
+          <mesh position={[0, 0, -0.03]}>
+            <boxGeometry args={[width + 0.14, height + 0.14, 0.06]} />
+            <meshStandardMaterial color="#fbf3e4" roughness={0.42} metalness={0.16} />
+          </mesh>
+          <mesh position={[0, 0, -0.005]}>
+            <boxGeometry args={[width + 0.02, height + 0.02, 0.01]} />
+            <meshStandardMaterial color={P.brass} roughness={0.3} metalness={0.7} />
+          </mesh>
+        </>
       )}
       <mesh position={[0, 0, 0.045]}>
         <planeGeometry args={[width, height]} />
         <meshBasicMaterial map={tex} toneMapped={false} />
       </mesh>
-      <mesh position={[0, -height / 2 - 0.06, 0.06]}>
-        <boxGeometry args={[width * 0.9, 0.05, 0.02]} />
-        <meshStandardMaterial color="#0f766e" emissive="#14b8a6" emissiveIntensity={0.6} />
+      <mesh position={[0, -height / 2 - 0.07, 0.055]}>
+        <boxGeometry args={[width * 0.86, 0.028, 0.016]} />
+        <meshStandardMaterial color={P.gold} emissive={P.goldSoft} emissiveIntensity={0.45} metalness={0.6} roughness={0.3} />
       </mesh>
       {radius ? null : null}
     </group>
   )
 }
 
-export function FrameBox({ width, height, position, rotation = [0, 0, 0], color = '#eef2f4' }) {
+export function FrameBox({ width, height, position, rotation = [0, 0, 0], color = '#f4ecdd' }) {
   return (
     <mesh position={position} rotation={rotation}>
       <boxGeometry args={[width, height, 0.06]} />
@@ -105,10 +112,10 @@ export function Bottle({
   position = [0, 0, 0],
   height = 1.1,
   radius = 0.26,
-  body = '#eef4ef',
-  cap = '#ffffff',
+  body = '#f1f5f0',
+  cap = '#e6d3a8',
   label,
-  labelAccent = '#0e7490',
+  labelAccent = P.gold,
   drop = true,
   glow = true,
 }) {
@@ -119,14 +126,14 @@ export function Bottle({
   const bodyH = height * 0.82
   return (
     <group position={position}>
-      {glow && <ShadowDisc radius={radius * 2.6} position={[0, 0.008, 0]} opacity={0.55} />}
+      {glow && <ShadowDisc radius={radius * 2.6} position={[0, 0.008, 0]} opacity={0.5} />}
       <mesh position={[0, bodyH / 2 + 0.02, 0]}>
         <cylinderGeometry args={[radius, radius * 0.96, bodyH, 28]} />
-        <meshStandardMaterial color={body} roughness={0.28} metalness={0.22} />
+        <meshStandardMaterial color={body} roughness={0.2} metalness={0.25} transparent opacity={0.94} envMapIntensity={0.7} />
       </mesh>
       <mesh position={[0, height - 0.045, 0]}>
         <cylinderGeometry args={[radius * 0.52, radius * 0.6, height * 0.16, 24]} />
-        <meshStandardMaterial color={cap} roughness={0.4} metalness={0.1} />
+        <meshStandardMaterial color={cap} roughness={0.35} metalness={0.45} />
       </mesh>
       {labelTex && (
         <mesh position={[0, bodyH * 0.52, radius * 0.99]}>
@@ -138,7 +145,7 @@ export function Bottle({
   )
 }
 
-// 바닥 이동 마커 — 누르면 그 존으로 카메라가 이동
+// 바닥 이동 마커 — 누르면 그 존으로 카메라가 부드럽게 이동
 export function ZoneMarker({ zone, active, onGo }) {
   const [hover, setHover] = useState(false)
   const tex = useMemo(() => markerTexture({ key: `marker-${zone.id}`, number: zone.no, label: zone.short }), [zone.id, zone.no, zone.short])
@@ -169,7 +176,7 @@ export function ZoneMarker({ zone, active, onGo }) {
       </mesh>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.002, 0]}>
         <ringGeometry args={[0.6, 0.66, 40]} />
-        <meshBasicMaterial color={active ? '#0d9488' : '#cbd5e1'} transparent opacity={0.9} toneMapped={false} />
+        <meshBasicMaterial color={active ? P.gold : P.stoneEdge} transparent opacity={0.9} toneMapped={false} />
       </mesh>
     </group>
   )

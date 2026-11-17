@@ -1,9 +1,13 @@
 import { useMemo } from 'react'
 import { panelTexture, screenTexture, plaqueTexture } from './textures.js'
 import { Panel, Clickable, ShadowDisc, Glow } from './parts.jsx'
+import { P } from './palette.js'
+import { useTextSize } from '../lib/textSize.js'
 
 // ── ④ 고객 루틴 시뮬레이터 존 ─────────────────────────────────
 export function SimulatorZone({ partner, onOpenSimulator }) {
+  const ts = useTextSize()
+
   const kiosk = useMemo(
     () =>
       screenTexture({
@@ -12,8 +16,10 @@ export function SimulatorZone({ partner, onOpenSimulator }) {
         lines: ['버튼 세 번이면 구성과 합계를 계산해 드립니다.', '목적 → 예산 → 지금 드시는 제품'],
         accent: partner.accent,
         cta: '3문항 시작하기',
+        theme: 'light',
       }),
-    [partner],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [partner, ts],
   )
 
   const stepTexts = useMemo(
@@ -22,7 +28,8 @@ export function SimulatorZone({ partner, onOpenSimulator }) {
       plaqueTexture({ key: 'step-2', name: '② 예산은 얼마인가요', price: '5만 · 10만 · 20~30만 · 40만', accent: partner.accent }),
       plaqueTexture({ key: 'step-3', name: '③ 지금 드시는 제품', price: '없음 · 미네랄만 · 효소도', accent: partner.accent }),
     ],
-    [partner],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [partner, ts],
   )
 
   const disclaimer = useMemo(
@@ -39,25 +46,26 @@ export function SimulatorZone({ partner, onOpenSimulator }) {
         titleSize: 50,
         lineSize: 34,
       }),
-    [partner],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [partner, ts],
   )
 
   return (
     <group position={[0, 0, -22]}>
       {/* 원형 상담 테이블 */}
-      <ShadowDisc radius={3.2} opacity={0.45} />
-      <Glow radius={3.6} opacity={0.3} />
+      <ShadowDisc radius={3.2} opacity={0.36} />
+      <Glow radius={3.6} opacity={0.26} />
       <mesh position={[0, 0.36, 0]}>
         <cylinderGeometry args={[0.42, 0.5, 0.72, 24]} />
-        <meshStandardMaterial color="#e2e8f0" roughness={0.3} metalness={0.35} />
+        <meshStandardMaterial color={P.brass} roughness={0.3} metalness={0.55} />
       </mesh>
       <mesh position={[0, 0.74, 0]}>
-        <cylinderGeometry args={[1.72, 1.72, 0.07, 48]} />
-        <meshStandardMaterial color="#ffffff" roughness={0.16} metalness={0.4} />
+        <cylinderGeometry args={[1.72, 1.72, 0.06, 48]} />
+        <meshStandardMaterial color={P.stoneTop} roughness={0.14} metalness={0.35} />
       </mesh>
       <mesh position={[0, 0.72, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[1.55, 1.66, 48]} />
-        <meshStandardMaterial color={partner.accentSoft} emissive={partner.accentSoft} emissiveIntensity={1.2} toneMapped={false} />
+        <ringGeometry args={[1.55, 1.64, 48]} />
+        <meshStandardMaterial color={P.brass} emissive={P.goldSoft} emissiveIntensity={0.45} metalness={0.8} toneMapped={false} />
       </mesh>
 
       {/* 3문항 카드 */}
@@ -66,10 +74,10 @@ export function SimulatorZone({ partner, onOpenSimulator }) {
         return (
           <group key={i} position={[x, 1.46, 0.12]} rotation={[-0.18, 0, (i - 1) * -0.03]}>
             <mesh position={[0, 0, -0.02]}>
-              <boxGeometry args={[1.06, 0.4, 0.03]} />
-              <meshStandardMaterial color="#ffffff" roughness={0.4} metalness={0.2} />
+              <boxGeometry args={[1.1, 0.42, 0.03]} />
+              <meshStandardMaterial color="#fffdf8" roughness={0.35} metalness={0.2} />
             </mesh>
-            <Panel texture={tex} width={1.02} height={0.38} position={[0, 0, 0.012]} />
+            <Panel texture={tex} width={1.04} height={0.39} position={[0, 0, 0.012]} />
           </group>
         )
       })}
@@ -78,18 +86,18 @@ export function SimulatorZone({ partner, onOpenSimulator }) {
       <group position={[0, 0, -3.6]}>
         <mesh position={[0, 0.5, 0]}>
           <boxGeometry args={[1.6, 1.0, 0.6]} />
-          <meshStandardMaterial color="#f1f5f9" roughness={0.3} metalness={0.3} />
+          <meshStandardMaterial color="#f8f0e2" roughness={0.3} metalness={0.25} />
         </mesh>
         <Clickable onClick={onOpenSimulator} hoverScale={1.03} position={[0, 1.95, 0]}>
           <mesh>
-            <boxGeometry args={[2.05, 2.6, 0.12]} />
-            <meshStandardMaterial color="#0b1a20" roughness={0.3} metalness={0.45} />
+            <boxGeometry args={[2.09, 2.64, 0.12]} />
+            <meshStandardMaterial color="#e7d9bf" roughness={0.32} metalness={0.4} />
           </mesh>
-          <Panel texture={kiosk} width={1.92} height={2.46} position={[0, 0, 0.07]} />
+          <Panel texture={kiosk} width={1.98} height={2.52} position={[0, 0, 0.07]} />
         </Clickable>
         <mesh position={[0, 1.95, -0.1]}>
           <boxGeometry args={[2.25, 2.75, 0.06]} />
-          <meshStandardMaterial color={partner.accent} emissive={partner.accentSoft} emissiveIntensity={0.4} transparent opacity={0.3} />
+          <meshStandardMaterial color={partner.accent} emissive={P.goldSoft} emissiveIntensity={0.3} transparent opacity={0.22} />
         </mesh>
       </group>
 
@@ -97,7 +105,7 @@ export function SimulatorZone({ partner, onOpenSimulator }) {
       <group position={[-8.72, 2.2, -21]} rotation={[0, Math.PI / 2, 0]}>
         <mesh>
           <boxGeometry args={[3.1, 1.4, 0.08]} />
-          <meshStandardMaterial color="#ffffff" roughness={0.45} metalness={0.15} />
+          <meshStandardMaterial color="#fdf8ee" roughness={0.42} metalness={0.15} />
         </mesh>
         <Panel texture={disclaimer} width={2.98} height={1.32} position={[0, 0, 0.05]} />
       </group>
@@ -105,8 +113,8 @@ export function SimulatorZone({ partner, onOpenSimulator }) {
       {/* 존 조명 기둥 */}
       {[-3.6, 3.6].map((x) => (
         <mesh key={x} position={[x, 1.9, -1.2]}>
-          <boxGeometry args={[0.08, 3.6, 0.08]} />
-          <meshStandardMaterial color={partner.accentSoft} emissive={partner.accentSoft} emissiveIntensity={1.1} toneMapped={false} />
+          <boxGeometry args={[0.06, 3.6, 0.06]} />
+          <meshStandardMaterial color={P.brass} emissive={P.goldSoft} emissiveIntensity={0.8} metalness={0.8} toneMapped={false} />
         </mesh>
       ))}
     </group>
