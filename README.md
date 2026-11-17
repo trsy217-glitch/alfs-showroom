@@ -116,8 +116,9 @@ npm run preview   # http://localhost:4173
 ```
 src/
   config/catalog.js     상품 7종 + 배송 정책 + 배송비 계산
+  config/knowledge.js   상담 매니저 '서연' 지식베이스 Q&A 32건 + 키워드 매칭
   config/partners.js    파트너샵(지점) 설정 · 인사말 · 포인트 컬러
-  lib/assistant.js      상담 답변 엔진(규칙 기반)
+  lib/assistant.js      상담 답변 엔진(지식베이스 우선 · 규칙 기반)
   lib/textSize.js       글자 크기(보통/크게) 상태 · CSS/3D 텍스처 배율
   lib/sets.js           세트 정의 · 3문항 추천 로직
   lib/order.js          주문 요약문(파트너 귀속) · 클립보드
@@ -137,6 +138,17 @@ src/
   ui/                   상단바(글자 크기 토글) · 챕터바 · 조이스틱 · 상품 패널 · 상담 드로어 · 시뮬레이터
 public/images/          alfs.kr 실물 제품 사진(webp)
 public/images/staff/    상담 매니저 서연 컷아웃(concierge.png) · 얼굴 크롭(concierge-face.png)
+```
+
+## 상담 지식베이스 (2026-11-18)
+
+`src/config/knowledge.js`에 매니저 '서연'의 Q&A 32건(오륜미네랄 9 · 효소세상 6종 13 · 쇼룸 공통 10)을 담았습니다.
+고객 화면에 나가는 정제 문구만 넣고, 내부 확인 메모·공급가/마진 같은 거래 조건은 넣지 않습니다.
+답변은 `matchKnowledge()`의 키워드 점수(브랜드어는 상품군 표시로만, 긴 키워드일수록 높은 가중치)로 고르고,
+지식베이스에 없는 질문은 지어내지 않고 상담 연결로 넘깁니다.
+
+```bash
+node scripts/qa-check.mjs   # 32건 자기 질문 매칭 · 고객 질문 50건 · 금지 표현 검사
 ```
 
 ## 화면 검증용 훅 (개발 보조)
