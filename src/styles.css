@@ -1308,6 +1308,27 @@ body {
 
   .topbar__actions {
     gap: 5px;
+    flex: 1 1 100%;
+    flex-wrap: wrap;
+  }
+
+  .topbar__actions .btn--accent {
+    order: 9;
+    flex: 1 1 100%;
+  }
+
+  .topbar__brand {
+    flex: 1 1 100%;
+  }
+
+  .partner-select {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .partner-select select {
+    max-width: none;
+    width: 100%;
   }
 
   .topbar__actions .btn--ghost {
