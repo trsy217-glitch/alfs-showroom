@@ -15,6 +15,7 @@ export const ZONES = [
     radius: 6.2,
     marker: [-0.6, 0.02, 8.9],
     bounds: [-12, 12, 4, 10.5],
+    narrow: { target: [2.3, 1.5, 5.5], theta: 0.0, phi: 1.46, radius: 4.4 },
   },
   {
     id: 'mineral',
@@ -28,6 +29,7 @@ export const ZONES = [
     radius: 6.0,
     marker: [-4.4, 0.02, 4.4],
     bounds: [-8, 3, -2, 6],
+    narrow: { target: [-2.8, 1.45, 1.3], theta: 0.06, phi: 1.44, radius: 4.6 },
   },
   {
     id: 'enzyme',
@@ -41,6 +43,7 @@ export const ZONES = [
     radius: 5.2,
     marker: [-8.4, 0.02, 1.2],
     bounds: [-12, -4, -6, 5],
+    narrow: { target: [-10.5, 1.25, 0.2], theta: 0.95, phi: 1.47, radius: 4.6 },
   },
   {
     id: 'experience',
@@ -54,6 +57,7 @@ export const ZONES = [
     radius: 6.7,
     marker: [0, 0.02, -4.6],
     bounds: [-7, 7, -10.5, -2],
+    narrow: { target: [0, 1.5, -8.3], theta: 0.02, phi: 1.48, radius: 5.4 },
   },
   {
     id: 'lounge',
@@ -67,6 +71,7 @@ export const ZONES = [
     radius: 7.7,
     marker: [5.2, 0.02, 3.4],
     bounds: [3, 12, -3, 8],
+    narrow: { target: [9.8, 1.3, 3.0], theta: -1.9, phi: 1.48, radius: 5.8 },
   },
 ]
 

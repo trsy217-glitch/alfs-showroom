@@ -18,7 +18,7 @@ export function ShowroomCanvas({
   zoneId,
   glideKey,
   focus,
-  summoned,
+  narrow,
   talking,
   onGo,
   onSelect,
@@ -27,7 +27,11 @@ export function ShowroomCanvas({
   onNearStaff,
   onReady,
 }) {
-  const zone = useMemo(() => zoneById(zoneId), [zoneId])
+  // 좁은 화면(세로형)은 존마다 조금 더 가까이, 그 존의 주인공을 향해 서는 프리셋을 씁니다
+  const zone = useMemo(() => {
+    const base = zoneById(zoneId)
+    return narrow && base.narrow ? { ...base, ...base.narrow } : base
+  }, [zoneId, narrow])
 
   return (
     <Canvas

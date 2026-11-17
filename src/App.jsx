@@ -126,6 +126,7 @@ export default function App() {
           zoneId={zoneId}
           glideKey={glideKey}
           focus={focus}
+          narrow={narrow}
           talking={assistantOpen}
           onGo={goZone}
           onSelect={openProduct}
