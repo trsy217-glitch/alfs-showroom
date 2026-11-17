@@ -231,6 +231,72 @@ export function plaqueTexture({ key, name, price, note, accent = C.gold }) {
   })
 }
 
+// 3D 인스펙터용 제품 라벨 — 병 띠 · 박스 앞면 · 파우치에 공통으로 씁니다
+export function productPackTexture({ key, name, volume, note, accent = C.gold, brand = 'AL.F.S', theme = 'light' }) {
+  return makeTexture(key, 1024, 1024, (ctx, w, h) => {
+    const bg = theme === 'light' ? '#fffdf7' : '#2f2822'
+    ctx.fillStyle = bg
+    ctx.fillRect(0, 0, w, h)
+
+    // 위쪽 브랜드 띠
+    const g = ctx.createLinearGradient(0, 0, w, 0)
+    g.addColorStop(0, accent)
+    g.addColorStop(1, 'rgba(176,141,87,0.55)')
+    ctx.fillStyle = g
+    ctx.fillRect(0, 0, w, 118)
+    ctx.fillStyle = '#fffdf7'
+    ctx.textAlign = 'left'
+    ctx.textBaseline = 'middle'
+    ctx.font = `700 ${FS(52)}px ${KFONT}`
+    ctx.fillText(brand, 62, 60)
+    ctx.textAlign = 'right'
+    ctx.font = `500 ${FS(32)}px ${KFONT_SERIF}`
+    ctx.fillText('VIRTUAL SHOWROOM', w - 62, 60)
+
+    // 제품명
+    ctx.textAlign = 'center'
+    ctx.fillStyle = theme === 'light' ? C.ink : '#fff9ee'
+    const size = fitText(ctx, name, w - 190, FS(96), 700)
+    ctx.font = `700 ${size}px ${KFONT}`
+    ctx.fillText(name, w / 2, 360)
+
+    // 골드 헤어라인
+    ctx.strokeStyle = accent
+    ctx.lineWidth = 5
+    ctx.beginPath()
+    ctx.moveTo(w * 0.28, 430)
+    ctx.lineTo(w * 0.72, 430)
+    ctx.stroke()
+
+    // 용량
+    if (volume) {
+      ctx.fillStyle = accent
+      fitText(ctx, volume, w - 220, FS(58), 700)
+      ctx.fillText(volume, w / 2, 510)
+    }
+
+    // 설명 두 줄
+    if (note) {
+      ctx.fillStyle = theme === 'light' ? C.muted : '#e8dcc6'
+      const lines = String(note).split('\n')
+      lines.forEach((line, i) => {
+        ctx.font = `500 ${FS(34)}px ${KFONT}`
+        ctx.fillText(line, w / 2, 640 + i * 52)
+      })
+    }
+
+    // 아래쪽 표시
+    ctx.fillStyle = theme === 'light' ? C.goldDeep : C.goldSoft
+    ctx.font = `600 ${FS(30)}px ${KFONT_SERIF}`
+    ctx.fillText('오륜미네랄 · 효소세상', w / 2, h - 96)
+
+    ctx.strokeStyle = 'rgba(176,141,87,0.45)'
+    ctx.lineWidth = 8
+    ctx.strokeRect(4, 4, w - 8, h - 8)
+    ctx.textAlign = 'left'
+  })
+}
+
 // 병 라벨 (제품 3D 병 앞면에 붙는 작은 라벨)
 export function bottleLabelTexture({ key, name, volume, accent = C.gold, drop = true }) {
   return makeTexture(key, 512, 640, (ctx, w, h) => {

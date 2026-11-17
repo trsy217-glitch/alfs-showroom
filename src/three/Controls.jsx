@@ -3,6 +3,8 @@ import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { interaction } from './interaction.js'
 import { walkIntent } from './walkIntent.js'
+import { nearestDisplay, displayEye } from './zones.js'
+import { BODY_RADIUS, resolveCameraCollision, resolveCollisions } from './colliders.js'
 
 // ─────────────────────────────────────────────────────────────
 // 카메라: 모든 변화가 "미끄러지듯" 이어집니다.
@@ -19,6 +21,16 @@ const softClamp = (v, min, max) => (v < min ? min + (v - min) * 0.22 : v > max ?
 
 const LIMIT = { x: 12.1, zMin: -10.1, zMax: 10.2, yMin: 0.95, yMax: 4.35 }
 const WALK_SPEED = 2.9
+const ZOOM_MIN = 1.6
+const ZOOM_MAX = 11
+
+// 두 각도의 가장 짧은 차이 (-π ~ π) — 정면 정렬이 360°를 넘어 돌지 않게
+const angleDelta = (from, to) => {
+  let d = (to - from) % (Math.PI * 2)
+  if (d > Math.PI) d -= Math.PI * 2
+  if (d < -Math.PI) d += Math.PI * 2
+  return d
+}
 
 export function CameraRig({ zone, glideKey, focus }) {
   const { camera, gl, size } = useThree()
@@ -120,7 +132,7 @@ export function CameraRig({ zone, glideKey, focus }) {
         const [a, b] = [...pointers.values()]
         const dist = Math.hypot(a.x - b.x, a.y - b.y)
         if (pinchStart > 0) {
-          want.current.radius = clamp(pinchRadius * (pinchStart / Math.max(dist, 1)), 3.4, 10.5)
+          want.current.radius = clamp(pinchRadius * (pinchStart / Math.max(dist, 1)), ZOOM_MIN, ZOOM_MAX)
         }
         interaction.moved = true
         return
@@ -146,7 +158,7 @@ export function CameraRig({ zone, glideKey, focus }) {
     const onWheel = (e) => {
       e.preventDefault()
       cancelGlide()
-      want.current.radius = clamp(want.current.radius + e.deltaY * 0.0045, 3.4, 10.5)
+      want.current.radius = clamp(want.current.radius + e.deltaY * 0.0045, ZOOM_MIN, ZOOM_MAX)
     }
 
     el.addEventListener('pointerdown', onDown)
@@ -260,8 +272,22 @@ export function CameraRig({ zone, glideKey, focus }) {
       vel.current.z += (tvz - vel.current.z) * accel
 
       if (Math.abs(vel.current.x) + Math.abs(vel.current.z) > 0.002) {
-        w.target.x += vel.current.x * dt
-        w.target.z += vel.current.z * dt
+        // 가구 충돌 — 파고든 만큼 밀어내고, 그 방향의 속도만 지워 벽을 따라 미끄러집니다
+        const solved = resolveCollisions(w.target.x + vel.current.x * dt, w.target.z + vel.current.z * dt, BODY_RADIUS)
+        w.target.x = solved.x
+        w.target.z = solved.z
+        if (solved.hit) {
+          const nlen = Math.hypot(solved.nx, solved.nz) || 1
+          const ux = solved.nx / nlen
+          const uz = solved.nz / nlen
+          const into = vel.current.x * ux + vel.current.z * uz
+          if (into < 0) {
+            vel.current.x -= ux * into
+            vel.current.z -= uz * into
+          }
+          metrics.current.lastHit = solved.hit.name
+          metrics.current.hits = (metrics.current.hits ?? 0) + 1
+        }
         const bx = LIMIT.x
         const bzMin = LIMIT.zMin
         const bzMax = LIMIT.zMax
@@ -276,6 +302,20 @@ export function CameraRig({ zone, glideKey, focus }) {
         w.target.y = clamp(w.target.y, 1.1, 2.2)
       }
 
+      // ② 전시물 앞에 멈췄을 때 — 카메라 각도와 시선(LookAt)을 정면으로 천천히 보정
+      const standing = Math.abs(walkIntent.x) + Math.abs(walkIntent.z) < 0.02 && Math.hypot(vel.current.x, vel.current.z) < 0.06
+      const canAlign = standing && performance.now() - interaction.lastDragAt > 2200
+      const display = canAlign ? nearestDisplay(w.target.x, w.target.z) : null
+      if (display) {
+        const eye = displayEye(display)
+        const desired = Math.atan2(display.front[0], display.front[1])
+        const k2 = 1 - Math.exp(-dt * 2.4)
+        w.target.x += (eye[0] - w.target.x) * k2
+        w.target.z += (eye[1] - w.target.z) * k2
+        w.theta += angleDelta(w.theta, desired) * k2
+      }
+      metrics.current.alignId = display ? display.id : null
+
       // 시선·거리도 같은 감쇠로 따라갑니다
       const k = 1 - Math.exp(-dt * 9)
       c.theta += (w.theta - c.theta) * k
@@ -288,7 +328,9 @@ export function CameraRig({ zone, glideKey, focus }) {
     const px = softClamp(c.target.x + c.radius * sinPhi * Math.sin(c.theta), -LIMIT.x, LIMIT.x)
     const py = clamp(c.target.y + c.radius * Math.cos(c.phi), LIMIT.yMin, LIMIT.yMax)
     const pz = softClamp(c.target.z + c.radius * sinPhi * Math.cos(c.theta), LIMIT.zMin, LIMIT.zMax)
-    camera.position.set(px, py, pz)
+    // 카메라(붐)도 책장·데스크 같은 높은 가구를 통과하지 않게
+    const camFit = resolveCameraCollision(px, py, pz, 0.28)
+    camera.position.set(camFit.x, py, camFit.z)
 
     // 시선 목표도 한 번 더 감쇠시켜 미세한 떨림을 없앱니다
     lookAt.current.lerp(c.target, 1 - Math.exp(-dt * 14))
@@ -314,7 +356,12 @@ export function CameraRig({ zone, glideKey, focus }) {
         tx: +c.target.x.toFixed(3),
         ty: +c.target.y.toFixed(3),
         tz: +c.target.z.toFixed(3),
+        theta: +c.theta.toFixed(3),
+        wantTheta: +w.theta.toFixed(3),
         gliding: !!glide.current,
+        alignId: m.alignId ?? null,
+        hits: m.hits ?? 0,
+        lastHit: m.lastHit ?? null,
         maxStep: +m.maxStep.toFixed(4),
         avgStep: +(m.sum / Math.max(1, m.frames)).toFixed(4),
         frames: m.frames,

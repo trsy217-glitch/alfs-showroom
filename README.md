@@ -1,4 +1,4 @@
-# 알프스 3D 가상 쇼룸 (AL.F.S Showroom) — Phase 3 (우드 라운지 · 누끼 진열)
+# 알프스 3D 가상 쇼룸 (AL.F.S Showroom) — Phase 3 (우드 라운지 · 누끼 진열 · 피드백 반영)
 
 알프스(AL.F.S)의 **독립 3D 가상 쇼룸**입니다. 기존 alfs.kr은 그대로 두고, 상품 데이터와 실물 사진만 물려받아
 3D 공간에서 제품을 살펴보고 · 상담 매니저(서연)에게 묻고 · alfs.kr 주문으로 넘어가는 웹앱입니다.
@@ -45,6 +45,17 @@ npm run preview   # http://localhost:4173
 새 지점은 `src/config/partners.js`에 **한 줄(객체 하나)** 만 추가하면 됩니다.
 `demo: true`인 지점은 화면에 `예시 지점` 배지가 붙습니다.
 
+## 2026-11-17 피드백 반영 — 소영 님 6가지 지시
+
+| 지시 | 구현 |
+| --- | --- |
+| ① 상품 클릭 시 들어서 360° 둘러보기 | `ui/ProductInspector.jsx` + `three/ProductModel.jsx` — 상품을 누르면 병·박스·파우치를 절차적 3D로 세운 인스펙터가 열리고(아래에서 들려 올라오는 등장), 드래그/터치로 360° 회전·핀치 확대. 상품 정보·주문 버튼도 같은 화면 |
+| ② 상품 앞 정면 각도 | `zones.js`의 모든 프리셋을 **전시물 정면(front 벡터)** 에서 계산. 걸어가 전시물 앞에 **멈추면** 카메라 각도·시선(LookAt)이 정면으로 천천히 정렬(`Controls.jsx`의 `nearestDisplay`) |
+| ③ 매니저 테이블 관통 + 가구 충돌 | 서연을 데스크 왼쪽 옆 바닥(2.08, 5.88)으로 옮겨 발을 딛게 하고, `three/colliders.js`의 회전 바운딩 박스·원으로 테이블·데스크·소파·책장·벽·진열대 충돌 처리(막히면 벽을 따라 미끄러짐, 카메라 붐도 높은 가구 통과 금지) |
+| ④ 입장 환영 인사 한 글자씩 | `ui/Greeting.jsx` — 입장 직후 `알프스에 오신것을 환영합니다. / 편하게 둘러보시고, 궁금하신사항은 매니저를 불러주세요.` 가 글자마다 3D pop(translateZ·rotateX·scale)으로 등장 |
+| ⑤ 라운지 축소 | `three/layout.js` — 소파 0.78배·테이블 0.82배·책장 4칸→3칸·러그 축소, 가구를 한쪽 코너로 모아 아늑하게 |
+| ⑥ 라운지 도착 문구 | `ui/Greeting.jsx`의 `LoungeToast` — 라운지 구역에 **도착하면**(챕터 이동·걷기 모두) `차한잔 하세요, 상담도와드릴까요?` 가 떠오름 |
+
 ## 5개 존
 
 | 존 | 내용 |
@@ -68,8 +79,11 @@ npm run preview   # http://localhost:4173
   머리 위 이름표와 말풍선은 항상 손님 쪽을 향합니다. 클릭하면 상담 드로어가 열립니다.
   상담 답변은 규칙 기반 엔진(`src/lib/assistant.js`)이며 **상품·가격·배송비는 카탈로그 값만 인용**하고
   효능·진단·처방 표현은 쓰지 않습니다. 모르는 질문은 상담 연결로 넘깁니다.
-- **상품 상세**: 제품을 누르면 카메라가 그 진열대로 부드럽게 다가가고, 상세 패널 · `alfs.kr에서 주문하기` ·
-  `주문 요약 복사`(파트너 귀속 코드 포함)가 열립니다.
+- **상품 상세**: 제품을 누르면 카메라가 그 진열대로 부드럽게 다가가고, **3D 인스펙터**(`ui/ProductInspector.jsx`)가 열립니다.
+  상품이 들려 올라오듯 나타나 드래그·터치로 360° 볼 수 있고, 같은 화면에 가격·구성·배송과
+  `alfs.kr에서 주문하기` · `주문 요약 복사`(파트너 귀속 코드 포함)가 있습니다.
+- **충돌**: `three/colliders.js` — 회전 박스·원 충돌체를 카메라 이동에 적용해 가구를 뚫지 않고,
+  막히면 법선 방향 속도만 지워 벽을 따라 미끄러집니다. 상품·존 프리셋은 충돌 박스 바깥 관람 지점에서 계산됩니다.
 - **사진 모드 없음**: 3D 단일 모드입니다(느린 기기용 사진 모드는 2단계).
 
 ## 상품 데이터 (2026-11-16 alfs.kr 판매가)
@@ -112,7 +126,12 @@ src/
   three/Hall.jsx        크림 대리석 바닥 · 아이보리 벽 · 골드 라인 · 코브 조명
   three/LobbyZone.jsx / MineralZone.jsx / EnzymeZone.jsx / SimulatorZone.jsx
   three/Concierge.jsx   실사 컷아웃 상담 매니저(서연) + 말풍선 + 클릭 상담
-  three/Controls.jsx    이징 글라이드 + 감쇠 추종 + 키보드 걷기 + 계측 훅
+  three/Controls.jsx    이징 글라이드 + 감쇠 추종 + 키보드 걷기 + 정면 정렬 + 가구 충돌 + 계측 훅
+  three/colliders.js    가구 충돌체(회전 박스·원) · 밀어내기/미끄러짐 · 카메라 붐 충돌
+  three/layout.js       05 라운지 배치(축소) — 존·충돌·프리셋이 공유
+  three/ProductModel.jsx 상품 3D 모델(병·박스·파우치) 절차 생성
+  ui/ProductInspector.jsx 상품 3D 인스펙터(360° 회전·확대·주문)
+  ui/Greeting.jsx       입장 환영 인사(글자별 3D pop) · 라운지 도착 안내
   three/walkIntent.js   키보드·조이스틱 공용 이동 의도
   three/textures.js     한글 간판·명판·마커·대리석 CanvasTexture (글자 배율 반영)
   ui/                   상단바(글자 크기 토글) · 챕터바 · 조이스틱 · 상품 패널 · 상담 드로어 · 시뮬레이터
@@ -122,8 +141,9 @@ public/images/staff/    상담 매니저 서연 컷아웃(concierge.png) · 얼�
 
 ## 화면 검증용 훅 (개발 보조)
 
-`window.__ALFS_CAM__`(카메라 좌표·글라이드 상태·프레임 간 이동량), `window.__ALFS_CAM_RESET__()`(계측 초기화),
-`window.__ALFS_CONCIERGE__`(점원 화면 좌표), `window.__SHOWROOM_ERRORS__`(실행 중 오류 수집)는
+`window.__ALFS_CAM__`(카메라 좌표·글라이드 상태·프레임 간 이동량·정면 정렬 대상·충돌 횟수), `window.__ALFS_CAM_RESET__()`(계측 초기화),
+`window.__ALFS_CONCIERGE__`(점원 화면 좌표), `window.__ALFS_HOTSPOTS__`(진열 상품 화면 좌표),
+`window.__ALFS_INSPECTOR__`(3D 인스펙터 회전·확대 상태), `window.__SHOWROOM_ERRORS__`(실행 중 오류 수집)는
 자동 검증용으로 남겨 둔 값입니다. 운영 화면에는 보이지 않습니다.
 
 ## 다음 단계(2단계 예정)

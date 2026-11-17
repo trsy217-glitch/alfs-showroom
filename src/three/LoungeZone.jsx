@@ -19,11 +19,12 @@ import {
 } from './furniture.jsx'
 import { plaqueTexture } from './textures.js'
 import { useTextSize } from '../lib/textSize.js'
+import { LOUNGE } from './layout.js'
 
 // ── ⑤ 파트너 라운지 — 곡선 린넨 소파 · 원목 커피테이블 · 오크 책장 · 데스크 ──
 // 사진(2026-11-17)의 무드: 따뜻한 오크 · 크림 린넨 · 베이지 스톤 · 간접 LED · 통창 자연광
+// 2026-11-17 소영 님 지시 ⑤: 라운지가 너무 넓다 → 가구를 한쪽 코너에 모아 축소 (layout.js)
 
-const SOFA = { x: 9.15, z: 0.85, rot: -0.52 }
 const DEG = THREE.MathUtils.degToRad
 
 // 곡선 소파 부품의 바닥면(도넛 조각) 형상
@@ -98,7 +99,7 @@ function CurvedSofa() {
   }, [])
 
   return (
-    <group position={[SOFA.x, 0, SOFA.z]} rotation={[0, SOFA.rot, 0]}>
+    <group position={[LOUNGE.sofa.x, 0, LOUNGE.sofa.z]} rotation={[0, LOUNGE.sofa.rot, 0]} scale={[LOUNGE.sofa.scale, LOUNGE.sofa.yScale, LOUNGE.sofa.scale]}>
       {/* 오크 받침 + 바닥 그림자 */}
       <mesh geometry={geos.plinth} position={[0, 0.16, 0]}>
         <meshStandardMaterial {...oak} />
@@ -162,7 +163,7 @@ function CurvedSofa() {
 function CoffeeTable() {
   const oak = useOak({ repeat: [2, 1], color: P.oakLight })
   return (
-    <group position={[8.25, 0, 2.85]}>
+    <group position={[LOUNGE.table.x, 0, LOUNGE.table.z]} scale={LOUNGE.table.scale}>
       <mesh position={[0, 0.4, 0]}>
         <cylinderGeometry args={[0.95, 0.95, 0.07, 48]} />
         <meshStandardMaterial {...oak} />
@@ -244,26 +245,21 @@ function ShelfUnit({ width = 2.1, height = 3.05, seed = 1 }) {
 }
 
 function BookshelfWall() {
-  // 오른벽(x=12.7)을 따라 이어지는 책장 — 가운데는 살짝 꺾여 곡선처럼 보입니다
-  const units = [
-    { z: -2.75, rot: 0.12, w: 2.0, seed: 1 },
-    { z: -0.7, rot: 0.04, w: 2.1, seed: 2 },
-    { z: 1.4, rot: -0.04, w: 2.1, seed: 3 },
-    { z: 3.5, rot: -0.12, w: 2.0, seed: 4 },
-  ]
+  // 오른벽(x=12.7)을 따라 이어지는 책장 — 라운지 축소에 맞춰 3칸으로 줄였습니다
+  const units = LOUNGE.shelfZ.map((z, i) => ({ z, rot: (i - 1) * 0.07, w: 1.8, seed: i + 1 }))
   return (
     <group>
       {units.map((u) => (
-        <group key={u.z} position={[12.52, 0, u.z]} rotation={[0, -Math.PI / 2 + u.rot, 0]}>
+        <group key={u.z} position={[LOUNGE.shelfX, 0, u.z]} rotation={[0, -Math.PI / 2 + u.rot, 0]}>
           <ShelfUnit width={u.w} seed={u.seed} />
         </group>
       ))}
       {/* 책장 상단 마감 · 벽면 LED 워시 */}
-      <mesh position={[12.56, 3.16, 0.4]}>
-        <boxGeometry args={[0.5, 0.08, 7.8]} />
+      <mesh position={[LOUNGE.shelfX + 0.04, 3.16, 0.55]}>
+        <boxGeometry args={[0.5, 0.08, 5.4]} />
         <meshStandardMaterial color={P.oakMid} roughness={0.65} />
       </mesh>
-      <LedStrip position={[12.3, 3.1, 0.4]} size={[0.05, 0.02, 7.4]} intensity={1.3} />
+      <LedStrip position={[LOUNGE.shelfX - 0.22, 3.1, 0.55]} size={[0.05, 0.02, 5.0]} intensity={1.3} />
     </group>
   )
 }
@@ -284,7 +280,7 @@ function Desk({ partner }) {
     [partner, ts],
   )
   return (
-    <group position={[10.6, 0, 7.5]} rotation={[0, -0.1, 0]}>
+    <group position={[LOUNGE.desk.x, 0, LOUNGE.desk.z]} rotation={[0, LOUNGE.desk.rot, 0]}>
       <mesh position={[0, 0.75, 0]}>
         <boxGeometry args={[2.2, 0.07, 0.84]} />
         <meshStandardMaterial {...oak} />
@@ -339,8 +335,8 @@ export function LoungeZone({ partner }) {
   const stone = useStone({ color: '#ffffff' })
   return (
     <group>
-      {/* 도톰한 울 러그 */}
-      <Rug position={[8.5, 0, 2.35]} size={[7.0, 5.6]} rotation={0.06} />
+      {/* 도톰한 울 러그 — 소파·테이블·데스크를 한 번에 묶는 아늑한 크기 */}
+      <Rug position={[LOUNGE.rug.x, 0, LOUNGE.rug.z]} size={[LOUNGE.rug.w, LOUNGE.rug.d]} rotation={LOUNGE.rug.rot} />
 
       {/* 곡선 린넨 소파 */}
       <CurvedSofa />
@@ -355,20 +351,20 @@ export function LoungeZone({ partner }) {
       <Desk partner={partner} />
 
       {/* 액자 — 창가 왼쪽 벽 */}
-      <FramedArt position={[4.4, 2.05, 10.68]} rotation={[0, Math.PI, 0]} width={1.4} height={1.66} variant={2} />
+      <FramedArt position={[LOUNGE.art[0], 2.05, LOUNGE.art[1]]} rotation={[0, Math.PI, 0]} width={1.3} height={1.54} variant={2} />
 
       {/* 스탠드 조명 · 화분 · 사이드 테이블 */}
-      <FloorLamp position={[11.85, 0, 5.1]} />
-      <Plant position={[6.3, 0, 9.3]} scale={1.05} tall />
-      <Plant position={[12.1, 0, -1.2]} scale={1.0} />
-      <SideTable position={[11.9, 0, -2.9]} radius={0.32} height={0.46} />
-      <Vase position={[11.9, 0.48, -2.9]} scale={0.95} color="#e2d5bd" />
+      <FloorLamp position={[LOUNGE.lamp[0], 0, LOUNGE.lamp[1]]} />
+      <Plant position={[LOUNGE.plantTall[0], 0, LOUNGE.plantTall[1]]} scale={1.0} tall />
+      <Plant position={[LOUNGE.plantSmall[0], 0, LOUNGE.plantSmall[1]]} scale={0.95} />
+      <SideTable position={[LOUNGE.sideTable[0], 0, LOUNGE.sideTable[1]]} radius={0.32} height={0.46} />
+      <Vase position={[LOUNGE.sideTable[0], 0.48, LOUNGE.sideTable[1]]} scale={0.95} color="#e2d5bd" />
 
       {/* 소파 뒤 슬랫 패널 (벽 마감) */}
-      <SlatWall position={[12.6, 0, -4.9]} rotation={[0, -Math.PI / 2, 0]} width={2.4} height={2.6} gap={0.2} />
+      <SlatWall position={[LOUNGE.slat[0], 0, LOUNGE.slat[1]]} rotation={[0, -Math.PI / 2, 0]} width={2.2} height={2.6} gap={0.2} />
 
       {/* 라운지 입구 바닥 표시 */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[5.4, 0.007, 3.0]}>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[LOUNGE.marker[0], 0.007, LOUNGE.marker[1]]}>
         <ringGeometry args={[1.5, 1.56, 48]} />
         <meshStandardMaterial {...stone} color={P.stone} roughness={0.5} />
       </mesh>

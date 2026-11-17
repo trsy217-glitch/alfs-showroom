@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { consultantGreeting, DEFAULT_PARTNER, resolvePartner } from './config/partners.js'
 import { productFocus, zoneById } from './three/zones.js'
 import { respond } from './lib/assistant.js'
@@ -6,10 +6,11 @@ import { setTextSize, useTextSize } from './lib/textSize.js'
 import { ShowroomCanvas } from './three/ShowroomCanvas.jsx'
 import { ChapterBar, Hint, LoadingScreen, TextSizeToggle, TopBar } from './ui/Chrome.jsx'
 import { Joystick } from './ui/Joystick.jsx'
-import { ProductPanel } from './ui/ProductPanel.jsx'
+import { ProductInspector } from './ui/ProductInspector.jsx'
 import { AssistantDrawer } from './ui/AssistantDrawer.jsx'
 import { SimulatorPanel } from './ui/SimulatorPanel.jsx'
 import { StaffMenu } from './ui/StaffMenu.jsx'
+import { LoungeToast, WelcomeGreeting } from './ui/Greeting.jsx'
 
 const readPartnerCode = () => {
   if (typeof window === 'undefined') return DEFAULT_PARTNER
@@ -36,12 +37,15 @@ export default function App() {
   const [assistantOpen, setAssistantOpen] = useState(false)
   const [staffMenu, setStaffMenu] = useState(false)
   const [nearStaff, setNearStaff] = useState(false)
-  const [greeting, setGreeting] = useState(false)
+  const [welcome, setWelcome] = useState(false)
+  const [loungeToast, setLoungeToast] = useState(false)
   const [simOpen, setSimOpen] = useState(false)
   const [ready, setReady] = useState(false)
   const [hint, setHint] = useState(true)
   const textSize = useTextSize()
   const narrow = useNarrow()
+  const loungeRef = useRef({ inside: false, shownAt: 0 })
+  const loungeTimer = useRef(0)
 
   const zone = useMemo(() => zoneById(zoneId), [zoneId])
 
@@ -64,16 +68,42 @@ export default function App() {
     return () => window.clearTimeout(t)
   }, [])
 
-  // 입장 인사 — 카브제처럼 잠깐 "어서오세요" 안내가 떠오릅니다
+  // 입장 인사 — 한 글자씩 입체로 나타나는 환영 문구
   useEffect(() => {
     if (!ready) return undefined
-    const a = window.setTimeout(() => setGreeting(true), 500)
-    const b = window.setTimeout(() => setGreeting(false), 4200)
+    const a = window.setTimeout(() => setWelcome(true), 400)
+    const b = window.setTimeout(() => setWelcome(false), 7800)
     return () => {
       window.clearTimeout(a)
       window.clearTimeout(b)
     }
   }, [ready])
+
+  // 05 라운지 도착 안내 — 챕터 이동으로 오든, 걸어서 들어오든 '도착하면' 한 번씩
+  const showLounge = useCallback(() => {
+    const now = performance.now()
+    if (now - loungeRef.current.shownAt < 12000) return
+    loungeRef.current.shownAt = now
+    setLoungeToast(true)
+    window.clearTimeout(loungeTimer.current)
+    loungeTimer.current = window.setTimeout(() => setLoungeToast(false), 7600)
+  }, [])
+
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      const cam = typeof window !== 'undefined' ? window.__ALFS_CAM__ : null
+      if (!cam) return
+      const b = zoneById('lounge').bounds
+      // 카메라가 라운지 구역에 실제로 들어와 멈췄을 때 (이동 중에는 띄우지 않음)
+      const inside = cam.tx > b[0] && cam.tx < b[1] && cam.tz > b[2] && cam.tz < b[3]
+      if (inside && !cam.gliding && !loungeRef.current.inside) showLounge()
+      loungeRef.current.inside = inside && !cam.gliding
+    }, 450)
+    return () => {
+      window.clearInterval(id)
+      window.clearTimeout(loungeTimer.current)
+    }
+  }, [showLounge])
 
   const goZone = useCallback((id) => {
     setProduct(null)
@@ -128,6 +158,7 @@ export default function App() {
           focus={focus}
           narrow={narrow}
           talking={assistantOpen}
+          paused={!!product}
           onGo={goZone}
           onSelect={openProduct}
           onSummon={summon}
@@ -159,7 +190,8 @@ export default function App() {
 
       <ChapterBar zoneId={zoneId} onGo={goZone} />
 
-      {greeting && <div className="greet-tip" data-testid="greet-tip">어서오세요. {partner.name}입니다.</div>}
+      <WelcomeGreeting show={welcome} />
+      <LoungeToast show={loungeToast} />
 
       {nearStaff && !staffMenu && !assistantOpen && !product && (
         <button type="button" className="staff-prompt" onClick={summon} data-testid="staff-prompt">
@@ -168,7 +200,7 @@ export default function App() {
         </button>
       )}
 
-      <ProductPanel product={product} partner={partner} onClose={() => setProduct(null)} onAsk={ask} onGo={goZone} />
+      <ProductInspector product={product} partner={partner} onClose={() => setProduct(null)} onAsk={ask} onGo={goZone} />
 
       <StaffMenu
         partner={partner}
