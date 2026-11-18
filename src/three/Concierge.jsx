@@ -1,87 +1,45 @@
 import { useMemo, useRef, useState } from 'react'
-import { useFrame, useLoader, useThree } from '@react-three/fiber'
+import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
-import { bubbleTexture, staffBadgeTexture } from './textures.js'
-import { ShadowDisc, Glow } from './parts.jsx'
+import { plaqueTexture } from './textures.js'
+import { Panel, Glow } from './parts.jsx'
 import { interaction } from './interaction.js'
 import { P } from './palette.js'
 import { CONCIERGE_POS, CONCIERGE_ROT } from './zones.js'
 
-// ── 쇼룸 상담 매니저 '서연' ────────────────────────────────────
-// 카브제 팝업스토어의 점원처럼: 데스크 옆에 자연스럽게 서 있고, 가까이 가면
-// 말을 걸 수 있으며, 누르면 상담 메뉴가 열립니다. (사진 컷아웃 + 미세한 호흡)
-// 이미지: public/images/staff/concierge.png (알파 컷아웃 실사 합성)
+// ── 상담 데스크 표지 ──────────────────────────────────────────
+// 2026-11-18 소영 님 지시 ②: 3D 공간 한가운데 떠 있던 매니저 전신 이미지·
+// 큰 말풍선·이름표를 걷어냈습니다. 뒤쪽 라운지 시야를 가리지 않고 배경과
+// 이질감도 없도록, 데스크 옆에는 작은 브라스 명패만 조용히 세워 둡니다.
+// 상담 UI 는 오른쪽 위 '상담 매니저 부르기' 버튼(또는 이 명패)을 눌렀을 때만 열립니다.
+// 매니저 Q&A 지식베이스(src/config/knowledge.js)와 상담 기능은 그대로입니다.
 
-const IMG = '/images/staff/concierge.png'
-const H = 1.74
-const W = H * (372 / 1320)
+const STAND_H = 0.46
 
-export function Concierge({ partner, onSummon, talking, hidden, onNear }) {
+export function Concierge({ partner, onSummon, hidden, onNear }) {
   const camera = useThree((s) => s.camera)
-  const tex = useLoader(THREE.TextureLoader, IMG)
   const [hover, setHover] = useState(false)
-  const root = useRef(null)
-  const bob = useRef(null)
-  const bubble = useRef(null)
-  const bubbleMat = useRef(null)
-  const bubbleOpacity = useRef(1)
   const nearState = useRef(false)
-  const yaw = useRef(CONCIERGE_ROT)
-  const group = useRef(null)
 
-  const map = useMemo(() => {
-    const t = tex.clone()
-    t.colorSpace = THREE.SRGBColorSpace
-    t.anisotropy = 8
-    t.needsUpdate = true
-    return t
-  }, [tex])
-
-  const bubbleTex = useMemo(
+  const plaque = useMemo(
     () =>
-      bubbleTexture({
-        key: 'concierge-hello',
-        title: '안녕하세요, 서연입니다',
-        lines: ['제품 구성 · 가격 · 배송 · 주문', '편하게 물어보세요'],
-        accent: P.goldDeep,
-      }),
-    [],
-  )
-
-  const badgeTex = useMemo(
-    () =>
-      staffBadgeTexture({
-        key: `concierge-badge-${partner.code}`,
-        name: '서연',
-        role: partner.type === 'hq' ? '알프스 쇼룸 매니저' : `${partner.shortName} 상담 매니저`,
+      plaqueTexture({
+        key: `concierge-desk-${partner.code}`,
+        name: '상담 매니저 서연',
+        price: '상담 데스크',
+        note: "오른쪽 위 '상담 매니저 부르기'",
         accent: partner.accent,
       }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [partner],
   )
 
   const tmp = useMemo(() => new THREE.Vector3(), [])
 
-  useFrame((state, delta) => {
-    const dt = Math.min(delta, 0.05)
-    const t = state.clock.elapsedTime
-    if (bob.current) {
-      // 아주 미세한 호흡 — 사진이 살아 있는 느낌
-      bob.current.position.y = Math.sin(t * 0.9) * 0.006
-      bob.current.rotation.z = Math.sin(t * 0.55) * 0.004
-    }
-
-    // 손님이 가까이 오면 자연스럽게 몸을 돌려 맞이합니다
+  useFrame(() => {
     const dx = camera.position.x - CONCIERGE_POS[0]
     const dz = camera.position.z - CONCIERGE_POS[2]
-    const targetYaw = Math.atan2(dx, dz)
-    yaw.current += (targetYaw - yaw.current) * (1 - Math.exp(-dt * 2.2))
-    if (group.current) group.current.rotation.y = yaw.current
-
     const dist = Math.hypot(dx, dz)
-    const wantBubble = talking ? 0 : dist < 9 ? 1 : 0.2
-    bubbleOpacity.current += (wantBubble - bubbleOpacity.current) * (1 - Math.exp(-dt * 3))
-    if (bubbleMat.current) bubbleMat.current.opacity = bubbleOpacity.current
-    if (bubble.current) bubble.current.visible = bubbleOpacity.current > 0.03
 
     const near = dist < 3.6
     if (near !== nearState.current) {
@@ -90,7 +48,7 @@ export function Concierge({ partner, onSummon, talking, hidden, onNear }) {
     }
 
     if (typeof window !== 'undefined') {
-      tmp.set(CONCIERGE_POS[0], 1.0, CONCIERGE_POS[2]).project(camera)
+      tmp.set(CONCIERGE_POS[0], 0.9, CONCIERGE_POS[2]).project(camera)
       window.__ALFS_CONCIERGE__ = {
         x: Math.round((tmp.x * 0.5 + 0.5) * window.innerWidth),
         y: Math.round((-tmp.y * 0.5 + 0.5) * window.innerHeight),
@@ -101,61 +59,46 @@ export function Concierge({ partner, onSummon, talking, hidden, onNear }) {
   })
 
   return (
-    <group ref={group} position={CONCIERGE_POS} rotation={[0, CONCIERGE_ROT, 0]} visible={!hidden}>
-      <Glow radius={1.5} opacity={0.16} />
-      <group ref={root}>
-        <ShadowDisc radius={0.42} position={[0, 0.012, 0.02]} opacity={0.62} />
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.014, 0.02]}>
-          <ringGeometry args={[0.41, 0.45, 48]} />
-          <meshBasicMaterial color={P.brass} transparent opacity={hover ? 0.95 : 0.5} toneMapped={false} />
-        </mesh>
-
-        <group
-          ref={bob}
-          onPointerOver={(e) => {
-            e.stopPropagation()
-            setHover(true)
-            document.body.style.cursor = 'pointer'
-          }}
-          onPointerOut={() => {
-            setHover(false)
-            document.body.style.cursor = 'auto'
-          }}
-          onClick={(e) => {
-            e.stopPropagation()
-            if (interaction.moved) return
-            onSummon?.()
-          }}
-        >
-          <mesh position={[0, H / 2 + 0.01, 0]}>
-            <planeGeometry args={[W, H]} />
-            <meshBasicMaterial map={map} transparent alphaTest={0.42} toneMapped={false} side={THREE.DoubleSide} />
-          </mesh>
-          <mesh position={[0, H / 2, 0.02]}>
-            <planeGeometry args={[W + 0.16, H]} />
-            <meshBasicMaterial transparent opacity={0} depthWrite={false} />
-          </mesh>
-          {hover && (
-            <mesh position={[0, H / 2, -0.01]}>
-              <planeGeometry args={[W + 0.2, H + 0.06]} />
-              <meshBasicMaterial color={P.goldSoft} transparent opacity={0.18} toneMapped={false} />
-            </mesh>
-          )}
-        </group>
-      </group>
-
-      {/* 이름표 */}
-      <mesh position={[0, H + 0.13, 0]}>
-        <planeGeometry args={[0.72, 0.24]} />
-        <meshBasicMaterial map={badgeTex} transparent toneMapped={false} />
+    <group position={CONCIERGE_POS} rotation={[0, CONCIERGE_ROT, 0]} visible={!hidden}>
+      {/* 바닥 안내 — 아주 옅은 빛과 얇은 브라스 링 */}
+      <Glow radius={1.15} opacity={0.12} />
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.013, 0.02]}>
+        <ringGeometry args={[0.26, 0.285, 48]} />
+        <meshBasicMaterial color={P.brass} transparent opacity={hover ? 0.8 : 0.4} toneMapped={false} />
       </mesh>
 
-      {/* 말풍선 */}
-      <group ref={bubble} position={[-0.74, 1.62, 0.08]}>
-        <mesh>
-          <planeGeometry args={[1.08, 0.55]} />
-          <meshBasicMaterial ref={bubbleMat} map={bubbleTex} transparent opacity={1} toneMapped={false} depthWrite={false} />
+      {/* 작은 명패 — 데스크 옆 바닥에 세운 슬림 스탠드 */}
+      <group
+        onPointerOver={(e) => {
+          e.stopPropagation()
+          setHover(true)
+          document.body.style.cursor = 'pointer'
+        }}
+        onPointerOut={() => {
+          setHover(false)
+          document.body.style.cursor = 'auto'
+        }}
+        onClick={(e) => {
+          e.stopPropagation()
+          if (interaction.moved) return
+          onSummon?.()
+        }}
+      >
+        <mesh position={[0, 0.012, 0]}>
+          <cylinderGeometry args={[0.085, 0.1, 0.02, 24]} />
+          <meshStandardMaterial color={P.brass} metalness={0.72} roughness={0.3} />
         </mesh>
+        <mesh position={[0, STAND_H / 2, 0]}>
+          <cylinderGeometry args={[0.01, 0.012, STAND_H, 12]} />
+          <meshStandardMaterial color={P.brass} metalness={0.8} roughness={0.26} />
+        </mesh>
+        <group position={[0, STAND_H + 0.065, 0]} rotation={[-0.16, 0, 0]}>
+          <mesh>
+            <boxGeometry args={[0.33, 0.126, 0.01]} />
+            <meshStandardMaterial color="#fbf5e8" roughness={0.4} metalness={0.1} />
+          </mesh>
+          <Panel texture={plaque} width={0.31} height={0.11} position={[0, 0, 0.007]} />
+        </group>
       </group>
     </group>
   )

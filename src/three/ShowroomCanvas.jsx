@@ -32,7 +32,7 @@ function ProductHotspots() {
         front: v.z < 1 && Math.abs(v.x) < 1 && Math.abs(v.y) < 1,
       })
     }
-    push('oryun', -2.8, 1.35, 1.4)
+    push('oryun', -2.8, 1.5, 1.4)
     ENZYME_Z.forEach((z, i) => push(ENZYME_IDS[i], ENZYME_X, 1.12, z))
     window.__ALFS_HOTSPOTS__ = out
   })
@@ -88,7 +88,7 @@ export function ShowroomCanvas({
         <EnzymeZone partner={partner} onSelect={onSelect} />
         <ExperienceZone partner={partner} onOpenSimulator={onOpenSimulator} />
         <LoungeZone partner={partner} />
-        <Concierge partner={partner} onSummon={onSummon} talking={talking} onNear={onNearStaff} />
+        <Concierge partner={partner} onSummon={onSummon} onNear={onNearStaff} />
       </Suspense>
 
       {ZONES.map((z) => (

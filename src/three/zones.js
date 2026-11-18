@@ -48,10 +48,10 @@ export const ZONES = [
     name: '오륜미네랄 전시대',
     short: '오륜미네랄',
     desc: '시그니처 · 1,000ml',
-    ...view({ display: [-2.8, 1.4], front: [0, 1], stand: 1.5, eyeY: 1.28, radius: 3.0, phi: 1.44 }),
+    ...view({ display: [-2.8, 1.4], front: [0, 1], stand: 1.58, eyeY: 1.4, radius: 2.6, phi: 1.45 }),
     marker: [-4.4, 0.02, 4.4],
     bounds: [-8, 3, -2, 6],
-    narrow: view({ display: [-2.8, 1.4], front: [0, 1], stand: 1.45, eyeY: 1.3, radius: 2.5, phi: 1.43 }),
+    narrow: view({ display: [-2.8, 1.4], front: [0, 1], stand: 1.55, eyeY: 1.38, radius: 2.35, phi: 1.44 }),
   },
   {
     id: 'enzyme',
@@ -102,10 +102,10 @@ export function productFocus(product, narrow = false) {
   if (!product) return null
   if (product.zone === 'mineral') {
     return {
-      target: [-2.8, narrow ? 1.3 : 1.28, 2.88],
+      target: [-2.8, narrow ? 1.42 : 1.42, 2.98],
       theta: 0,
-      phi: narrow ? 1.43 : 1.44,
-      radius: narrow ? 1.8 : 2.2,
+      phi: narrow ? 1.44 : 1.45,
+      radius: narrow ? 1.8 : 2.15,
     }
   }
   const i = ['fit30', 'fit3', 'bioenergy', 'zymogen', 'cleanbiome', 'cleanbiome1'].indexOf(product.id)
@@ -125,7 +125,7 @@ export function productFocus(product, narrow = false) {
 //  · stand: 전시물에서 손님이 서는 거리 (충돌 박스 바깥)
 // ─────────────────────────────────────────────────────────────
 export const DISPLAYS = [
-  { id: 'mineral', zone: 'mineral', pos: [-2.8, 1.4], front: [0, 1], stand: 1.5, eyeY: 1.28 },
+  { id: 'mineral', zone: 'mineral', pos: [-2.8, 1.4], front: [0, 1], stand: 1.58, eyeY: 1.4 },
   ...ENZYME_Z.map((z, i) => ({
     id: `enzyme-${i}`,
     zone: 'enzyme',

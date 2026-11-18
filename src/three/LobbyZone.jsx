@@ -44,7 +44,7 @@ export function LobbyZone({ partner, onSummon }) {
       screenTexture({
         key: `kiosk-${partner.code}`,
         title: '상담 매니저 서연',
-        lines: ['데스크 옆에 서 있는 매니저를 눌러도 상담이 열립니다.', '제품 구성 · 가격 · 배송 · 주문을 바로 안내합니다.'],
+        lines: ["오른쪽 위 '상담 매니저 부르기'를 누르면 상담이 열립니다.", '제품 구성 · 가격 · 배송 · 주문을 바로 안내합니다.'],
         accent: partner.accent,
         cta: '눌러서 상담 열기',
         theme: 'light',

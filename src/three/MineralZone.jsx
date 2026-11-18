@@ -1,16 +1,38 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
+import * as THREE from 'three'
 import { mineralProduct, won } from '../config/catalog.js'
-import { panelTexture, plaqueTexture, signTexture } from './textures.js'
-import { Panel, Clickable, CutoutStand, ShadowDisc, Glow, LedStrip } from './parts.jsx'
+import { glowTexture, panelTexture, plaqueTexture, shadowTexture, signTexture } from './textures.js'
+import { Panel, Clickable, CutoutStand, ShadowDisc, Glow } from './parts.jsx'
 import { P } from './palette.js'
 import { useTextSize } from '../lib/textSize.js'
-import { Pendant, Plant, SlatWall, useOak, useStone } from './furniture.jsx'
+import { Pendant, Plant, StoneBackdrop, useOak } from './furniture.jsx'
+
+// 제품을 향해 떨어지는 스포트 — 대상(object3D)을 명시해야 그 자리를 비춥니다
+function ProductSpot() {
+  const light = useRef(null)
+  const target = useRef(null)
+  useEffect(() => {
+    if (light.current && target.current) light.current.target = target.current
+  }, [])
+  return (
+    <>
+      <spotLight ref={light} position={[0, 3.25, 1.0]} angle={0.52} penumbra={0.9} intensity={16} distance={9} decay={2} color="#fff1d6" />
+      <object3D ref={target} position={[0, 1.2, 0]} />
+    </>
+  )
+}
 
 // ── ② 오륜미네랄 전시대 — 스톤 테이블 위 누끼 병 진열 (1,000ml) ──
+//  2026-11-18 소영 님 지시 ③ + 최우선 원칙:
+//   · 뒤 가벽의 굵은 세로 슬랫 줄무늬를 없애고 차분한 스톤 단색으로, 높이도 낮춰
+//     홀 뒤쪽 시야가 시원하게 트이도록 정리
+//   · 다른 어떤 요소보다 오륜미네랄 제품이 먼저·선명하게 보이도록
+//     조명(스포트 + 뒤 후광) · 대비(차분한 배경) · 구도(작은 간판 · 정면 배치)를 다시 잡음
 export function MineralZone({ partner, onSelect }) {
   const ts = useTextSize()
   const oak = useOak({ repeat: [2, 1], color: P.oakMid })
-  const stone = useStone({ color: '#ffffff' })
+  const halo = useMemo(() => glowTexture(), [])
+  const contact = useMemo(() => shadowTexture(), [])
 
   const price = useMemo(
     () =>
@@ -70,94 +92,118 @@ export function MineralZone({ partner, onSelect }) {
 
   return (
     <group position={[-2.8, 0, 1.4]}>
-      {/* 원형 스톤 아일랜드 — 오크 받침 + 트라버틴 상판 */}
-      <ShadowDisc radius={1.8} opacity={0.32} />
-      <Glow radius={2.6} opacity={0.2} />
-      <mesh position={[0, 0.32, 0]}>
-        <cylinderGeometry args={[0.62, 0.7, 0.64, 40]} />
+      {/* 스톤 페데스탈 — 갤러리 진열대처럼 제품만 조용히 받칩니다 */}
+      <ShadowDisc radius={1.5} opacity={0.3} />
+      <Glow radius={2.4} opacity={0.24} />
+      {/* 바닥 받침 링 */}
+      <mesh position={[0, 0.028, 0]}>
+        <cylinderGeometry args={[0.5, 0.54, 0.056, 56]} />
         <meshStandardMaterial {...oak} />
       </mesh>
-      <mesh position={[0, 0.67, 0]}>
-        <cylinderGeometry args={[0.96, 1.0, 0.08, 56]} />
-        <meshStandardMaterial {...stone} />
+      {/* 트라버틴 기둥 — 무늬 없이 차분한 단색 스톤 */}
+      <mesh position={[0, 0.46, 0]}>
+        <cylinderGeometry args={[0.32, 0.36, 0.86, 56]} />
+        <meshStandardMaterial color="#bda98a" roughness={0.58} metalness={0.04} />
       </mesh>
-      <mesh position={[0, 0.725, 0]}>
-        <cylinderGeometry args={[0.94, 0.94, 0.02, 56]} />
-        <meshStandardMaterial color={P.stoneTop} roughness={0.32} metalness={0.08} />
+      {/* 상단 캡 + 브라스 헤어라인 */}
+      <mesh position={[0, 0.92, 0]}>
+        <cylinderGeometry args={[0.34, 0.34, 0.06, 56]} />
+        <meshStandardMaterial color="#d5c4a3" roughness={0.42} metalness={0.06} />
+      </mesh>
+      <mesh position={[0, 0.892, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[0.325, 0.34, 64]} />
+        <meshStandardMaterial color={P.brass} metalness={0.75} roughness={0.28} />
       </mesh>
       <mesh position={[0, 0.05, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[1.46, 1.52, 64]} />
+        <ringGeometry args={[1.28, 1.34, 64]} />
         <meshStandardMaterial color={P.oakDark} roughness={0.6} />
       </mesh>
 
-      {/* 누끼로 딴 1,000ml 병 — 아크릴 스탠드에 세워 진열 */}
-      <mesh position={[0, 0.78, 0]}>
-        <cylinderGeometry args={[0.44, 0.48, 0.06, 40]} />
-        <meshStandardMaterial color={P.stone} roughness={0.38} metalness={0.08} />
+      {/* 제품 뒷면 후광 — 배경에서 제품만 떠 보이게 (은은하게) */}
+      <mesh position={[0, 1.52, -2.5]}>
+        <planeGeometry args={[1.5, 1.5]} />
+        <meshBasicMaterial map={halo} transparent opacity={0.16} depthWrite={false} blending={THREE.AdditiveBlending} toneMapped={false} />
       </mesh>
+
+      {/* 제품 접지 그림자 — 캡 위에 확실히 내려앉아 보이게 */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.952, 0]}>
+        <planeGeometry args={[0.56, 0.38]} />
+        <meshBasicMaterial map={contact} transparent opacity={0.7} depthWrite={false} toneMapped={false} />
+      </mesh>
+
+      {/* 누끼로 딴 1,000ml 병 — 아크릴 스탠드에 세워 진열 */}
       <CutoutStand
         url="/images/cutout/mineral-1000.webp"
-        height={1.08}
-        position={[0, 0.81, 0]}
+        height={1.18}
+        position={[0, 0.91, 0]}
         rotation={[0, 0.06, 0]}
-        lean={0.02}
+        lean={0.01}
         shadowWidth={1.2}
         onClick={() => onSelect(mineralProduct)}
       />
 
+      {/* 제품을 향한 스포트 + 뒤쪽 림라이트 — 공간에서 가장 밝은 자리 */}
+      <ProductSpot />
+      <pointLight position={[0, 1.75, -1.95]} intensity={3} distance={3.0} decay={2} color="#ffeecb" />
+
       {/* 위에서 떨어지는 따뜻한 펜던트 */}
       <Pendant position={[0, 3.15, 0]} drop={1.0} radius={0.3} />
 
-      {/* 뒤쪽 오크 슬랫 파티션 + 존 간판 */}
+      {/* 뒤쪽 차분한 스톤 가벽 + 존 간판 (줄무늬 없음 · 낮게) */}
       <group position={[0, 0, -2.6]}>
-        <SlatWall position={[0, 0, 0]} width={4.8} height={3.15} gap={0.22} color={P.oakLight} />
-        <LedStrip position={[0, 0.12, 0.14]} size={[4.4, 0.02, 0.03]} intensity={1.1} />
-        <group position={[0, 2.16, 0.14]}>
+        <StoneBackdrop width={5.2} height={2.9} />
+        <group position={[0, 2.46, 0.11]}>
           <mesh position={[0, 0, -0.03]}>
-            <boxGeometry args={[3.1, 0.94, 0.06]} />
+            <boxGeometry args={[2.32, 0.68, 0.05]} />
             <meshStandardMaterial color="#fbf5e8" roughness={0.45} metalness={0.1} />
           </mesh>
-          <Panel texture={brand} width={3.0} height={0.86} position={[0, 0, 0.02]} />
+          <Panel texture={brand} width={2.2} height={0.629} position={[0, 0, 0.015]} />
         </group>
       </group>
 
-      {/* 가격 명판 — 앞쪽 이젤 */}
-      <group position={[0, 0, 1.62]} rotation={[-0.36, 0, 0]}>
+      {/* 가격 라벨 — 페데스탈 왼쪽 앞에 낮게 눕힌 안내판 */}
+      <group position={[-0.72, 0, 1.02]} rotation={[0, 0.34, 0]}>
         <Clickable onClick={() => onSelect(mineralProduct)} hoverScale={1.05}>
-          <mesh position={[0, 0.92, 0]}>
-            <boxGeometry args={[0.96, 0.36, 0.04]} />
-            <meshStandardMaterial color="#fbf5e8" roughness={0.4} metalness={0.12} />
+          <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <circleGeometry args={[0.13, 20]} />
+            <meshStandardMaterial color={P.brass} metalness={0.7} roughness={0.3} />
           </mesh>
-          <Panel texture={price} width={0.9} height={0.32} position={[0, 0.92, 0.025]} />
-          <mesh position={[0, 0.62, -0.05]} rotation={[0.22, 0, 0]}>
-            <boxGeometry args={[0.05, 0.5, 0.04]} />
+          <mesh position={[0, 0.2, 0]}>
+            <boxGeometry args={[0.028, 0.36, 0.028]} />
             <meshStandardMaterial color={P.oakDark} roughness={0.6} />
           </mesh>
+          <group position={[0, 0.42, 0.03]} rotation={[-0.62, 0, 0]}>
+            <mesh>
+              <boxGeometry args={[0.6, 0.22, 0.02]} />
+              <meshStandardMaterial color="#fbf5e8" roughness={0.4} metalness={0.1} />
+            </mesh>
+            <Panel texture={price} width={0.56} height={0.199} position={[0, 0, 0.013]} />
+          </group>
         </Clickable>
       </group>
 
-      {/* 좌우 설명 카드 — 테이블 옆에 비스듬히 */}
-      <group position={[-1.35, 0, 1.0]} rotation={[0, 0.72, 0]}>
-        <mesh position={[0, 0.62, 0]}>
-          <boxGeometry args={[0.04, 1.2, 0.04]} />
+      {/* 좌우 설명 카드 — 진열대 뒤쪽으로 물려 제품이 먼저 보이게 */}
+      <group position={[-1.72, 0, -1.48]} rotation={[0, 1.0, 0]}>
+        <mesh position={[0, 0.42, 0]}>
+          <boxGeometry args={[0.03, 0.8, 0.03]} />
           <meshStandardMaterial color={P.oakDark} roughness={0.6} />
         </mesh>
-        <mesh position={[0, 1.02, 0]} rotation={[0, 0, 0.06]}>
-          <boxGeometry args={[0.86, 0.56, 0.035]} />
+        <mesh position={[0, 0.72, 0]} rotation={[0, 0, 0.06]}>
+          <boxGeometry args={[0.6, 0.39, 0.03]} />
           <meshStandardMaterial color="#fbf5e8" roughness={0.45} />
         </mesh>
-        <Panel texture={factLeft} width={0.81} height={0.51} position={[0, 1.02, 0.022]} rotation={[0, 0, 0.06]} />
+        <Panel texture={factLeft} width={0.56} height={0.36} position={[0, 0.72, 0.02]} rotation={[0, 0, 0.06]} />
       </group>
-      <group position={[1.35, 0, 1.0]} rotation={[0, -0.72, 0]}>
-        <mesh position={[0, 0.62, 0]}>
-          <boxGeometry args={[0.04, 1.2, 0.04]} />
+      <group position={[1.72, 0, -1.48]} rotation={[0, -1.0, 0]}>
+        <mesh position={[0, 0.42, 0]}>
+          <boxGeometry args={[0.03, 0.8, 0.03]} />
           <meshStandardMaterial color={P.oakDark} roughness={0.6} />
         </mesh>
-        <mesh position={[0, 1.02, 0]} rotation={[0, 0, -0.06]}>
-          <boxGeometry args={[0.86, 0.56, 0.035]} />
+        <mesh position={[0, 0.72, 0]} rotation={[0, 0, -0.06]}>
+          <boxGeometry args={[0.6, 0.39, 0.03]} />
           <meshStandardMaterial color="#fbf5e8" roughness={0.45} />
         </mesh>
-        <Panel texture={factRight} width={0.81} height={0.51} position={[0, 1.02, 0.022]} rotation={[0, 0, -0.06]} />
+        <Panel texture={factRight} width={0.56} height={0.36} position={[0, 0.72, 0.02]} rotation={[0, 0, -0.06]} />
       </group>
 
       {/* 옆 화분 */}

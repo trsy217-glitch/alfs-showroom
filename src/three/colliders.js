@@ -28,7 +28,7 @@ const circle = (name, x, z, r, top = 1.2) => ({ kind: 'circle', name, x, z, r, t
 export const COLLIDERS = [
   // ── 01 로비 ──────────────────────────────────────────────
   box('lobby-desk', DESK.x, DESK.z, DESK.hw, DESK.hd, DESK.rot, 0.84),
-  circle('concierge', CONCIERGE_STAND.pos[0], CONCIERGE_STAND.pos[2], 0.34, 1.8),
+  circle('concierge', CONCIERGE_STAND.pos[0], CONCIERGE_STAND.pos[2], 0.2, 0.9),
   circle('lobby-chair-a', -8.3, 8.6, 0.56, 0.9),
   circle('lobby-chair-b', -9.6, 7.2, 0.56, 0.9),
   circle('lobby-side-table', -9.3, 8.35, 0.34, 0.55),
@@ -39,7 +39,7 @@ export const COLLIDERS = [
   // ── 02 오륜미네랄 전시대 (원형 아일랜드) ───────────────────
   circle('mineral-island', -2.8, 1.4, 1.0, 0.75),
   circle('mineral-plant', -0.3, 3.7, 0.36, 1.0),
-  box('mineral-partition', -2.8, -1.2, 2.4, 0.16, 0, 3.2),
+  box('mineral-partition', -2.8, -1.2, 2.6, 0.16, 0, 2.9),
 
   // ── 03 효소세상 진열 벤치 ────────────────────────────────
   box('enzyme-bench', -11.05, -0.4, 0.62, 3.9, 0, 0.85),

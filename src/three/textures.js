@@ -948,6 +948,41 @@ export function foliageTexture() {
   })
 }
 
+// 오륜미네랄 진열대 뒤 가벽 — 세로 줄무늬 없는 차분한 스톤
+//  · 위는 밝고 아래는 살짝 깊은 샴페인 스톤. 결은 아주 옅은 얼룩만 남깁니다.
+export function backdropTexture({ key = 'backdrop-stone', top = '#cdb99c', mid = '#c2ac8d', bottom = '#b39d7e' } = {}) {
+  return makeTexture(key, 1024, 512, (ctx, w, h) => {
+    const g = ctx.createLinearGradient(0, 0, 0, h)
+    g.addColorStop(0, top)
+    g.addColorStop(0.55, mid)
+    g.addColorStop(1, bottom)
+    ctx.fillStyle = g
+    ctx.fillRect(0, 0, w, h)
+
+    // 트라버틴 같은 부드러운 얼룩 — 줄무늬 없이 톤만 은은하게
+    for (let i = 0; i < 120; i += 1) {
+      const x = Math.random() * w
+      const y = Math.random() * h
+      const r = 30 + Math.random() * 130
+      const rg = ctx.createRadialGradient(x, y, 0, x, y, r)
+      const dark = Math.random() < 0.5
+      rg.addColorStop(0, dark ? `rgba(176,152,118,${0.02 + Math.random() * 0.04})` : `rgba(255,250,236,${0.03 + Math.random() * 0.05})`)
+      rg.addColorStop(1, 'rgba(0,0,0,0)')
+      ctx.fillStyle = rg
+      ctx.beginPath()
+      ctx.arc(x, y, r, 0, 7)
+      ctx.fill()
+    }
+
+    // 아래로 갈수록 살짝 가라앉는 그늘
+    const v = ctx.createLinearGradient(0, h * 0.55, 0, h)
+    v.addColorStop(0, 'rgba(120,98,72,0)')
+    v.addColorStop(1, 'rgba(120,98,72,0.10)')
+    ctx.fillStyle = v
+    ctx.fillRect(0, 0, w, h)
+  })
+}
+
 export function disposeTextures() {
   for (const tex of cache.values()) tex.dispose()
   cache.clear()

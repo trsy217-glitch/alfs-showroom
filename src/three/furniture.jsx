@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import * as THREE from 'three'
-import { artTexture, booksTexture, linenTexture, oakGrainTexture, shadowTexture, stoneTexture, woolTexture } from './textures.js'
+import { artTexture, backdropTexture, booksTexture, linenTexture, oakGrainTexture, shadowTexture, stoneTexture, woolTexture } from './textures.js'
+import { LedStrip } from './parts.jsx'
 import { P } from './palette.js'
 
 // ─────────────────────────────────────────────────────────────
@@ -331,6 +332,44 @@ export function SlatWall({ position = [0, 0, 0], rotation = [0, 0, 0], width = 4
           <meshStandardMaterial color={color} roughness={0.68} metalness={0.02} />
         </mesh>
       ))}
+    </group>
+  )
+}
+
+// 차분한 단색 스톤 가벽 (세로 슬랫 없음) — 상단 브라스 캡 + 앞쪽 코브 LED
+//  · 오륜미네랄 진열대 뒤에 세워 홀 뒤쪽 시야가 시원하게 트이도록 낮게 잡습니다
+export function StoneBackdrop({ position = [0, 0, 0], rotation = [0, 0, 0], width = 5, height = 2.9, depth = 0.16 }) {
+  const stone = useMemo(() => {
+    const t = backdropTexture({ key: 'backdrop-stone' })
+    return new THREE.MeshStandardMaterial({ map: t, color: '#ffffff', roughness: 0.66, metalness: 0.04 })
+  }, [])
+  const edge = useMemo(() => new THREE.MeshStandardMaterial({ color: P.stoneEdge, roughness: 0.6, metalness: 0.08 }), [])
+  return (
+    <group position={position} rotation={rotation}>
+      {/* 가벽 본체 */}
+      <mesh position={[0, height / 2, 0]}>
+        <boxGeometry args={[width, height, depth]} />
+        <primitive object={stone} attach="material" />
+      </mesh>
+      {/* 좌우 얇은 측면 — 종이처럼 얇아 보이지 않게 */}
+      {[-1, 1].map((s) => (
+        <mesh key={s} position={[(s * (width - 0.04)) / 2, height / 2, 0]}>
+          <boxGeometry args={[0.06, height, depth + 0.02]} />
+          <primitive object={edge} attach="material" />
+        </mesh>
+      ))}
+      {/* 상단 브라스 캡 */}
+      <mesh position={[0, height + 0.025, 0]}>
+        <boxGeometry args={[width + 0.08, 0.05, depth + 0.08]} />
+        <meshStandardMaterial color={P.brass} metalness={0.72} roughness={0.28} />
+      </mesh>
+      {/* 상단 코브 LED — 가벽만 은은하게 밝혀 배경과 분리 */}
+      <LedStrip position={[0, height - 0.09, depth / 2 + 0.03]} size={[width - 0.5, 0.02, 0.03]} intensity={0.8} />
+      {/* 하단 접지 그늘 */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.007, depth / 2 + 0.42]}>
+        <planeGeometry args={[width + 0.3, 0.9]} />
+        <meshBasicMaterial map={shadowTexture()} transparent opacity={0.34} depthWrite={false} />
+      </mesh>
     </group>
   )
 }
