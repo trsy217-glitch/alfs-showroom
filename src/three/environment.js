@@ -57,7 +57,7 @@ export function createStage(container, opts = {}) {
     // 오륜미네랄 (그림자)
     { pos: [-3.4, 3.95, -3.6], target: [-5.85, 1.35, -4.9], angle: 0.48, penumbra: 0.5, intensity: 165, shadow: true, key: true },
     // 효소세상 (그림자)
-    { pos: [4.1, 3.95, -3.7], target: [5.9, 1.25, -4.7], angle: 0.58, penumbra: 0.5, intensity: 185, shadow: true, key: true },
+    { pos: [3.6, 3.9, -3.8], target: [5.2, 1.25, -5.2], angle: 0.6, penumbra: 0.5, intensity: 200, shadow: true, key: true },
     // 브랜드 월 + 센터
     { pos: [0, 3.9, -3.8], target: [0, 1.7, -8.6], angle: 0.5, penumbra: 0.55, intensity: 165, shadow: false, key: true },
     // 라운지 · B2B 보드

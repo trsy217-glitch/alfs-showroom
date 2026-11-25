@@ -195,10 +195,10 @@ export function buildFurniture(scene, M, { register } = {}) {
 
     // 유리 받침
     const risers = [
-      { z: -5.2 - z, h: 0.14, r: 0.13 },
-      { z: -4.45 - z, h: 0.1, r: 0.12 },
-      { z: -3.7 - z, h: 0.08, r: 0.15 },
-      { z: -3.1 - z, h: 0.16, r: 0.09 },
+      { z: -6.5 - z, h: 0.14, r: 0.13 },
+      { z: -5.75 - z, h: 0.1, r: 0.12 },
+      { z: -5.0 - z, h: 0.08, r: 0.15 },
+      { z: -4.4 - z, h: 0.16, r: 0.09 },
     ]
     for (const r of risers) {
       const m = new THREE.Mesh(new THREE.CylinderGeometry(r.r, r.r, r.h, 40), M.frost)

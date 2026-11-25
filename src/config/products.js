@@ -54,7 +54,7 @@ export const products = [
     listPrice: 600000,
     photo: '/images/cutout/fit30.webp',
     model: 'box30',
-    anchor: [5.9, 1.2425, -5.2],
+    anchor: [5.12, 1.2425, -6.5],
     view: [-1, 0.08, 0.5],
     summary:
       '엔자임밀 파우치와 클린바이옴 병을 30일 동안 나눠 마시는 구성입니다. 파우치와 병으로 나뉘어 있어 하루 분량을 챙기기 쉽고, 설탕을 넣지 않았습니다.',
@@ -79,7 +79,7 @@ export const products = [
     listPrice: 150000,
     photo: '/images/cutout/fit3.webp',
     model: 'box3',
-    anchor: [5.9, 1.175, -4.45],
+    anchor: [5.12, 1.175, -5.75],
     view: [-1, 0.08, 0.55],
     summary:
       '30일 프로그램과 같은 엔자임밀·클린바이옴을 3일 분량으로 묶은 구성입니다. 처음 써 보거나 짧게 시험해 보려는 분들이 찾는 상품입니다.',
@@ -102,7 +102,7 @@ export const products = [
     listPrice: 126000,
     photo: '/images/cutout/cleanbiome6.webp',
     model: 'cluster6',
-    anchor: [5.9, 1.1175, -3.7],
+    anchor: [5.12, 1.1175, -5.0],
     view: [-1, 0.1, 0.5],
     summary:
       '자몽 맛 미생물 발효 음료 100ml 6병 구성입니다. 상온의 물에 한 병을 희석해 마시는 방식이라, 물만으로는 심심할 때 챙기기 좋습니다.',
@@ -126,7 +126,7 @@ export const products = [
     listPrice: 21000,
     photo: '/images/cutout/cleanbiome1.webp',
     model: 'single',
-    anchor: [5.9, 1.1925, -3.1],
+    anchor: [5.12, 1.1925, -4.4],
     view: [-1, 0.1, 0.55],
     summary:
       '클린바이옴 6병 구성과 같은 100ml 병을 한 병만 담은 상품입니다. 여섯 병을 한 번에 사기 전에 한 병만 먼저 써 보려는 분들이 찾습니다.',
