@@ -177,9 +177,6 @@ export function buildFurniture(scene, M, { register } = {}) {
     const top = rbox(0.44, 0.055, 3.05, 0.012, M.walnutLong)
     top.position.set(0, 0.925, 0)
     g.add(top)
-    const shelf = rbox(0.4, 0.04, 2.9, 0.01, M.walnutLong)
-    shelf.position.set(0, 0.3, 0)
-    g.add(shelf)
     for (const sz of [-1.42, 1.42]) {
       for (const sx of [-0.15, 0.15]) {
         const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.014, 0.9, 12), M.brass)
@@ -188,13 +185,13 @@ export function buildFurniture(scene, M, { register } = {}) {
         g.add(leg)
       }
     }
-    // 하부 수납함
-    const drawer = rbox(0.34, 0.14, 1.4, 0.006, M.walnutLong)
-    drawer.position.set(0, 0.58, 0.3)
-    g.add(drawer)
-    const pull = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.012, 0.3), M.brass)
-    pull.position.set(0.18, 0.58, 0.3)
-    g.add(pull)
+    // 얇은 황동 레일
+    const railBar = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.02, 2.84), M.brass)
+    railBar.position.set(-0.2, 0.28, 0)
+    g.add(railBar)
+    const railBack = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.02, 2.84), M.brass)
+    railBack.position.set(0.2, 0.28, 0)
+    g.add(railBack)
 
     // 유리 받침
     const risers = [
