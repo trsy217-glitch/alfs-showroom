@@ -243,9 +243,7 @@ html, body {
   justify-content: center;
   text-align: center;
   background:
-    radial-gradient(90% 70% at 50% 38%, rgba(247, 240, 227, 0.95) 0%, rgba(236, 224, 205, 0.9) 46%, rgba(221, 205, 180, 0.86) 100%);
-  backdrop-filter: blur(16px) saturate(1.05);
-  -webkit-backdrop-filter: blur(16px) saturate(1.05);
+    radial-gradient(90% 70% at 50% 38%, #f7f0e3 0%, #ece0cd 46%, #ddcdb4 100%);
   color: #221d16;
   transition: opacity 1.15s var(--ease), visibility 1.15s;
 }
@@ -255,6 +253,11 @@ html, body {
   inset: 0;
   background: radial-gradient(75% 60% at 50% 45%, rgba(255, 255, 255, 0) 40%, rgba(120, 98, 66, 0.16) 100%);
   pointer-events: none;
+}
+.intro.ready {
+  background: radial-gradient(90% 70% at 50% 38%, rgba(247, 240, 227, 0.95) 0%, rgba(236, 224, 205, 0.9) 46%, rgba(221, 205, 180, 0.86) 100%);
+  backdrop-filter: blur(16px) saturate(1.05);
+  -webkit-backdrop-filter: blur(16px) saturate(1.05);
 }
 .intro.gone { opacity: 0; visibility: hidden; }
 .intro-inner { position: relative; z-index: 2; padding: 0 24px; }
@@ -312,6 +315,8 @@ html, body {
   transition: background 0.55s var(--ease), color 0.55s var(--ease), border-color 0.55s var(--ease);
 }
 .intro-enter:hover { background: #1d1913; border-color: #1d1913; color: #f2ead9; }
+.intro-enter[disabled] { opacity: 0.45; cursor: progress; letter-spacing: 0.2em; }
+.intro-enter[disabled]:hover { background: transparent; color: #2b241b; border-color: rgba(139, 115, 81, 0.55); }
 .intro-note {
   margin-top: 26px;
   font-size: 10.5px;

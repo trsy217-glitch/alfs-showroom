@@ -3,7 +3,7 @@ import { ZONES } from '../three/layout.js'
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
 
-export function createUI({ onZone, onEnter, onPanelClose }) {
+export function createUI({ onZone, onPanelClose }) {
   const ui = document.getElementById('ui')
   ui.innerHTML = `
     <header class="topbar">
@@ -60,41 +60,6 @@ export function createUI({ onZone, onEnter, onPanelClose }) {
   const panel = ui.querySelector('#panel')
   const panelContent = ui.querySelector('#panelContent')
   const caption = ui.querySelector('#caption')
-
-  /* ---------------- 인트로 ---------------- */
-  const intro = document.createElement('div')
-  intro.className = 'intro'
-  intro.innerHTML = `
-    <div class="intro-inner">
-      <div class="intro-eyebrow">AL.F.S · Wellness Atelier</div>
-      <h1 class="intro-mark">A L . F . S</h1>
-      <p class="intro-sub">Private Showroom</p>
-      <div class="intro-rule"></div>
-      <p class="intro-ko">
-        서울 상암의 웰니스 아틀리에에서 준비한 <b>프라이빗 3D 쇼룸</b>입니다.<br />
-        오륜미네랄과 하루 1.3핏 · 클린바이옴을 공간에서 살펴보세요.
-      </p>
-      <button class="intro-enter" type="button" id="enterBtn">입장하기</button>
-      <p class="intro-note">마우스 드래그로 둘러보고, 진열된 제품을 눌러 보세요.</p>
-    </div>
-    <div class="intro-foot"><span>AL.F.S</span><span>Seoul · 2026</span></div>
-  `
-  document.getElementById('app').appendChild(intro)
-
-  let entered = false
-  const enter = () => {
-    if (entered) return
-    entered = true
-    intro.classList.add('gone')
-    setTimeout(() => {
-      intro.style.display = 'none'
-    }, 1300)
-    onEnter && onEnter()
-  }
-  intro.querySelector('#enterBtn').addEventListener('click', enter)
-  intro.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') enter()
-  })
 
   /* ---------------- 존 이동 ---------------- */
   const railBtns = [...ui.querySelectorAll('.rail-btn')]
@@ -238,7 +203,6 @@ export function createUI({ onZone, onEnter, onPanelClose }) {
 
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') close()
-    if (!entered) return
     const idx = ZONES.findIndex((z) => z.id === currentZone)
     if (e.key === 'ArrowRight' && idx >= 0) onZone(ZONES[(idx + 1) % ZONES.length].id)
     if (e.key === 'ArrowLeft' && idx >= 0) onZone(ZONES[(idx - 1 + ZONES.length) % ZONES.length].id)
@@ -260,7 +224,6 @@ export function createUI({ onZone, onEnter, onPanelClose }) {
     openB2B,
     close,
     tip,
-    enter,
     isOpen: () => isOpen,
     rail: railBtns,
   }

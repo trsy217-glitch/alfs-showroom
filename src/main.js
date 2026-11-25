@@ -7,6 +7,7 @@ import { buildFurniture } from './three/furniture.js'
 import { buildProducts } from './three/models.js'
 import { CameraRig } from './three/rig.js'
 import { createUI } from './ui/ui.js'
+import { createIntro } from './ui/intro.js'
 import { ZONE_BY_ID, HOTSPOTS, productPose } from './three/layout.js'
 import { products } from './config/products.js'
 import { engraveTexture } from './three/textures.js'
@@ -39,6 +40,17 @@ async function boot() {
   const timing = []
   const mark = (name) => timing.push([name, Math.round(performance.now())])
   mark('boot')
+
+  // 인트로를 먼저 띄워 기다림을 줄입니다.
+  const intro = createIntro()
+  const bootEl = document.getElementById('boot')
+  if (bootEl) {
+    bootEl.classList.add('gone')
+    setTimeout(() => bootEl.remove(), 900)
+  }
+  await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))
+  mark('intro')
+
   const container = document.getElementById('stage')
   const stage = createStage(container, { quality: qualityParam || undefined })
   const { renderer, scene, camera } = stage
@@ -192,11 +204,6 @@ async function boot() {
 
   const ui = createUI({
     onZone: (id) => goZone(id),
-    onEnter: () => {
-      entered = true
-      rig.setPose({ pos: [1.05, 2.8, 5.95], target: [0, 1.45, -4.2] }, { instant: true })
-      goZone('lobby')
-    },
     onPanelClose: (restore = true) => {
       if (!restore) return
       const z = ZONE_BY_ID[currentZone]
@@ -208,6 +215,12 @@ async function boot() {
   })
   ui.setZone('lobby')
   if (partnerCode) ui.setPartner(partnerCode)
+
+  intro.onEnter(() => {
+    entered = true
+    rig.setPose({ pos: [1.05, 2.8, 5.95], target: [0, 1.45, -4.2] }, { instant: true })
+    goZone('lobby')
+  })
 
   /* ---------------- 클릭 · 호버 ---------------- */
   const raycaster = new THREE.Raycaster()
@@ -329,21 +342,21 @@ async function boot() {
 
   window.addEventListener('resize', () => stage.resize())
 
+  if (renderer.compileAsync) {
+    try {
+      await renderer.compileAsync(scene, camera)
+    } catch (err) {
+      console.warn('compileAsync skipped', err && err.message)
+    }
+  }
+  mark('compiled')
   renderer.render(scene, camera)
   mark('first-render')
-  renderer.render(scene, camera)
-  mark('second-render')
   timing.push(['programs', renderer.info.programs ? renderer.info.programs.length : -1])
   timing.push(['quality', stage.quality])
   window.__SHOWROOM_TIMING__ = timing
-  requestAnimationFrame(() => {
-    const bootEl = document.getElementById('boot')
-    if (bootEl) {
-      bootEl.classList.add('gone')
-      setTimeout(() => bootEl.remove(), 900)
-    }
-    window.__SHOWROOM_READY__ = true
-  })
+  window.__SHOWROOM_READY__ = true
+  intro.setReady()
   tick()
 
   window.__SHOWROOM__ = {
