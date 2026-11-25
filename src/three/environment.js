@@ -29,7 +29,7 @@ export function createStage(container) {
   renderer.setSize(container.clientWidth || window.innerWidth, container.clientHeight || window.innerHeight)
   renderer.outputColorSpace = THREE.SRGBColorSpace
   renderer.toneMapping = THREE.ACESFilmicToneMapping
-  renderer.toneMappingExposure = 1.02
+  renderer.toneMappingExposure = 1.0
   renderer.shadowMap.enabled = true
   renderer.shadowMap.type = THREE.PCFSoftShadowMap
   container.appendChild(renderer.domElement)
@@ -43,27 +43,31 @@ export function createStage(container) {
   camera.lookAt(0, 1.5, -5)
 
   scene.environment = buildEnvironment(renderer)
-  scene.environmentIntensity = 0.5
+  scene.environmentIntensity = 0.26
 
   /* ---------- 빛 ---------- */
-  const hemi = new THREE.HemisphereLight(0xfff1de, 0x3b3026, 0.55)
+  const hemi = new THREE.HemisphereLight(0xffeeda, 0x2c241c, 0.16)
   scene.add(hemi)
 
   const spotDefs = [
     // 오륜미네랄
-    { pos: [-6.0, 4.5, -6.0], target: [-8.3, 1.2, -7.0], angle: 0.34, penumbra: 0.82, intensity: 120, shadow: true },
+    { pos: [-4.5, 3.95, -5.0], target: [-6.85, 1.2, -6.2], angle: 0.3, penumbra: 0.55, intensity: 210, shadow: true },
     // 효소세상
-    { pos: [6.4, 4.5, -5.4], target: [8.4, 1.15, -6.3], angle: 0.34, penumbra: 0.82, intensity: 130, shadow: true },
+    { pos: [4.7, 3.95, -4.2], target: [6.9, 1.15, -5.6], angle: 0.3, penumbra: 0.55, intensity: 230, shadow: true },
     // B2B 보드
-    { pos: [6.6, 4.1, 2.6], target: [8.4, 1.9, 2.9], angle: 0.42, penumbra: 0.9, intensity: 90, shadow: false },
+    { pos: [5.3, 3.7, 1.8], target: [7.0, 1.85, 2.2], angle: 0.36, penumbra: 0.7, intensity: 150, shadow: false },
     // 브랜드 월
-    { pos: [0, 4.35, -8.2], target: [0, 2.2, -12.2], angle: 0.42, penumbra: 0.95, intensity: 100, shadow: false },
+    { pos: [0, 3.95, -6.6], target: [0, 2.1, -10.4], angle: 0.34, penumbra: 0.7, intensity: 200, shadow: false },
     // 라운지 테이블
-    { pos: [5.1, 4.4, 3.0], target: [5.1, 0.8, 3.0], angle: 0.55, penumbra: 0.95, intensity: 95, shadow: !mobile },
+    { pos: [4.0, 3.9, 1.8], target: [4.0, 0.75, 1.8], angle: 0.46, penumbra: 0.85, intensity: 150, shadow: true },
     // 로비 페데스탈
-    { pos: [-2.5, 4.3, 6.5], target: [-2.5, 1.0, 6.5], angle: 0.5, penumbra: 0.9, intensity: 70, shadow: false },
+    { pos: [-2.3, 3.9, 4.4], target: [-2.3, 0.95, 4.4], angle: 0.44, penumbra: 0.8, intensity: 130, shadow: true },
     // 아트 벽감
-    { pos: [-6.9, 4.2, 1.1], target: [-8.5, 1.8, 1.1], angle: 0.36, penumbra: 0.9, intensity: 65, shadow: false },
+    { pos: [-5.4, 3.8, 1.6], target: [-7.0, 1.75, 1.6], angle: 0.32, penumbra: 0.8, intensity: 110, shadow: false },
+    // 벽 워시 — 왼쪽
+    { pos: [-4.2, 3.6, -1.0], target: [-6.4, 1.6, -1.4], angle: 0.75, penumbra: 1, intensity: 70, shadow: false },
+    // 벽 워시 — 오른쪽
+    { pos: [4.2, 3.6, 0.4], target: [6.4, 1.6, 0.6], angle: 0.75, penumbra: 1, intensity: 70, shadow: false },
   ]
 
   const spots = []
@@ -86,7 +90,7 @@ export function createStage(container) {
   }
 
   // 벽을 살짝 훑는 필 라이트
-  const key = new THREE.DirectionalLight(0xffe8c9, 0.35)
+  const key = new THREE.DirectionalLight(0xffe8c9, 0.1)
   key.position.set(-4, 6, 8)
   scene.add(key)
 

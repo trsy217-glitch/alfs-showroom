@@ -190,10 +190,10 @@ export function buildFurniture(scene, M, { register } = {}) {
 
     // 유리 받침
     const risers = [
-      { z: -7.2 - z, h: 0.14, r: 0.13 },
-      { z: -6.35 - z, h: 0.1, r: 0.12 },
-      { z: -5.5 - z, h: 0.08, r: 0.15 },
-      { z: -4.85 - z, h: 0.16, r: 0.09 },
+      { z: -6.5 - z, h: 0.14, r: 0.13 },
+      { z: -5.75 - z, h: 0.1, r: 0.12 },
+      { z: -5.0 - z, h: 0.08, r: 0.15 },
+      { z: -4.4 - z, h: 0.16, r: 0.09 },
     ]
     for (const r of risers) {
       const m = new THREE.Mesh(new THREE.CylinderGeometry(r.r, r.r, r.h, 40), M.frost)
@@ -394,14 +394,14 @@ export function buildFurniture(scene, M, { register } = {}) {
       new THREE.MeshStandardMaterial({ map: artTexture(), roughness: 0.88, metalness: 0 }),
     )
     art.rotation.y = Math.PI / 2
-    art.position.set(-8.66, 2.0, 1.1)
+    art.position.set(-7.16, 2.0, 1.6)
     root.add(art)
     const frameMat = M.brass
     const bars = [
-      [0.04, 1.9, 0.06, -8.64, 2.0, 1.1 - 0.7],
-      [0.04, 1.9, 0.06, -8.64, 2.0, 1.1 + 0.7],
-      [0.04, 0.06, 1.46, -8.64, 2.0 - 0.92, 1.1],
-      [0.04, 0.06, 1.46, -8.64, 2.0 + 0.92, 1.1],
+      [0.04, 1.9, 0.06, -7.14, 2.0, 1.6 - 0.7],
+      [0.04, 1.9, 0.06, -7.14, 2.0, 1.6 + 0.7],
+      [0.04, 0.06, 1.46, -7.14, 2.0 - 0.92, 1.6],
+      [0.04, 0.06, 1.46, -7.14, 2.0 + 0.92, 1.6],
     ]
     for (const [w, h, d, x, y, z] of bars) {
       const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), frameMat)
@@ -410,10 +410,10 @@ export function buildFurniture(scene, M, { register } = {}) {
     }
     // 받침
     const plinth = rbox(0.6, 0.4, 0.5, 0.01, M.stone)
-    plinth.position.set(-8.4, 0.2, 1.1)
+    plinth.position.set(-6.95, 0.2, 1.6)
     root.add(plinth)
     const v = vase(M, 1.0)
-    v.position.set(-8.4, 0.4, 1.1)
+    v.position.set(-6.95, 0.4, 1.6)
     root.add(v)
   }
 
@@ -425,7 +425,7 @@ export function buildFurniture(scene, M, { register } = {}) {
       new THREE.MeshStandardMaterial({ map: boardTex, roughness: 0.55, metalness: 0.15, emissive: 0x120c06, envMapIntensity: 0.9 }),
     )
     board.rotation.y = -Math.PI / 2
-    board.position.set(8.52, 2.18, 2.9)
+    board.position.set(7.0, 2.1, 2.2)
     board.userData.pick = { kind: 'b2b' }
     root.add(board)
     pickables.push(board)
@@ -433,10 +433,10 @@ export function buildFurniture(scene, M, { register } = {}) {
     const frameW = 2.25
     const frameH = 1.48
     const parts = [
-      [0.05, frameH, 0.03, 8.56, 2.18, 2.9 - frameW / 2],
-      [0.05, frameH, 0.03, 8.56, 2.18, 2.9 + frameW / 2],
-      [0.05, 0.03, frameW, 8.56, 2.18 - frameH / 2, 2.9],
-      [0.05, 0.03, frameW, 8.56, 2.18 + frameH / 2, 2.9],
+      [0.05, frameH, 0.03, 7.04, 2.1, 2.2 - frameW / 2],
+      [0.05, frameH, 0.03, 7.04, 2.1, 2.2 + frameW / 2],
+      [0.05, 0.03, frameW, 7.04, 2.1 - frameH / 2, 2.2],
+      [0.05, 0.03, frameW, 7.04, 2.1 + frameH / 2, 2.2],
     ]
     for (const [w, h, d, x, y, z] of parts) {
       const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), M.brass)
@@ -446,11 +446,11 @@ export function buildFurniture(scene, M, { register } = {}) {
     }
     // 보드 아래 콘솔
     const cons = rbox(0.4, 0.06, 1.9, 0.01, M.walnutLong)
-    cons.position.set(8.42, 0.9, 2.9)
+    cons.position.set(6.9, 0.9, 2.2)
     root.add(cons)
-    for (const z of [2.9 - 0.8, 2.9 + 0.8]) {
+    for (const z of [2.2 - 0.8, 2.2 + 0.8]) {
       const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.012, 0.87, 10), M.brass)
-      leg.position.set(8.42, 0.44, z)
+      leg.position.set(6.9, 0.44, z)
       root.add(leg)
     }
   }
@@ -458,8 +458,8 @@ export function buildFurniture(scene, M, { register } = {}) {
   /* ---------- 펜던트 ---------- */
   const lights = []
   const pendants = [
-    { x: FIXTURE.lobbyPedestal[0], z: FIXTURE.lobbyPedestal[1], drop: 1.62, r: 0.3, i: 14 },
-    { x: FIXTURE.partnerTable[0], z: FIXTURE.partnerTable[1], drop: 1.95, r: 0.36, i: 18 },
+    { x: FIXTURE.lobbyPedestal[0], z: FIXTURE.lobbyPedestal[1], drop: 1.5, r: 0.28, i: 16 },
+    { x: FIXTURE.partnerTable[0], z: FIXTURE.partnerTable[1], drop: 1.72, r: 0.32, i: 20 },
   ]
   for (const p of pendants) {
     const pg = pendant(M, p.r, p.drop)

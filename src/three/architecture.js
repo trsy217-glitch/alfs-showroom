@@ -6,8 +6,8 @@ const W = ROOM.width
 const H = ROOM.height
 const D = ROOM.depth
 const T = ROOM.wall
-const Z0 = -12 // 안쪽 벽
-const Z1 = 10 // 입구 쪽
+const Z0 = -10 // 안쪽 벽
+const Z1 = 7 // 입구 쪽
 
 function wallGeometry(width, height, arches, thickness) {
   const shape = new THREE.Shape()
@@ -138,7 +138,7 @@ export function buildArchitecture(scene, M) {
   // 다운라이트
   const dlGeo = new THREE.CircleGeometry(0.075, 20)
   const dlMat = new THREE.MeshBasicMaterial({ color: 0xfff0d6 })
-  for (let z = -10.5; z <= 8.5; z += 2.6) {
+  for (let z = -9.2; z <= 6.2; z += 2.4) {
     for (const x of [-2.4, 2.4]) {
       const d = new THREE.Mesh(dlGeo, dlMat)
       d.rotation.x = Math.PI / 2
@@ -154,7 +154,7 @@ export function buildArchitecture(scene, M) {
       arches: ARCHES.back,
       rotY: 0,
       pos: [0, 0, Z0],
-      niche: (a) => ({ width: a.width, spring: a.spring, depth: 0.75 }),
+      niche: (a) => ({ width: a.width, spring: a.spring, depth: 0.72 }),
     },
     {
       width: D,
@@ -168,7 +168,7 @@ export function buildArchitecture(scene, M) {
       arches: ARCHES.right.map((a) => ({ ...a, x: a.z - (Z0 + Z1) / 2 })),
       rotY: -Math.PI / 2,
       pos: [W / 2, 0, 0],
-      niche: (a) => ({ width: a.width, spring: a.spring, depth: 0.75 }),
+      niche: (a) => ({ width: a.width, spring: a.spring, depth: 0.72 }),
     },
     {
       width: W + T * 2,
@@ -208,7 +208,7 @@ export function buildArchitecture(scene, M) {
   /* ---------- 브랜드 월 (안쪽 벽감) ---------- */
   const plaqueTex = brandPlaqueTexture()
   const plaque = new THREE.Mesh(
-    new THREE.PlaneGeometry(3.6, 1.35),
+    new THREE.PlaneGeometry(4.0, 1.5),
     new THREE.MeshStandardMaterial({
       map: plaqueTex,
       transparent: true,
@@ -220,15 +220,15 @@ export function buildArchitecture(scene, M) {
       envMapIntensity: 1.6,
     }),
   )
-  plaque.position.set(0, 2.06, Z0 - 0.62)
+  plaque.position.set(0, 2.12, Z0 - 0.66)
   root.add(plaque)
 
   // 브랜드 월 뒤판 조명 느낌
   const backGlow = new THREE.Mesh(
-    new THREE.PlaneGeometry(3.4, 3.6),
+    new THREE.PlaneGeometry(4.2, 4.0),
     new THREE.MeshBasicMaterial({ color: 0xffe0b6, transparent: true, opacity: 0.06, depthWrite: false }),
   )
-  backGlow.position.set(0, 1.8, Z0 - 0.73)
+  backGlow.position.set(0, 1.9, Z0 - 0.74)
   root.add(backGlow)
 
   /* ---------- 입구 커튼 ---------- */
@@ -243,8 +243,8 @@ export function buildArchitecture(scene, M) {
     return g
   }
   for (const s of [-1, 1]) {
-    const c = new THREE.Mesh(curtainGeo(1.5, 3.6), M.linenCurtain)
-    c.position.set(s * 3.05, 2.05, Z1 - 0.22)
+    const c = new THREE.Mesh(curtainGeo(1.4, 3.4), M.linenCurtain)
+    c.position.set(s * 3.0, 1.92, Z1 - 0.2)
     c.rotation.y = s * 0.06
     root.add(c)
   }
@@ -266,12 +266,12 @@ export function buildArchitecture(scene, M) {
     g.rotation.y = rotY
     return g
   }
-  root.add(sconceAt(-W / 2 + 0.02, -3.3, -Math.PI / 2))
-  root.add(sconceAt(-W / 2 + 0.02, 6.3, -Math.PI / 2))
-  root.add(sconceAt(W / 2 - 0.02, -2.0, Math.PI / 2))
-  root.add(sconceAt(W / 2 - 0.02, 6.4, Math.PI / 2))
-  root.add(sconceAt(-5.2, Z0 + 0.02, 0))
-  root.add(sconceAt(5.2, Z0 + 0.02, 0))
+  root.add(sconceAt(-W / 2 + 0.02, -2.6, -Math.PI / 2))
+  root.add(sconceAt(-W / 2 + 0.02, 4.5, -Math.PI / 2))
+  root.add(sconceAt(W / 2 - 0.02, -1.6, Math.PI / 2))
+  root.add(sconceAt(W / 2 - 0.02, 4.6, Math.PI / 2))
+  root.add(sconceAt(-4.0, Z0 + 0.02, 0))
+  root.add(sconceAt(4.0, Z0 + 0.02, 0))
 
   scene.add(root)
   return root

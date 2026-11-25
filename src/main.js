@@ -9,7 +9,7 @@ import { CameraRig } from './three/rig.js'
 import { createUI } from './ui/ui.js'
 import { ZONE_BY_ID, HOTSPOTS, productPose } from './three/layout.js'
 import { products } from './config/products.js'
-import { hotspotLabelTexture } from './three/textures.js'
+import { engraveTexture } from './three/textures.js'
 
 const params = new URLSearchParams(window.location.search)
 const partnerCode = (params.get('p') || '').trim()
@@ -67,20 +67,20 @@ async function boot() {
     })
     for (const h of HOTSPOTS) {
       const g = new THREE.Group()
-      const ring = new THREE.Mesh(new THREE.RingGeometry(0.46, 0.5, 64), ringMat)
+      const ring = new THREE.Mesh(new THREE.RingGeometry(0.52, 0.56, 64), ringMat)
       ring.rotation.x = -Math.PI / 2
       ring.position.y = 0.014
       ring.userData.pick = { kind: 'zone', id: h.id }
       g.add(ring)
       register(ring)
 
-      const halo = new THREE.Mesh(new THREE.RingGeometry(0.5, 0.66, 64), haloMat.clone())
+      const halo = new THREE.Mesh(new THREE.RingGeometry(0.56, 0.74, 64), haloMat.clone())
       halo.rotation.x = -Math.PI / 2
       halo.position.y = 0.012
       g.add(halo)
 
       const glow = new THREE.Mesh(
-        new THREE.CircleGeometry(0.66, 48),
+        new THREE.CircleGeometry(0.74, 48),
         new THREE.MeshBasicMaterial({ color: 0xc9a468, transparent: true, opacity: 0.07, depthWrite: false }),
       )
       glow.rotation.x = -Math.PI / 2
@@ -92,9 +92,9 @@ async function boot() {
       g.add(stem)
 
       const plate = new THREE.Mesh(
-        new THREE.PlaneGeometry(0.46, 0.158),
+        new THREE.PlaneGeometry(0.54, 0.168),
         new THREE.MeshStandardMaterial({
-          map: hotspotLabelTexture(h.no, h.name),
+          map: engraveTexture(`${h.no}  ${h.name}`, 'TOUCH TO ENTER'),
           transparent: true,
           roughness: 0.5,
           metalness: 0.3,
@@ -102,7 +102,7 @@ async function boot() {
           envMapIntensity: 0.7,
         }),
       )
-      plate.position.set(0, 0.63, -0.66)
+      plate.position.set(0, 0.56, -0.66)
       plate.rotation.x = -0.3
       plate.userData.pick = { kind: 'zone', id: h.id }
       g.add(plate)
@@ -119,7 +119,7 @@ async function boot() {
   /* ---------------- 금빛 먼지 ---------------- */
   let dust = null
   {
-    const N = 360
+    const N = 150
     const pos = new Float32Array(N * 3)
     const vel = new Float32Array(N)
     for (let i = 0; i < N; i++) {
@@ -132,9 +132,9 @@ async function boot() {
     geo.setAttribute('position', new THREE.BufferAttribute(pos, 3))
     const mat = new THREE.PointsMaterial({
       color: 0xffd9a2,
-      size: 0.014,
+      size: 0.011,
       transparent: true,
-      opacity: 0.5,
+      opacity: 0.32,
       depthWrite: false,
       blending: THREE.AdditiveBlending,
       sizeAttenuation: true,

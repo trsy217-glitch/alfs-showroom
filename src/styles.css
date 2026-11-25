@@ -78,6 +78,22 @@ html, body {
 
 #ui { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
 #ui a, #ui button { pointer-events: auto; }
+#ui::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 320px;
+  background: linear-gradient(90deg, rgba(10, 8, 5, 0.62) 0%, rgba(10, 8, 5, 0.28) 45%, rgba(10, 8, 5, 0) 100%);
+  pointer-events: none;
+}
+#ui::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 140px;
+  background: linear-gradient(180deg, rgba(10, 8, 5, 0.5) 0%, rgba(10, 8, 5, 0) 100%);
+  pointer-events: none;
+}
 
 /* ---------------- top bar ---------------- */
 .topbar {
@@ -121,6 +137,7 @@ html, body {
   backdrop-filter: blur(8px);
 }
 .partner-chip b { color: var(--gold); font-weight: 500; letter-spacing: 0.18em; }
+.partner-chip[hidden] { display: none; }
 .top-link {
   border: 1px solid var(--hair);
   background: rgba(16, 13, 10, 0.4);
@@ -168,7 +185,7 @@ html, body {
   color: var(--gold-dim);
   transition: color 0.5s var(--ease);
 }
-.rail-name { font-size: 12.5px; letter-spacing: 0.06em; line-height: 1.35; font-weight: 400; }
+.rail-name { font-size: 12.5px; letter-spacing: 0.06em; line-height: 1.35; font-weight: 400; text-shadow: 0 1px 14px rgba(0, 0, 0, 0.55); }
 .rail-name small {
   display: block;
   font-size: 9.5px;
@@ -226,7 +243,7 @@ html, body {
   justify-content: center;
   text-align: center;
   background:
-    radial-gradient(90% 70% at 50% 38%, rgba(247, 240, 227, 0.96) 0%, rgba(236, 224, 205, 0.93) 46%, rgba(221, 205, 180, 0.9) 100%);
+    radial-gradient(90% 70% at 50% 38%, rgba(247, 240, 227, 0.95) 0%, rgba(236, 224, 205, 0.9) 46%, rgba(221, 205, 180, 0.86) 100%);
   backdrop-filter: blur(16px) saturate(1.05);
   -webkit-backdrop-filter: blur(16px) saturate(1.05);
   color: #221d16;
@@ -527,6 +544,7 @@ html, body {
   .rail-btn.on { color: var(--cream); background: rgba(195, 160, 107, 0.1); }
 
   .hint { display: none; }
+  #ui::before { width: 130px; background: linear-gradient(90deg, rgba(10, 8, 5, 0.45) 0%, rgba(10, 8, 5, 0) 100%); }
 
   .panel {
     left: 0; right: 0; top: auto; bottom: 0;
