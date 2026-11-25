@@ -51,23 +51,25 @@ export function createStage(container) {
 
   const spotDefs = [
     // 오륜미네랄
-    { pos: [-4.5, 3.95, -5.0], target: [-6.85, 1.2, -6.2], angle: 0.3, penumbra: 0.55, intensity: 210, shadow: true },
+    { pos: [-3.5, 3.75, -3.9], target: [-5.85, 1.2, -4.9], angle: 0.3, penumbra: 0.55, intensity: 190, shadow: true },
     // 효소세상
-    { pos: [4.7, 3.95, -4.2], target: [6.9, 1.15, -5.6], angle: 0.3, penumbra: 0.55, intensity: 230, shadow: true },
+    { pos: [3.7, 3.75, -3.2], target: [5.9, 1.15, -4.3], angle: 0.3, penumbra: 0.55, intensity: 210, shadow: true },
     // B2B 보드
-    { pos: [5.3, 3.7, 1.8], target: [7.0, 1.85, 2.2], angle: 0.36, penumbra: 0.7, intensity: 150, shadow: false },
+    { pos: [4.4, 3.55, 2.2], target: [6.0, 1.8, 2.6], angle: 0.34, penumbra: 0.7, intensity: 140, shadow: false },
     // 브랜드 월
-    { pos: [0, 3.95, -6.6], target: [0, 2.1, -10.4], angle: 0.34, penumbra: 0.7, intensity: 200, shadow: false },
+    { pos: [0, 3.75, -5.2], target: [0, 2.0, -8.9], angle: 0.32, penumbra: 0.7, intensity: 190, shadow: false },
     // 라운지 테이블
-    { pos: [4.0, 3.9, 1.8], target: [4.0, 0.75, 1.8], angle: 0.46, penumbra: 0.85, intensity: 150, shadow: true },
+    { pos: [3.5, 3.7, 1.6], target: [3.5, 0.7, 1.6], angle: 0.44, penumbra: 0.85, intensity: 140, shadow: true },
     // 로비 페데스탈
-    { pos: [-2.3, 3.9, 4.4], target: [-2.3, 0.95, 4.4], angle: 0.44, penumbra: 0.8, intensity: 130, shadow: true },
+    { pos: [-2.0, 3.7, 3.9], target: [-2.0, 0.95, 3.9], angle: 0.4, penumbra: 0.8, intensity: 120, shadow: false },
     // 아트 벽감
-    { pos: [-5.4, 3.8, 1.6], target: [-7.0, 1.75, 1.6], angle: 0.32, penumbra: 0.8, intensity: 110, shadow: false },
+    { pos: [-4.3, 3.6, 1.5], target: [-5.9, 1.75, 1.5], angle: 0.3, penumbra: 0.8, intensity: 110, shadow: false },
+    // 센터 테이블
+    { pos: [0, 3.8, -0.4], target: [0, 0.5, -1.05], angle: 0.4, penumbra: 0.9, intensity: 120, shadow: true },
     // 벽 워시 — 왼쪽
-    { pos: [-4.2, 3.6, -1.0], target: [-6.4, 1.6, -1.4], angle: 0.75, penumbra: 1, intensity: 70, shadow: false },
+    { pos: [-3.2, 3.4, -0.4], target: [-5.4, 1.6, -0.7], angle: 0.75, penumbra: 1, intensity: 55, shadow: false },
     // 벽 워시 — 오른쪽
-    { pos: [4.2, 3.6, 0.4], target: [6.4, 1.6, 0.6], angle: 0.75, penumbra: 1, intensity: 70, shadow: false },
+    { pos: [3.2, 3.4, 0.6], target: [5.4, 1.6, 0.8], angle: 0.75, penumbra: 1, intensity: 55, shadow: false },
   ]
 
   const spots = []

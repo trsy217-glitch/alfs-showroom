@@ -67,6 +67,21 @@ function pampas(M, scale = 1) {
   return g
 }
 
+function cleanBottle(M) {
+  const g = new THREE.Group()
+  const body = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.02, 0.02, 0.12, 24),
+    new THREE.MeshPhysicalMaterial({ color: 0xe9dcc4, roughness: 0.3, clearcoat: 0.6, envMapIntensity: 0.8 }),
+  )
+  body.position.y = 0.06
+  body.castShadow = true
+  g.add(body)
+  const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.011, 0.011, 0.02, 16), M.brass)
+  cap.position.y = 0.13
+  g.add(cap)
+  return g
+}
+
 function brassTray(M, r) {
   const g = new THREE.Group()
   const base = new THREE.Mesh(new THREE.CylinderGeometry(r, r, 0.012, 48), M.brass)
@@ -190,10 +205,10 @@ export function buildFurniture(scene, M, { register } = {}) {
 
     // 유리 받침
     const risers = [
-      { z: -6.5 - z, h: 0.14, r: 0.13 },
-      { z: -5.75 - z, h: 0.1, r: 0.12 },
-      { z: -5.0 - z, h: 0.08, r: 0.15 },
-      { z: -4.4 - z, h: 0.16, r: 0.09 },
+      { z: -5.2 - z, h: 0.14, r: 0.13 },
+      { z: -4.45 - z, h: 0.1, r: 0.12 },
+      { z: -3.7 - z, h: 0.08, r: 0.15 },
+      { z: -3.1 - z, h: 0.16, r: 0.09 },
     ]
     for (const r of risers) {
       const m = new THREE.Mesh(new THREE.CylinderGeometry(r.r, r.r, r.h, 40), M.frost)
@@ -220,13 +235,13 @@ export function buildFurniture(scene, M, { register } = {}) {
   {
     const [tx, tz] = FIXTURE.partnerTable
     // 러그
-    const rug = new THREE.Mesh(new THREE.CircleGeometry(2.35, 64), M.linen.clone())
+    const rug = new THREE.Mesh(new THREE.CircleGeometry(1.72, 64), M.linen.clone())
     rug.material.color = new THREE.Color(0xd9cbb2)
     rug.rotation.x = -Math.PI / 2
     rug.position.set(tx, 0.008, tz)
     rug.receiveShadow = true
     root.add(rug)
-    const rugRing = new THREE.Mesh(new THREE.TorusGeometry(2.3, 0.012, 8, 80), M.brassDark)
+    const rugRing = new THREE.Mesh(new THREE.TorusGeometry(1.68, 0.01, 8, 80), M.brassDark)
     rugRing.rotation.x = Math.PI / 2
     rugRing.position.set(tx, 0.012, tz)
     root.add(rugRing)
@@ -303,6 +318,71 @@ export function buildFurniture(scene, M, { register } = {}) {
       s.position.set(x, 0.005, z)
       root.add(s)
     }
+  }
+
+  /* ---------- 센터 테이블 ---------- */
+  {
+    const [x, z] = FIXTURE.centerTable
+    const g = new THREE.Group()
+    const top = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 0.9, 0.075, 64), M.stone)
+    top.scale.z = 0.48
+    top.position.y = 0.4
+    top.castShadow = true
+    top.receiveShadow = true
+    g.add(top)
+    const rim = new THREE.Mesh(new THREE.TorusGeometry(0.88, 0.009, 8, 80), M.brass)
+    rim.rotation.x = Math.PI / 2
+    rim.scale.y = 0.48
+    rim.position.y = 0.44
+    g.add(rim)
+    for (const sx of [-0.55, 0.55]) {
+      const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.024, 0.37, 16), M.brassDark)
+      leg.position.set(sx, 0.185, 0)
+      leg.castShadow = true
+      g.add(leg)
+    }
+    const bar = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.025, 0.03), M.brassDark)
+    bar.position.y = 0.1
+    g.add(bar)
+
+    // 소품
+    const bowl = new THREE.Mesh(new THREE.SphereGeometry(0.2, 32, 20, 0, Math.PI * 2, 0, Math.PI * 0.6), M.ceramicDark)
+    bowl.rotation.x = Math.PI
+    bowl.position.set(-0.42, 0.56, 0.06)
+    bowl.castShadow = true
+    g.add(bowl)
+
+    const stack = rbox(0.34, 0.05, 0.26, 0.004, M.linen)
+    stack.position.set(0.32, 0.465, -0.05)
+    stack.rotation.y = 0.16
+    g.add(stack)
+    const stack2 = rbox(0.3, 0.04, 0.23, 0.004, M.stoneDark)
+    stack2.position.set(0.33, 0.51, -0.04)
+    stack2.rotation.y = 0.1
+    g.add(stack2)
+
+    const tray = brassTray(M, 0.15)
+    tray.position.set(0.62, 0.44, 0.16)
+    g.add(tray)
+    for (let i = 0; i < 3; i++) {
+      const b = cleanBottle(M)
+      b.position.set(0.56 + i * 0.06, 0.45, 0.15 + (i % 2) * 0.03)
+      g.add(b)
+    }
+
+    const v = vase(M, 1.15)
+    v.position.set(-0.05, 0.44, -0.12)
+    g.add(v)
+    const p = pampas(M, 0.75)
+    p.position.set(-0.05, 0.44 + 1.15 * 0.56, -0.12)
+    g.add(p)
+
+    g.position.set(x, 0, z)
+    root.add(g)
+    const sh = circleShadow(M, 1.0, 0.4)
+    sh.scale.set(1, 0.55, 1)
+    sh.position.set(x, 0.005, z)
+    root.add(sh)
   }
 
   /* ---------- 로비 ---------- */
@@ -394,14 +474,14 @@ export function buildFurniture(scene, M, { register } = {}) {
       new THREE.MeshStandardMaterial({ map: artTexture(), roughness: 0.88, metalness: 0 }),
     )
     art.rotation.y = Math.PI / 2
-    art.position.set(-7.16, 2.0, 1.6)
+    art.position.set(-6.16, 2.0, 1.5)
     root.add(art)
     const frameMat = M.brass
     const bars = [
-      [0.04, 1.9, 0.06, -7.14, 2.0, 1.6 - 0.7],
-      [0.04, 1.9, 0.06, -7.14, 2.0, 1.6 + 0.7],
-      [0.04, 0.06, 1.46, -7.14, 2.0 - 0.92, 1.6],
-      [0.04, 0.06, 1.46, -7.14, 2.0 + 0.92, 1.6],
+      [0.04, 1.9, 0.06, -6.14, 2.0, 1.5 - 0.7],
+      [0.04, 1.9, 0.06, -6.14, 2.0, 1.5 + 0.7],
+      [0.04, 0.06, 1.46, -6.14, 2.0 - 0.92, 1.5],
+      [0.04, 0.06, 1.46, -6.14, 2.0 + 0.92, 1.5],
     ]
     for (const [w, h, d, x, y, z] of bars) {
       const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), frameMat)
@@ -410,10 +490,10 @@ export function buildFurniture(scene, M, { register } = {}) {
     }
     // 받침
     const plinth = rbox(0.6, 0.4, 0.5, 0.01, M.stone)
-    plinth.position.set(-6.95, 0.2, 1.6)
+    plinth.position.set(-5.95, 0.2, 1.5)
     root.add(plinth)
     const v = vase(M, 1.0)
-    v.position.set(-6.95, 0.4, 1.6)
+    v.position.set(-5.95, 0.4, 1.5)
     root.add(v)
   }
 
@@ -425,7 +505,7 @@ export function buildFurniture(scene, M, { register } = {}) {
       new THREE.MeshStandardMaterial({ map: boardTex, roughness: 0.55, metalness: 0.15, emissive: 0x120c06, envMapIntensity: 0.9 }),
     )
     board.rotation.y = -Math.PI / 2
-    board.position.set(7.0, 2.1, 2.2)
+    board.position.set(6.0, 2.05, 2.6)
     board.userData.pick = { kind: 'b2b' }
     root.add(board)
     pickables.push(board)
@@ -433,10 +513,10 @@ export function buildFurniture(scene, M, { register } = {}) {
     const frameW = 2.25
     const frameH = 1.48
     const parts = [
-      [0.05, frameH, 0.03, 7.04, 2.1, 2.2 - frameW / 2],
-      [0.05, frameH, 0.03, 7.04, 2.1, 2.2 + frameW / 2],
-      [0.05, 0.03, frameW, 7.04, 2.1 - frameH / 2, 2.2],
-      [0.05, 0.03, frameW, 7.04, 2.1 + frameH / 2, 2.2],
+      [0.05, frameH, 0.03, 6.04, 2.05, 2.6 - frameW / 2],
+      [0.05, frameH, 0.03, 6.04, 2.05, 2.6 + frameW / 2],
+      [0.05, 0.03, frameW, 6.04, 2.05 - frameH / 2, 2.6],
+      [0.05, 0.03, frameW, 6.04, 2.05 + frameH / 2, 2.6],
     ]
     for (const [w, h, d, x, y, z] of parts) {
       const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), M.brass)
@@ -446,11 +526,11 @@ export function buildFurniture(scene, M, { register } = {}) {
     }
     // 보드 아래 콘솔
     const cons = rbox(0.4, 0.06, 1.9, 0.01, M.walnutLong)
-    cons.position.set(6.9, 0.9, 2.2)
+    cons.position.set(5.9, 0.9, 2.6)
     root.add(cons)
-    for (const z of [2.2 - 0.8, 2.2 + 0.8]) {
+    for (const z of [2.6 - 0.8, 2.6 + 0.8]) {
       const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.012, 0.87, 10), M.brass)
-      leg.position.set(6.9, 0.44, z)
+      leg.position.set(5.9, 0.44, z)
       root.add(leg)
     }
   }
@@ -459,7 +539,7 @@ export function buildFurniture(scene, M, { register } = {}) {
   const lights = []
   const pendants = [
     { x: FIXTURE.lobbyPedestal[0], z: FIXTURE.lobbyPedestal[1], drop: 1.5, r: 0.28, i: 16 },
-    { x: FIXTURE.partnerTable[0], z: FIXTURE.partnerTable[1], drop: 1.72, r: 0.32, i: 20 },
+    { x: FIXTURE.partnerTable[0], z: FIXTURE.partnerTable[1], drop: 1.45, r: 0.3, i: 20 },
   ]
   for (const p of pendants) {
     const pg = pendant(M, p.r, p.drop)

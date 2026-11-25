@@ -6,8 +6,8 @@ const W = ROOM.width
 const H = ROOM.height
 const D = ROOM.depth
 const T = ROOM.wall
-const Z0 = -10 // 안쪽 벽
-const Z1 = 7 // 입구 쪽
+const Z0 = -8.5 // 안쪽 벽
+const Z1 = 6.5 // 입구 쪽
 
 function wallGeometry(width, height, arches, thickness) {
   const shape = new THREE.Shape()
@@ -115,6 +115,22 @@ export function buildArchitecture(scene, M) {
     root.add(line)
   }
 
+  // 바닥 테두리 밴드 — 공간에 경계를 만듭니다
+  const bandMat = M.stoneDark
+  const bands = [
+    [W, 0.9, 0, Z0 + 0.45],
+    [W, 0.9, 0, Z1 - 0.45],
+    [0.9, D - 1.8, -W / 2 + 0.45, (Z0 + Z1) / 2],
+    [0.9, D - 1.8, W / 2 - 0.45, (Z0 + Z1) / 2],
+  ]
+  for (const [bw, bd, bx, bz] of bands) {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(bw, bd), bandMat)
+    m.rotation.x = -Math.PI / 2
+    m.position.set(bx, 0.003, bz)
+    m.receiveShadow = true
+    root.add(m)
+  }
+
   /* ---------- 천장 ---------- */
   const ceil = new THREE.Mesh(new THREE.PlaneGeometry(W, D), M.ceiling)
   ceil.rotation.x = Math.PI / 2
@@ -138,7 +154,7 @@ export function buildArchitecture(scene, M) {
   // 다운라이트
   const dlGeo = new THREE.CircleGeometry(0.075, 20)
   const dlMat = new THREE.MeshBasicMaterial({ color: 0xfff0d6 })
-  for (let z = -9.2; z <= 6.2; z += 2.4) {
+  for (let z = -7.8; z <= 5.8; z += 2.2) {
     for (const x of [-2.4, 2.4]) {
       const d = new THREE.Mesh(dlGeo, dlMat)
       d.rotation.x = Math.PI / 2
@@ -208,7 +224,7 @@ export function buildArchitecture(scene, M) {
   /* ---------- 브랜드 월 (안쪽 벽감) ---------- */
   const plaqueTex = brandPlaqueTexture()
   const plaque = new THREE.Mesh(
-    new THREE.PlaneGeometry(4.0, 1.5),
+    new THREE.PlaneGeometry(3.9, 1.46),
     new THREE.MeshStandardMaterial({
       map: plaqueTex,
       transparent: true,
@@ -220,7 +236,7 @@ export function buildArchitecture(scene, M) {
       envMapIntensity: 1.6,
     }),
   )
-  plaque.position.set(0, 2.12, Z0 - 0.66)
+  plaque.position.set(0, 2.02, Z0 - 0.66)
   root.add(plaque)
 
   // 브랜드 월 뒤판 조명 느낌
@@ -243,8 +259,8 @@ export function buildArchitecture(scene, M) {
     return g
   }
   for (const s of [-1, 1]) {
-    const c = new THREE.Mesh(curtainGeo(1.4, 3.4), M.linenCurtain)
-    c.position.set(s * 3.0, 1.92, Z1 - 0.2)
+    const c = new THREE.Mesh(curtainGeo(1.35, 3.3), M.linenCurtain)
+    c.position.set(s * 2.9, 1.85, Z1 - 0.2)
     c.rotation.y = s * 0.06
     root.add(c)
   }
@@ -274,12 +290,12 @@ export function buildArchitecture(scene, M) {
     g.rotation.y = rotY
     return g
   }
-  root.add(sconceAt(-W / 2 + 0.02, -2.6, -Math.PI / 2))
-  root.add(sconceAt(-W / 2 + 0.02, 4.5, -Math.PI / 2))
-  root.add(sconceAt(W / 2 - 0.02, -1.6, Math.PI / 2))
-  root.add(sconceAt(W / 2 - 0.02, 4.6, Math.PI / 2))
-  root.add(sconceAt(-4.0, Z0 + 0.02, 0))
-  root.add(sconceAt(4.0, Z0 + 0.02, 0))
+  root.add(sconceAt(-W / 2 + 0.02, -2.2, -Math.PI / 2))
+  root.add(sconceAt(-W / 2 + 0.02, 3.9, -Math.PI / 2))
+  root.add(sconceAt(W / 2 - 0.02, -1.2, Math.PI / 2))
+  root.add(sconceAt(W / 2 - 0.02, 4.2, Math.PI / 2))
+  root.add(sconceAt(-3.2, Z0 + 0.02, 0))
+  root.add(sconceAt(3.2, Z0 + 0.02, 0))
 
   scene.add(root)
   return root

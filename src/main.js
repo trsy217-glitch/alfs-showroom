@@ -147,7 +147,7 @@ async function boot() {
 
   /* ---------------- 카메라 ---------------- */
   const rig = new CameraRig(camera, renderer.domElement)
-  rig.setPose({ pos: [1.05, 2.72, 6.35], target: [-0.1, 1.62, -5.2] }, { instant: true })
+  rig.setPose({ pos: [0.7, 2.6, 5.8], target: [-0.1, 1.5, -4.4] }, { instant: true })
   rig.setLimits(ZONE_BY_ID.lobby.limits)
 
   let currentZone = 'lobby'
@@ -185,7 +185,7 @@ async function boot() {
     onZone: (id) => goZone(id),
     onEnter: () => {
       entered = true
-      rig.setPose({ pos: [1.25, 2.95, 6.5], target: [0, 1.52, -4.4] }, { instant: true })
+      rig.setPose({ pos: [1.05, 2.8, 5.95], target: [0, 1.45, -4.2] }, { instant: true })
       goZone('lobby')
     },
     onPanelClose: (restore = true) => {
