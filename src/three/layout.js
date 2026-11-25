@@ -55,7 +55,7 @@ export const ZONES = [
     name: '오륜미네랄',
     sub: 'Signature 1,000ml',
     // 연단과 그 옆의 전담 매니저가 한 화면에 들어오는 2샷
-    pose: { pos: [-3.5, 1.5, -2.95], target: [-5.66, 1.1, -4.32] },
+    pose: { pos: [-3.62, 1.52, -3.4], target: [-5.66, 1.1, -4.5] },
     mobile: { pos: [-3.5, 1.5, -2.95], target: [-5.66, 1.1, -4.32] },
     limits: { minDist: 1.2, maxDist: 3.6, minPitch: -0.05, maxPitch: 0.4, yawRange: 0.8 },
   },
