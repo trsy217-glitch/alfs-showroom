@@ -316,9 +316,14 @@ async function boot() {
   const clock = new THREE.Clock()
   let elapsed = 0
 
+  let warmFrames = 0
   function tick() {
     const dt = Math.min(clock.getDelta(), 0.06)
     elapsed += dt
+    if (warmFrames < 3) {
+      renderer.shadowMap.needsUpdate = true
+      warmFrames += 1
+    }
     rig.update(dt)
 
     for (let i = 0; i < hotspotRings.length; i++) {
@@ -359,6 +364,8 @@ async function boot() {
   window.__SHOWROOM_TIMING__ = timing
   window.__SHOWROOM_READY__ = true
   intro.setReady()
+  // 첫 프레임에서 그림자를 한 번 더 확실히 굽습니다 (정적 씬 — 이후 갱신 없음)
+  renderer.shadowMap.needsUpdate = true
   tick()
 
   window.__SHOWROOM__ = {
