@@ -31,7 +31,7 @@ export function createStage(container, opts = {}) {
   renderer.setSize(container.clientWidth || window.innerWidth, container.clientHeight || window.innerHeight)
   renderer.outputColorSpace = THREE.SRGBColorSpace
   renderer.toneMapping = THREE.ACESFilmicToneMapping
-  renderer.toneMappingExposure = 0.94
+  renderer.toneMappingExposure = 0.88
   renderer.shadowMap.enabled = shadows
   renderer.shadowMap.type = THREE.PCFSoftShadowMap
   renderer.shadowMap.autoUpdate = false
@@ -47,23 +47,23 @@ export function createStage(container, opts = {}) {
   camera.lookAt(0, 1.5, -5)
 
   scene.environment = buildEnvironment(renderer)
-  scene.environmentIntensity = 0.42
+  scene.environmentIntensity = 0.3
 
   /* ---------- 빛 ---------- */
-  const hemi = new THREE.HemisphereLight(0xffeeda, 0x2c241c, 0.2)
+  const hemi = new THREE.HemisphereLight(0xffeeda, 0x2b2219, 0.15)
   scene.add(hemi)
 
   const spotDefs = [
     // 오륜미네랄 (그림자)
-    { pos: [-3.4, 3.95, -3.6], target: [-5.85, 1.35, -4.9], angle: 0.5, penumbra: 0.65, intensity: 190, shadow: true, key: true },
+    { pos: [-3.4, 3.95, -3.6], target: [-5.85, 1.35, -4.9], angle: 0.48, penumbra: 0.5, intensity: 165, shadow: true, key: true },
     // 효소세상 (그림자)
-    { pos: [4.1, 3.95, -3.7], target: [5.9, 1.25, -4.7], angle: 0.62, penumbra: 0.6, intensity: 210, shadow: true, key: true },
+    { pos: [4.1, 3.95, -3.7], target: [5.9, 1.25, -4.7], angle: 0.58, penumbra: 0.5, intensity: 185, shadow: true, key: true },
     // 브랜드 월 + 센터
-    { pos: [0, 3.9, -3.8], target: [0, 1.7, -8.6], angle: 0.55, penumbra: 0.7, intensity: 200, shadow: false, key: true },
+    { pos: [0, 3.9, -3.8], target: [0, 1.7, -8.6], angle: 0.5, penumbra: 0.55, intensity: 165, shadow: false, key: true },
     // 라운지 · B2B 보드
-    { pos: [4.3, 3.7, 2.4], target: [4.3, 1.1, 1.9], angle: 0.8, penumbra: 0.7, intensity: 170, shadow: true, key: true },
+    { pos: [4.3, 3.7, 2.4], target: [4.3, 1.1, 1.9], angle: 0.72, penumbra: 0.55, intensity: 140, shadow: true, key: true },
     // 센터 테이블
-    { pos: [-1.0, 3.8, -0.2], target: [-1.25, 0.7, -0.95], angle: 0.45, penumbra: 0.7, intensity: 110, shadow: false, key: true },
+    { pos: [-1.0, 3.8, -0.2], target: [-1.25, 0.7, -0.95], angle: 0.42, penumbra: 0.55, intensity: 95, shadow: false, key: true },
   ]
 
   const spots = []

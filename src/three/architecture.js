@@ -268,8 +268,12 @@ export function buildArchitecture(scene, M) {
   /* ---------- 벽 스콘 ---------- */
   const sconceAt = (x, z, rotY) => {
     const g = new THREE.Group()
-    const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.5, 10), M.brass)
-    stem.position.set(0, 0.25, 0.02)
+    const plate = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, 0.012, 20), M.brass)
+    plate.rotation.x = Math.PI / 2
+    plate.position.set(0, 0.28, 0.008)
+    g.add(plate)
+    const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, 0.46, 10), M.brass)
+    stem.position.set(0, 0.28, 0.03)
     g.add(stem)
     const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.012, 20), M.brass)
     cap.position.set(0, 0.5, 0.02)
