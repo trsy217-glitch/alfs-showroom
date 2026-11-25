@@ -82,7 +82,7 @@ export function productPose(product) {
   const a = product.anchor
   const v = product.view
   const len = Math.hypot(v[0], v[2]) || 1
-  const dist = 1.1
+  const dist = product.zoom || 1.25
   const dx = (v[0] / len) * dist
   const dz = (v[2] / len) * dist
   return {

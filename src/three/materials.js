@@ -59,6 +59,12 @@ export function createMaterials(renderer) {
       envMapIntensity: 0.2,
       color: 0xdccdb6,
     }),
+    plasterPlain: new THREE.MeshStandardMaterial({
+      color: 0xe7d7bd,
+      roughness: 0.92,
+      metalness: 0,
+      envMapIntensity: 0.24,
+    }),
     wallWarm: new THREE.MeshStandardMaterial({
       map: plasterSoft,
       roughness: 0.9,
@@ -75,9 +81,11 @@ export function createMaterials(renderer) {
       emissiveIntensity: 0.9,
     }),
     brass: new THREE.MeshStandardMaterial({
-      color: 0xc09454,
+      color: 0xc79b5c,
       metalness: 1,
       roughness: 0.34,
+      emissive: 0x1d1409,
+      emissiveIntensity: 0.6,
       roughnessMap: brassRoughMap,
       envMapIntensity: 1.35,
     }),

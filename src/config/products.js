@@ -28,6 +28,7 @@ export const products = [
     model: 'mineral',
     anchor: [-5.85, 1.14, -4.9],
     view: [1, 0.1, 0.42],
+    zoom: 1.62,
     summary:
       '충북 보은의 어린 뽕잎과 누에에서 얻은 미네랄 원액입니다. 원액을 물에 10~30배 희석해 마시는 방식이고, 1,000ml 한 병으로 옵니다.',
     facts: [

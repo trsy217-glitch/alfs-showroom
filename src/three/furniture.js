@@ -152,8 +152,8 @@ export function buildFurniture(scene, M, { register } = {}) {
     body.position.y = 0.41
     const cap = rbox(0.58, 0.03, 0.58, 0.008, M.brass)
     cap.position.y = 0.815
-    const riser = new THREE.Mesh(new RoundedBoxGeometry(0.34, 0.14, 0.34, 3, 0.01), M.frost)
-    riser.position.y = 0.9
+    const riser = new THREE.Mesh(new RoundedBoxGeometry(0.36, 0.05, 0.36, 3, 0.008), M.frost)
+    riser.position.y = 0.855
     riser.castShadow = false
     g.add(base, body, cap, riser)
 
@@ -230,15 +230,12 @@ export function buildFurniture(scene, M, { register } = {}) {
     const [tx, tz] = FIXTURE.partnerTable
     // 러그
     const rug = new THREE.Mesh(new THREE.CircleGeometry(1.72, 64), M.linen.clone())
-    rug.material.color = new THREE.Color(0xd9cbb2)
+    rug.material.color = new THREE.Color(0xcbb894)
     rug.rotation.x = -Math.PI / 2
     rug.position.set(tx, 0.008, tz)
     rug.receiveShadow = true
     root.add(rug)
-    const rugRing = new THREE.Mesh(new THREE.TorusGeometry(1.68, 0.01, 8, 80), M.brassDark)
-    rugRing.rotation.x = Math.PI / 2
-    rugRing.position.set(tx, 0.012, tz)
-    root.add(rugRing)
+
 
     const g = new THREE.Group()
     const top = new THREE.Mesh(new THREE.CylinderGeometry(0.98, 0.98, 0.075, 64), M.walnut)
@@ -299,9 +296,9 @@ export function buildFurniture(scene, M, { register } = {}) {
     root.add(sh)
 
     const seats = [
-      [tx - 0.1, tz - 1.5, 0.15],
-      [tx - 1.45, tz + 0.2, Math.PI / 2 - 0.2],
-      [tx + 1.45, tz + 0.15, -Math.PI / 2 + 0.2],
+      [tx - 0.15, tz - 1.5, 0.12],
+      [tx - 1.5, tz - 0.15, Math.PI / 2 - 0.15],
+      [tx + 1.35, tz - 0.95, -Math.PI / 2 + 0.5],
     ]
     for (const [x, z, ry] of seats) {
       const c = chair(M)

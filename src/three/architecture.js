@@ -60,7 +60,7 @@ function nicheShell(M, width, spring, depth) {
   const r = width / 2
   const totalH = spring + r
   // 뒤판
-  const back = new THREE.Mesh(new THREE.PlaneGeometry(width + 0.06, totalH + 0.02), M.wallWarm)
+  const back = new THREE.Mesh(new THREE.PlaneGeometry(width + 0.06, totalH + 0.02), M.plasterPlain)
   back.position.set(0, (totalH + 0.02) / 2, -depth)
   back.receiveShadow = true
   g.add(back)
@@ -72,7 +72,7 @@ function nicheShell(M, width, spring, depth) {
   g.add(floor)
   // 옆벽
   for (const s of [-1, 1]) {
-    const jamb = new THREE.Mesh(new THREE.PlaneGeometry(depth, totalH), M.wallWarm)
+    const jamb = new THREE.Mesh(new THREE.PlaneGeometry(depth, totalH), M.plasterPlain)
     jamb.rotation.y = s > 0 ? -Math.PI / 2 : Math.PI / 2
     jamb.position.set(s * (width / 2), totalH / 2, -depth / 2)
     jamb.receiveShadow = true
