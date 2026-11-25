@@ -107,6 +107,7 @@ html, body {
 }
 .brand { display: flex; align-items: baseline; gap: 16px; }
 .brand-mark {
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
   font-family: var(--serif);
   font-size: 21px;
   letter-spacing: 0.34em;
@@ -524,11 +525,15 @@ html, body {
   .rail {
     left: 0; right: 0;
     top: auto;
-    bottom: 14px;
+    bottom: 0;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    background: linear-gradient(0deg, rgba(12, 10, 8, 0.92) 0%, rgba(12, 10, 8, 0.72) 55%, rgba(12, 10, 8, 0) 100%);
     transform: none;
     flex-direction: row;
     gap: 0;
-    padding: 0 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 22px;
     justify-content: space-between;
     overflow-x: auto;
     scrollbar-width: none;
@@ -543,7 +548,7 @@ html, body {
     color: rgba(242, 234, 217, 0.42);
   }
   .rail-no { font-size: 9.5px; }
-  .rail-name { font-size: 9.5px; letter-spacing: 0.02em; text-align: center; white-space: nowrap; }
+  .rail-name { font-size: 9.5px; letter-spacing: 0.02em; text-align: center; white-space: nowrap; color: inherit; }
   .rail-name small { display: none; }
   .rail-btn::before { display: none; }
   .rail-btn.on { color: var(--cream); background: rgba(195, 160, 107, 0.1); }
