@@ -252,17 +252,25 @@ export function buildArchitecture(scene, M) {
   /* ---------- 벽 스콘 ---------- */
   const sconceAt = (x, z, rotY) => {
     const g = new THREE.Group()
-    const arm = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.34, 0.03), M.brass)
-    arm.position.set(0, 0.17, 0.015)
-    g.add(arm)
-    const shade = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.075, 0.16, 20, 1, true), M.brass)
-    shade.position.set(0, 0.36, 0.06)
-    shade.rotation.x = 0.18
-    g.add(shade)
-    const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.032, 12, 12), M.glow)
-    bulb.position.set(0, 0.33, 0.06)
-    g.add(bulb)
-    g.position.set(x, 2.05, z)
+    const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.5, 10), M.brass)
+    stem.position.set(0, 0.25, 0.02)
+    g.add(stem)
+    const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.012, 20), M.brass)
+    cap.position.set(0, 0.5, 0.02)
+    g.add(cap)
+    const globe = new THREE.Mesh(
+      new THREE.SphereGeometry(0.07, 20, 16),
+      new THREE.MeshBasicMaterial({ color: 0xffe7c2 }),
+    )
+    globe.position.set(0, 0.56, 0.03)
+    g.add(globe)
+    const halo = new THREE.Mesh(
+      new THREE.SphereGeometry(0.14, 16, 12),
+      new THREE.MeshBasicMaterial({ color: 0xffd9a2, transparent: true, opacity: 0.16, depthWrite: false }),
+    )
+    halo.position.copy(globe.position)
+    g.add(halo)
+    g.position.set(x, 2.0, z)
     g.rotation.y = rotY
     return g
   }

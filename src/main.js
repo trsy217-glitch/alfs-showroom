@@ -147,7 +147,7 @@ async function boot() {
 
   /* ---------------- 카메라 ---------------- */
   const rig = new CameraRig(camera, renderer.domElement)
-  rig.setPose({ pos: [1.7, 2.62, 9.15], target: [0, 1.85, -4.2] }, { instant: true })
+  rig.setPose({ pos: [1.05, 2.72, 6.35], target: [-0.1, 1.62, -5.2] }, { instant: true })
   rig.setLimits(ZONE_BY_ID.lobby.limits)
 
   let currentZone = 'lobby'
@@ -185,6 +185,7 @@ async function boot() {
     onZone: (id) => goZone(id),
     onEnter: () => {
       entered = true
+      rig.setPose({ pos: [1.25, 2.95, 6.5], target: [0, 1.52, -4.4] }, { instant: true })
       goZone('lobby')
     },
     onPanelClose: (restore = true) => {
@@ -294,7 +295,6 @@ async function boot() {
   function tick() {
     const dt = Math.min(clock.getDelta(), 0.06)
     elapsed += dt
-    if (!entered) rig.goal.yaw += dt * 0.028
     rig.update(dt)
 
     for (let i = 0; i < hotspotRings.length; i++) {
