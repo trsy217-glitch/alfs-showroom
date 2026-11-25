@@ -8,48 +8,37 @@ import {
   contactShadowTexture,
 } from './textures.js'
 
-function rep(tex, x, y) {
-  const t = tex.clone()
-  t.needsUpdate = true
+function tex(canvas, rx, ry, aniso, srgb = true) {
+  const t = new THREE.CanvasTexture(canvas)
   t.wrapS = THREE.RepeatWrapping
   t.wrapT = THREE.RepeatWrapping
-  t.repeat.set(x, y)
+  t.repeat.set(rx, ry)
+  t.colorSpace = srgb ? THREE.SRGBColorSpace : THREE.NoColorSpace
+  t.anisotropy = aniso
+  t.needsUpdate = true
   return t
 }
 
 export function createMaterials(renderer) {
   const aniso = Math.min(8, renderer.capabilities.getMaxAnisotropy())
 
-  const stone = travertineTexture(1024)
-  const plaster = plasterTexture(512)
-  const walnut = walnutTexture(1024)
-  const linen = linenTexture(512)
-  const brassRough = brassRoughness(512)
+  const stoneCanvas = travertineTexture(1024)
+  const plasterCanvas = plasterTexture(512)
+  const walnutCanvas = walnutTexture(1024)
+  const linenCanvas = linenTexture(512)
+  const brassRoughCanvas = brassRoughness(512)
 
-  const stoneFloor = rep(stone, 4, 5.5)
-  const stoneWall = rep(stone, 1, 1)
-  const stonePlinth = rep(stone, 1, 1)
-  const plasterWall = rep(plaster, 6, 2.4)
-  const plasterSoft = rep(plaster, 2, 2)
-  const walnutMap = rep(walnut, 1.4, 1)
-  const walnutMapLong = rep(walnut, 2.6, 1)
-  const linenMap = rep(linen, 3, 3)
-  const linenCurtain = rep(linen, 2, 1)
+  const stoneFloor = tex(stoneCanvas, 4, 5.5, aniso)
+  const stoneWall = tex(stoneCanvas, 1.4, 1.4, aniso)
+  const stonePlinth = tex(stoneCanvas, 1, 1, aniso)
+  const plasterWall = tex(plasterCanvas, 6, 2.4, aniso)
+  const plasterSoft = tex(plasterCanvas, 2, 2, aniso)
+  const walnutMap = tex(walnutCanvas, 1.4, 1, aniso)
+  const walnutMapLong = tex(walnutCanvas, 2.6, 1, aniso)
+  const linenMap = tex(linenCanvas, 3, 3, aniso)
+  const linenCurtain = tex(linenCanvas, 2, 1, aniso)
 
-  for (const t of [stoneFloor, stoneWall, stonePlinth, plasterWall, plasterSoft, walnutMap, walnutMapLong, linenMap, linenCurtain]) {
-    t.anisotropy = aniso
-  }
-  stoneFloor.colorSpace = THREE.SRGBColorSpace
-  stoneWall.colorSpace = THREE.SRGBColorSpace
-  stonePlinth.colorSpace = THREE.SRGBColorSpace
-  plasterWall.colorSpace = THREE.SRGBColorSpace
-  plasterSoft.colorSpace = THREE.SRGBColorSpace
-  walnutMap.colorSpace = THREE.SRGBColorSpace
-  walnutMapLong.colorSpace = THREE.SRGBColorSpace
-  linenMap.colorSpace = THREE.SRGBColorSpace
-  linenCurtain.colorSpace = THREE.SRGBColorSpace
-
-  const brassRoughMap = rep(brassRough, 2, 2)
+  const brassRoughMap = tex(brassRoughCanvas, 2, 2, aniso, false)
   const shadowTex = new THREE.CanvasTexture(contactShadowTexture(256))
   shadowTex.colorSpace = THREE.SRGBColorSpace
 
