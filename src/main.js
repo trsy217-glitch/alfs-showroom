@@ -133,6 +133,7 @@ async function boot() {
       register(plate)
 
       g.position.set(h.at[0], 0, h.at[1])
+      g.userData.zone = h.id
       g.userData.halo = halo
       g.userData.ring = ring
       scene.add(g)
@@ -187,12 +188,14 @@ async function boot() {
     const pose = portrait && zone.mobile ? zone.mobile : zone.pose
     rig.setPose(pose, { duration: fromHotspot ? 1.35 : 1.7 })
     ui.setZone(id)
+    for (const g of hotspotRings) g.visible = g.userData.zone !== id
     if (!keepPanel && ui.isOpen()) ui.close(false)
   }
 
   function focusProduct(id) {
     const p = products.find((x) => x.id === id)
     if (!p) return
+    for (const g of hotspotRings) g.visible = false
     rig.setLimits({ minDist: 0.45, maxDist: 2.2, minPitch: -0.15, maxPitch: 0.42, yawRange: 0.7 })
     rig.setPose(productPose(p, camera.aspect < 0.8 ? 'mobile' : 'desktop'), { duration: 1.3 })
     ui.openProduct(id)

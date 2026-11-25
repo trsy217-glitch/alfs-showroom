@@ -542,13 +542,6 @@ export function buildFurniture(scene, M, { register } = {}) {
     sh.rotation.z = -0.8
     root.add(sh)
 
-    // 벽감 안 사이드보드 위 샘플 병
-    for (let i = 0; i < 4; i++) {
-      const b = cleanBottle(M)
-      b.position.set(5.9, 0.93, 2.0 + i * 0.28)
-      b.scale.setScalar(1.15)
-      root.add(b)
-    }
   }
 
   /* ---------- 벽 명패 ---------- */
