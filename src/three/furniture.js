@@ -492,7 +492,7 @@ export function buildFurniture(scene, M, { register } = {}) {
     const boardTex = b2bBoardTexture()
     const g = new THREE.Group()
     const board = new THREE.Mesh(
-      new THREE.PlaneGeometry(1.9, 1.22),
+      new THREE.PlaneGeometry(1.72, 1.1),
       new THREE.MeshStandardMaterial({
         map: boardTex,
         roughness: 0.55,
@@ -506,8 +506,8 @@ export function buildFurniture(scene, M, { register } = {}) {
     g.add(board)
     pickables.push(board)
 
-    const fw = 1.96
-    const fh = 1.28
+    const fw = 1.78
+    const fh = 1.16
     const frame = [
       [0.05, fh, 0.05, -fw / 2, 0, 0],
       [0.05, fh, 0.05, fw / 2, 0, 0],
@@ -534,7 +534,7 @@ export function buildFurniture(scene, M, { register } = {}) {
       foot.position.set(sx, -fh / 2 - 0.6, -0.22)
       g.add(foot)
     }
-    g.position.set(4.6, 1.62, 2.2)
+    g.position.set(4.55, 1.55, 2.2)
     g.rotation.y = -0.8
     root.add(g)
     const sh = shadowPlane(M, 2.2, 0.9, 0.32)

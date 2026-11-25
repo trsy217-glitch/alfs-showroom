@@ -180,14 +180,9 @@ async function boot() {
     if (!zone) return
     currentZone = id
     rig.setLimits(zone.limits)
-    const pose = zone.pose
     const portrait = camera.aspect < 0.8
-    rig.setPose(
-      portrait
-        ? { pos: [pose.pos[0] * 1.04, pose.pos[1] + 0.05, pose.pos[2] + 0.55], target: pose.target }
-        : pose,
-      { duration: fromHotspot ? 1.35 : 1.7 },
-    )
+    const pose = portrait && zone.mobile ? zone.mobile : zone.pose
+    rig.setPose(pose, { duration: fromHotspot ? 1.35 : 1.7 })
     ui.setZone(id)
     if (!keepPanel && ui.isOpen()) ui.close(false)
   }
@@ -196,7 +191,7 @@ async function boot() {
     const p = products.find((x) => x.id === id)
     if (!p) return
     rig.setLimits({ minDist: 0.45, maxDist: 2.2, minPitch: -0.15, maxPitch: 0.42, yawRange: 0.7 })
-    rig.setPose(productPose(p), { duration: 1.3 })
+    rig.setPose(productPose(p, camera.aspect < 0.8 ? 'mobile' : 'desktop'), { duration: 1.3 })
     ui.openProduct(id)
     ui.setZone(p.zone)
     currentZone = p.zone

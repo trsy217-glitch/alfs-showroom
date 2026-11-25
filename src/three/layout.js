@@ -40,6 +40,7 @@ export const ZONES = [
     name: '아틀리에 로비',
     sub: 'Brand Wall · Collection',
     pose: { pos: [0.3, 2.45, 5.6], target: [-0.15, 1.26, -4.5] },
+    mobile: { pos: [-0.1, 1.98, 6.0], target: [-0.75, 1.12, -4.4] },
     limits: { minDist: 2.0, maxDist: 7.0, minPitch: 0.0, maxPitch: 0.45, yawRange: 0.7 },
   },
   {
@@ -48,6 +49,7 @@ export const ZONES = [
     name: '오륜미네랄',
     sub: 'Signature 1,000ml',
     pose: { pos: [-4.62, 1.3, -4.08], target: [-5.85, 1.2, -4.9] },
+    mobile: { pos: [-4.45, 1.28, -3.95], target: [-5.85, 1.16, -4.9] },
     limits: { minDist: 0.8, maxDist: 2.8, minPitch: -0.05, maxPitch: 0.4, yawRange: 0.8 },
   },
   {
@@ -56,6 +58,7 @@ export const ZONES = [
     name: '하루 1.3핏 · 클린바이옴',
     sub: '30 Days · 3 Days · Grapefruit',
     pose: { pos: [4.25, 1.34, -3.1], target: [5.9, 1.15, -4.55] },
+    mobile: { pos: [4.2, 1.32, -3.05], target: [5.95, 1.12, -4.5] },
     limits: { minDist: 0.8, maxDist: 3.0, minPitch: -0.05, maxPitch: 0.4, yawRange: 0.85 },
   },
   {
@@ -63,7 +66,8 @@ export const ZONES = [
     no: '04',
     name: 'B2B 파트너 라운지',
     sub: 'Partners · Quotation',
-    pose: { pos: [0.85, 1.55, 3.95], target: [4.25, 1.2, 1.7] },
+    pose: { pos: [0.5, 1.55, 4.15], target: [4.3, 1.15, 1.8] },
+    mobile: { pos: [0.35, 1.5, 4.5], target: [4.35, 1.15, 1.85] },
     limits: { minDist: 1.3, maxDist: 4.2, minPitch: 0.0, maxPitch: 0.45, yawRange: 0.9 },
   },
 ]
@@ -78,11 +82,11 @@ export const HOTSPOTS = [
 ]
 
 // 제품 클로즈업 카메라 (제품 anchor 기준)
-export function productPose(product) {
+export function productPose(product, mode = 'desktop') {
   const a = product.anchor
   const v = product.view
   const len = Math.hypot(v[0], v[2]) || 1
-  const dist = product.zoom || 1.25
+  const dist = (product.zoom || 1.25) * (mode === 'mobile' ? 0.82 : 1)
   const dx = (v[0] / len) * dist
   const dz = (v[2] / len) * dist
   return {
