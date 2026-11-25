@@ -32,6 +32,8 @@ export function createStage(container) {
   renderer.toneMappingExposure = 1.0
   renderer.shadowMap.enabled = true
   renderer.shadowMap.type = THREE.PCFSoftShadowMap
+  renderer.shadowMap.autoUpdate = false
+  renderer.shadowMap.needsUpdate = true
   container.appendChild(renderer.domElement)
 
   const scene = new THREE.Scene()
@@ -50,26 +52,16 @@ export function createStage(container) {
   scene.add(hemi)
 
   const spotDefs = [
-    // 오륜미네랄
-    { pos: [-3.5, 3.75, -3.9], target: [-5.85, 1.2, -4.9], angle: 0.3, penumbra: 0.55, intensity: 190, shadow: true },
-    // 효소세상
-    { pos: [3.7, 3.75, -3.2], target: [5.9, 1.15, -4.3], angle: 0.3, penumbra: 0.55, intensity: 210, shadow: true },
-    // B2B 보드
-    { pos: [4.4, 3.55, 2.2], target: [6.0, 1.8, 2.6], angle: 0.34, penumbra: 0.7, intensity: 140, shadow: false },
-    // 브랜드 월
-    { pos: [0, 3.75, -5.2], target: [0, 2.0, -8.9], angle: 0.32, penumbra: 0.7, intensity: 190, shadow: false },
-    // 라운지 테이블
-    { pos: [3.5, 3.7, 1.6], target: [3.5, 0.7, 1.6], angle: 0.44, penumbra: 0.85, intensity: 140, shadow: true },
-    // 로비 페데스탈
-    { pos: [-2.0, 3.7, 3.9], target: [-2.0, 0.95, 3.9], angle: 0.4, penumbra: 0.8, intensity: 120, shadow: false },
-    // 아트 벽감
-    { pos: [-4.3, 3.6, 1.5], target: [-5.9, 1.75, 1.5], angle: 0.3, penumbra: 0.8, intensity: 110, shadow: false },
+    // 오륜미네랄 (그림자)
+    { pos: [-3.5, 3.75, -3.9], target: [-5.85, 1.2, -4.9], angle: 0.3, penumbra: 0.55, intensity: 200, shadow: true },
+    // 효소세상 (그림자)
+    { pos: [3.7, 3.75, -3.2], target: [5.9, 1.15, -4.3], angle: 0.3, penumbra: 0.55, intensity: 220, shadow: true },
+    // 브랜드 월 + 센터
+    { pos: [0, 3.8, -4.4], target: [0, 1.5, -8.6], angle: 0.42, penumbra: 0.8, intensity: 210, shadow: false },
+    // 라운지 · B2B 보드
+    { pos: [3.9, 3.65, 1.9], target: [4.9, 0.95, 2.2], angle: 0.6, penumbra: 0.9, intensity: 170, shadow: true },
     // 센터 테이블
-    { pos: [0, 3.8, -0.4], target: [0, 0.5, -1.05], angle: 0.4, penumbra: 0.9, intensity: 120, shadow: true },
-    // 벽 워시 — 왼쪽
-    { pos: [-3.2, 3.4, -0.4], target: [-5.4, 1.6, -0.7], angle: 0.75, penumbra: 1, intensity: 55, shadow: false },
-    // 벽 워시 — 오른쪽
-    { pos: [3.2, 3.4, 0.6], target: [5.4, 1.6, 0.8], angle: 0.75, penumbra: 1, intensity: 55, shadow: false },
+    { pos: [-1.0, 3.75, -0.4], target: [-1.25, 0.6, -0.95], angle: 0.34, penumbra: 0.85, intensity: 120, shadow: false },
   ]
 
   const spots = []
@@ -80,7 +72,7 @@ export function createStage(container) {
     scene.add(s.target)
     s.castShadow = d.shadow
     if (d.shadow) {
-      s.shadow.mapSize.set(mobile ? 1024 : 1536, mobile ? 1024 : 1536)
+      s.shadow.mapSize.set(1024, 1024)
       s.shadow.bias = -0.0009
       s.shadow.normalBias = 0.022
       s.shadow.camera.near = 0.6

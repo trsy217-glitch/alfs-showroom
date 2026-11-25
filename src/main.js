@@ -35,20 +35,28 @@ async function loadFonts() {
 }
 
 async function boot() {
+  const timing = []
+  const mark = (name) => timing.push([name, Math.round(performance.now())])
+  mark('boot')
   const container = document.getElementById('stage')
   const stage = createStage(container)
   const { renderer, scene, camera } = stage
+  mark('stage')
 
   await loadFonts()
+  mark('fonts')
 
   const M = createMaterials(renderer)
+  mark('materials')
   buildArchitecture(scene, M)
+  mark('architecture')
 
   const pickables = []
   const register = (m) => pickables.push(m)
 
   buildFurniture(scene, M, { register })
   buildProducts(scene, M, register)
+  mark('fixtures')
 
   /* ---------------- 바닥 핫스팟 ---------------- */
   const hotspotRings = []
@@ -321,6 +329,8 @@ async function boot() {
   window.addEventListener('resize', () => stage.resize())
 
   renderer.render(scene, camera)
+  mark('first-render')
+  window.__SHOWROOM_TIMING__ = timing
   requestAnimationFrame(() => {
     const bootEl = document.getElementById('boot')
     if (bootEl) {

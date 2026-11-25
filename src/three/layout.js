@@ -26,11 +26,11 @@ export const FIXTURE = {
   enzymeConsole: [5.9, -4.3],
   lobbyPedestal: [-2.0, 3.9],
   bench: [2.05, 4.55],
-  partnerTable: [3.5, 1.6],
+  partnerTable: [3.75, 0.95],
   brandBench: [0, -7.8],
   artPanel: [-6.16, 1.5],
   partnerBoard: [6.0, 2.6],
-  centerTable: [0, -1.05],
+  centerTable: [-1.25, -0.95],
 }
 
 export const ZONES = [
@@ -39,7 +39,7 @@ export const ZONES = [
     no: '01',
     name: '아틀리에 로비',
     sub: 'Brand Wall · Collection',
-    pose: { pos: [0.45, 2.42, 5.65], target: [-0.1, 1.28, -4.5] },
+    pose: { pos: [0.3, 2.45, 5.6], target: [-0.15, 1.26, -4.5] },
     limits: { minDist: 2.0, maxDist: 7.0, minPitch: 0.0, maxPitch: 0.45, yawRange: 0.7 },
   },
   {

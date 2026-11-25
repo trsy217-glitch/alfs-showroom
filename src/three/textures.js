@@ -53,56 +53,58 @@ function tracked(ctx, text, x, y, spacing, align = 'center') {
 
 /* ---------------- stone ---------------- */
 
-export function travertineTexture(size = 1024, tint = [233, 223, 205]) {
+export function travertineTexture(size = 1024, tint = [231, 221, 202]) {
   const c = makeCanvas(size, size)
   const g = c.getContext('2d')
   g.fillStyle = `rgb(${tint[0]},${tint[1]},${tint[2]})`
   g.fillRect(0, 0, size, size)
 
-  // 결(層)
+  // 큰 얼룩 — 돌의 결
   for (let i = 0; i < 90; i++) {
+    const x = rnd() * size
     const y = rnd() * size
-    const h = 6 + rnd() * 28
-    const v = rnd()
-    g.fillStyle =
-      v > 0.55
-        ? `rgba(${205 + rnd() * 30 | 0},${196 + rnd() * 28 | 0},${176 + rnd() * 26 | 0},${0.08 + rnd() * 0.16})`
-        : `rgba(${168 + rnd() * 30 | 0},${156 + rnd() * 28 | 0},${134 + rnd() * 26 | 0},${0.05 + rnd() * 0.14})`
+    const r = 60 + rnd() * 260
+    const grd = g.createRadialGradient(x, y, 0, x, y, r)
+    const warm = rnd() > 0.5
+    grd.addColorStop(0, warm ? 'rgba(214,199,175,0.16)' : 'rgba(246,238,222,0.16)')
+    grd.addColorStop(1, 'rgba(231,221,202,0)')
+    g.fillStyle = grd
+    g.beginPath()
+    g.arc(x, y, r, 0, TAU)
+    g.fill()
+  }
+
+  // 가로로 흐르는 얇은 결
+  for (let i = 0; i < 26; i++) {
+    const y = rnd() * size
+    const h = 2 + rnd() * 9
+    g.fillStyle = `rgba(${176 + rnd() * 30 | 0},${164 + rnd() * 26 | 0},${142 + rnd() * 22 | 0},${0.04 + rnd() * 0.08})`
     g.beginPath()
     g.moveTo(0, y)
-    for (let x = 0; x <= size; x += 24) {
-      g.lineTo(x, y + Math.sin((x / size) * TAU * 1.6 + i * 1.7) * 5 + (rnd() - 0.5) * 4)
+    for (let x = 0; x <= size; x += 32) {
+      g.lineTo(x, y + Math.sin((x / size) * TAU * 1.2 + i) * 7)
     }
     g.lineTo(size, y + h)
-    for (let x = size; x >= 0; x -= 24) {
-      g.lineTo(x, y + h + Math.sin((x / size) * TAU * 1.6 + i * 1.7) * 5)
+    for (let x = size; x >= 0; x -= 32) {
+      g.lineTo(x, y + h + Math.sin((x / size) * TAU * 1.2 + i) * 7)
     }
     g.closePath()
     g.fill()
   }
 
   // 기공
-  for (let i = 0; i < 2400; i++) {
+  for (let i = 0; i < 3200; i++) {
     const x = rnd() * size
     const y = rnd() * size
-    const rx = 1 + rnd() * 6
-    const ry = 1 + rnd() * 3.4
-    g.fillStyle = `rgba(${150 + rnd() * 40 | 0},${138 + rnd() * 36 | 0},${118 + rnd() * 30 | 0},${0.08 + rnd() * 0.22})`
+    const rx = 0.8 + rnd() * 4.2
+    const ry = 0.8 + rnd() * 2.6
+    g.fillStyle = `rgba(${150 + rnd() * 40 | 0},${138 + rnd() * 36 | 0},${118 + rnd() * 30 | 0},${0.07 + rnd() * 0.2})`
     g.beginPath()
-    g.ellipse(x, y, rx, ry, rnd() * 0.6, 0, TAU)
+    g.ellipse(x, y, rx, ry, rnd() * 0.8, 0, TAU)
     g.fill()
   }
 
-  // 타일 줄눈
-  g.strokeStyle = 'rgba(150,138,118,0.28)'
-  g.lineWidth = 2
-  g.strokeRect(0, 0, size, size)
-  g.beginPath()
-  g.moveTo(0, size / 2)
-  g.lineTo(size, size / 2)
-  g.stroke()
-
-  grain(g, size, size, 13)
+  grain(g, size, size, 14)
   return c
 }
 
