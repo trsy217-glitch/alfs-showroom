@@ -96,7 +96,7 @@ export function createStage(container, opts = {}) {
     const h = container.clientHeight || window.innerHeight
     const aspect = w / h
     camera.aspect = aspect
-    camera.fov = aspect < 0.8 ? 62 : aspect < 1.25 ? 52 : 46
+    camera.fov = aspect < 0.8 ? 54 : aspect < 1.25 ? 52 : 46
     camera.updateProjectionMatrix()
     renderer.setSize(w, h, false)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, mobile ? 1.8 : 2))

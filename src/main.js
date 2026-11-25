@@ -12,6 +12,7 @@ import { ZONE_BY_ID, HOTSPOTS, productPose } from './three/layout.js'
 import { products } from './config/products.js'
 import { engraveTexture } from './three/textures.js'
 
+const hasHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches
 const params = new URLSearchParams(window.location.search)
 const partnerCode = (params.get('p') || '').trim()
 const qualityParam = (params.get('q') || '').trim()
@@ -262,6 +263,7 @@ async function boot() {
   })
 
   renderer.domElement.addEventListener('pointermove', (e) => {
+    if (!hasHover) return
     if (rig.dragging) {
       if (lastHover) {
         ui.tip(null)

@@ -47,7 +47,9 @@ export function createIntro() {
       el.classList.add('ready')
       btn.disabled = false
       btn.textContent = '입장하기'
-      note.textContent = '마우스 드래그로 둘러보고, 진열된 제품을 눌러 보세요.'
+      note.textContent = window.matchMedia('(hover: none)').matches
+        ? '손가락으로 돌려 보고, 진열된 제품을 눌러 보세요.'
+        : '마우스 드래그로 둘러보고, 진열된 제품을 눌러 보세요.'
     },
   }
 }

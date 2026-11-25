@@ -49,7 +49,7 @@ export const ZONES = [
     name: '오륜미네랄',
     sub: 'Signature 1,000ml',
     pose: { pos: [-4.62, 1.3, -4.08], target: [-5.85, 1.2, -4.9] },
-    mobile: { pos: [-4.45, 1.28, -3.95], target: [-5.85, 1.16, -4.9] },
+    mobile: { pos: [-4.8, 1.2, -4.25], target: [-5.85, 1.12, -4.9] },
     limits: { minDist: 0.8, maxDist: 2.8, minPitch: -0.05, maxPitch: 0.4, yawRange: 0.8 },
   },
   {
@@ -58,7 +58,7 @@ export const ZONES = [
     name: '하루 1.3핏 · 클린바이옴',
     sub: '30 Days · 3 Days · Grapefruit',
     pose: { pos: [4.25, 1.34, -3.1], target: [5.9, 1.15, -4.55] },
-    mobile: { pos: [4.2, 1.32, -3.05], target: [5.95, 1.12, -4.5] },
+    mobile: { pos: [4.6, 1.24, -3.45], target: [5.95, 1.12, -4.45] },
     limits: { minDist: 0.8, maxDist: 3.0, minPitch: -0.05, maxPitch: 0.4, yawRange: 0.85 },
   },
   {
