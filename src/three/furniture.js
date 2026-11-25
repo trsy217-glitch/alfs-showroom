@@ -507,13 +507,13 @@ export function buildFurniture(scene, M, { register } = {}) {
     g.add(board)
     pickables.push(board)
 
-    const fw = 1.98
-    const fh = 1.3
+    const fw = 1.96
+    const fh = 1.28
     const frame = [
-      [0.05, fh, 0.04, 0, 0, -fw / 2],
-      [0.05, fh, 0.04, 0, 0, fw / 2],
-      [0.05, 0.04, fw, 0, fh / 2, 0],
-      [0.05, 0.04, fw, 0, -fh / 2, 0],
+      [0.05, fh, 0.05, -fw / 2, 0, 0],
+      [0.05, fh, 0.05, fw / 2, 0, 0],
+      [fw, 0.05, 0.05, 0, fh / 2, 0],
+      [fw, 0.05, 0.05, 0, -fh / 2, 0],
     ]
     for (const [w, h, d, x, y, z] of frame) {
       const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), M.brass)
@@ -521,20 +521,20 @@ export function buildFurniture(scene, M, { register } = {}) {
       m.castShadow = true
       g.add(m)
     }
-    for (const sx of [-0.62, 0.62]) {
-      const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.02, 1.0, 12), M.brass)
-      leg.position.set(sx, -fh / 2 - 0.42, 0.1)
-      leg.rotation.x = 0.16
+    // A자 이젤 다리
+    for (const sx of [-0.6, 0.6]) {
+      const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.018, 0.62, 10), M.brass)
+      leg.position.set(sx, -fh / 2 - 0.3, 0.02)
       leg.castShadow = true
       g.add(leg)
-      const foot = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.02, 16), M.brassDark)
-      foot.position.set(sx, -fh / 2 - 0.9, 0.2)
+      const back = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.016, 0.7, 10), M.brass)
+      back.position.set(sx, -fh / 2 - 0.34, -0.16)
+      back.rotation.x = 0.34
+      g.add(back)
+      const foot = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.015, 14), M.brassDark)
+      foot.position.set(sx, -fh / 2 - 0.6, -0.22)
       g.add(foot)
     }
-    const rail = new THREE.Mesh(new THREE.BoxGeometry(fw * 0.9, 0.03, 0.03), M.brassDark)
-    rail.position.set(0, -fh / 2 - 0.5, 0.12)
-    g.add(rail)
-
     g.position.set(4.6, 1.62, 2.2)
     g.rotation.y = -0.8
     root.add(g)
@@ -578,8 +578,8 @@ export function buildFurniture(scene, M, { register } = {}) {
   /* ---------- 펜던트 ---------- */
   const lights = []
   const pendants = [
-    { x: FIXTURE.lobbyPedestal[0], z: FIXTURE.lobbyPedestal[1], drop: 1.5, r: 0.28, i: 16 },
-    { x: FIXTURE.partnerTable[0], z: FIXTURE.partnerTable[1], drop: 1.45, r: 0.3, i: 20 },
+    { x: FIXTURE.lobbyPedestal[0], z: FIXTURE.lobbyPedestal[1], drop: 1.32, r: 0.26, i: 14 },
+    { x: FIXTURE.partnerTable[0], z: FIXTURE.partnerTable[1], drop: 1.3, r: 0.27, i: 18 },
   ]
   for (const p of pendants) {
     const pg = pendant(M, p.r, p.drop)

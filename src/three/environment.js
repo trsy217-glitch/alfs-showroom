@@ -50,7 +50,7 @@ export function createStage(container, opts = {}) {
   scene.environmentIntensity = 0.42
 
   /* ---------- 빛 ---------- */
-  const hemi = new THREE.HemisphereLight(0xffeeda, 0x2c241c, 0.16)
+  const hemi = new THREE.HemisphereLight(0xffeeda, 0x2c241c, 0.2)
   scene.add(hemi)
 
   const spotDefs = [

@@ -63,7 +63,7 @@ export const ZONES = [
     no: '04',
     name: 'B2B 파트너 라운지',
     sub: 'Partners · Quotation',
-    pose: { pos: [1.15, 1.5, 3.5], target: [4.15, 1.25, 1.35] },
+    pose: { pos: [0.85, 1.55, 3.95], target: [4.25, 1.2, 1.7] },
     limits: { minDist: 1.3, maxDist: 4.2, minPitch: 0.0, maxPitch: 0.45, yawRange: 0.9 },
   },
 ]
@@ -74,7 +74,7 @@ export const ZONE_BY_ID = Object.fromEntries(ZONES.map((z) => [z.id, z]))
 export const HOTSPOTS = [
   { id: 'mineral', no: '02', name: '오륜미네랄', at: [-2.55, -2.85] },
   { id: 'enzyme', no: '03', name: '하루 1.3핏', at: [2.55, -2.45] },
-  { id: 'b2b', no: '04', name: 'B2B 라운지', at: [2.2, 2.3] },
+  { id: 'b2b', no: '04', name: 'B2B 라운지', at: [1.75, 3.5] },
 ]
 
 // 제품 클로즈업 카메라 (제품 anchor 기준)

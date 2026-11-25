@@ -56,7 +56,7 @@ export function createMaterials(renderer) {
       roughness: 0.93,
       metalness: 0,
       envMapIntensity: 0.22,
-      color: 0xdfd0b9,
+      color: 0xe7d8c1,
     }),
     plasterPlain: new THREE.MeshStandardMaterial({
       color: 0xe7d7bd,
