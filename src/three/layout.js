@@ -55,7 +55,7 @@ export const ZONES = [
     no: '03',
     name: '하루 1.3핏 · 클린바이옴',
     sub: '30 Days · 3 Days · Grapefruit',
-    pose: { pos: [3.95, 1.3, -3.15], target: [5.9, 1.12, -4.3] },
+    pose: { pos: [4.55, 1.32, -3.42], target: [5.9, 1.15, -4.3] },
     limits: { minDist: 0.8, maxDist: 3.0, minPitch: -0.05, maxPitch: 0.4, yawRange: 0.85 },
   },
   {
@@ -86,7 +86,7 @@ export function productPose(product) {
   const dx = (v[0] / len) * dist
   const dz = (v[2] / len) * dist
   return {
-    pos: [a[0] + dx, a[1] + 0.13, a[2] + dz],
-    target: [a[0], a[1] - 0.03, a[2]],
+    pos: [a[0] + dx, a[1] + 0.3, a[2] + dz],
+    target: [a[0], a[1] - 0.04, a[2]],
   }
 }

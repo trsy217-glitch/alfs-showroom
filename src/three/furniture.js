@@ -190,11 +190,11 @@ export function buildFurniture(scene, M, { register } = {}) {
       }
     }
     // 하부 수납함
-    const drawer = rbox(0.3, 0.35, 1.2, 0.008, M.linen)
-    drawer.position.set(0, 0.5, 0.4)
+    const drawer = rbox(0.34, 0.14, 1.4, 0.006, M.walnutLong)
+    drawer.position.set(0, 0.58, 0.3)
     g.add(drawer)
-    const pull = new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.01, 0.24), M.brass)
-    pull.position.set(0.16, 0.5, 0.4)
+    const pull = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.012, 0.3), M.brass)
+    pull.position.set(0.18, 0.58, 0.3)
     g.add(pull)
 
     // 유리 받침

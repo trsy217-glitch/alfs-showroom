@@ -133,10 +133,10 @@ export function walnutTexture(size = 1024) {
   const c = makeCanvas(size, size)
   const g = c.getContext('2d')
   const grd = g.createLinearGradient(0, 0, size, 0)
-  grd.addColorStop(0, '#43291c')
-  grd.addColorStop(0.45, '#573624')
-  grd.addColorStop(0.7, '#4a2c1d')
-  grd.addColorStop(1, '#3a2216')
+  grd.addColorStop(0, '#3a2a20')
+  grd.addColorStop(0.45, '#4a352a')
+  grd.addColorStop(0.7, '#402d22')
+  grd.addColorStop(1, '#33241b')
   g.fillStyle = grd
   g.fillRect(0, 0, size, size)
 
@@ -146,8 +146,8 @@ export function walnutTexture(size = 1024) {
     const width = 0.6 + rnd() * 3.4
     const dark = rnd() > 0.42
     g.strokeStyle = dark
-      ? `rgba(${30 + rnd() * 26 | 0},${18 + rnd() * 16 | 0},${11 + rnd() * 10 | 0},${0.16 + rnd() * 0.4})`
-      : `rgba(${124 + rnd() * 40 | 0},${88 + rnd() * 30 | 0},${60 + rnd() * 24 | 0},${0.08 + rnd() * 0.2})`
+      ? `rgba(${26 + rnd() * 22 | 0},${18 + rnd() * 14 | 0},${12 + rnd() * 10 | 0},${0.16 + rnd() * 0.4})`
+      : `rgba(${104 + rnd() * 34 | 0},${80 + rnd() * 26 | 0},${60 + rnd() * 20 | 0},${0.08 + rnd() * 0.18})`
     g.lineWidth = width
     g.beginPath()
     const amp = 4 + rnd() * 22
@@ -273,8 +273,8 @@ export function mineralLabelTexture() {
   g.stroke()
 
   g.fillStyle = '#1d4c66'
-  g.font = '700 86px ALFSans, sans-serif'
-  tracked(g, '오륜미네랄', W / 2, 320, 6)
+  g.font = '700 74px ALFSans, sans-serif'
+  tracked(g, '오륜미네랄', W / 2, 322, 2)
 
   g.fillStyle = '#40606f'
   g.font = '400 30px ALFSans, sans-serif'
