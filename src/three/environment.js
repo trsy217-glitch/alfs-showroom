@@ -18,11 +18,14 @@ function buildEnvironment(renderer) {
 }
 
 export function createStage(container, opts = {}) {
+  // ?pb=1 — QA 스크린샷용 (drawing buffer 보존). 일반 방문에는 영향 없음.
+  const preserve = new URLSearchParams(window.location.search).get('pb') === '1'
   const renderer = new THREE.WebGLRenderer({
     antialias: true,
     powerPreference: 'high-performance',
     alpha: false,
     stencil: false,
+    preserveDrawingBuffer: preserve,
   })
   const mobile = window.matchMedia('(max-width: 900px)').matches
   const quality = opts.quality || (mobile ? 'low' : 'high')

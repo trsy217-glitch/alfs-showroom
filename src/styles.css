@@ -211,6 +211,35 @@ html, body {
 .rail-btn.on::before { height: 100%; }
 .rail-btn.on .rail-name small { color: rgba(242, 234, 217, 0.45); }
 
+/* ---------------- 전담 매니저 칩 ---------------- */
+.staff-chip {
+  position: absolute;
+  left: 34px;
+  bottom: 26px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 15px;
+  border: 1px solid var(--hair);
+  background: rgba(16, 13, 10, 0.5);
+  color: var(--cream-dim);
+  font-family: var(--sans);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: border-color 0.4s var(--ease), color 0.4s var(--ease);
+}
+.staff-chip[hidden] { display: none; }
+.staff-chip:hover { border-color: var(--gold); color: var(--gold); }
+.staff-chip-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 8px rgba(195, 160, 107, 0.85);
+}
+
 /* ---------------- hint ---------------- */
 .hint {
   position: absolute;
@@ -472,6 +501,24 @@ html, body {
 .btn-ghost:hover { border-color: var(--gold); color: var(--cream); }
 .btn small { font-size: 9px; letter-spacing: 0.1em; opacity: 0.6; }
 
+/* 전담 매니저 카드 */
+.staff-hero {
+  background: linear-gradient(160deg, #2b2219 0%, #1e1811 66%, #16110c 100%);
+  align-items: center;
+  justify-content: center;
+}
+.staff-hero-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 11px;
+  color: #e9d7b4;
+  text-align: center;
+}
+.staff-eyebrow { font-size: 8.5px; letter-spacing: 0.4em; color: #c9a468; }
+.staff-mark { font-family: var(--serif); font-size: 33px; letter-spacing: 0.16em; line-height: 1; color: #f2ead9; }
+.staff-zone { font-size: 10px; letter-spacing: 0.22em; color: rgba(242, 234, 217, 0.6); }
+
 /* B2B panel */
 .b2b-step {
   display: grid;
@@ -543,17 +590,33 @@ html, body {
     grid-template-columns: 1fr;
     justify-items: center;
     gap: 5px;
-    flex: 1 0 auto;
-    padding: 9px 6px;
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 9px 3px;
     color: rgba(242, 234, 217, 0.42);
   }
   .rail-no { font-size: 9.5px; }
-  .rail-name { font-size: 9.5px; letter-spacing: 0.02em; text-align: center; white-space: nowrap; color: inherit; }
+  .rail-name {
+    font-size: 9px;
+    letter-spacing: 0;
+    text-align: center;
+    white-space: normal;
+    word-break: keep-all;
+    line-height: 1.3;
+    color: inherit;
+  }
   .rail-name small { display: none; }
   .rail-btn::before { display: none; }
   .rail-btn.on { color: var(--cream); background: rgba(195, 160, 107, 0.1); }
 
   .hint { display: none; }
+  .staff-chip {
+    left: 12px;
+    bottom: calc(86px + env(safe-area-inset-bottom, 0px));
+    font-size: 9.5px;
+    padding: 9px 12px;
+    letter-spacing: 0.1em;
+  }
   #ui::before { width: 130px; background: linear-gradient(90deg, rgba(10, 8, 5, 0.45) 0%, rgba(10, 8, 5, 0) 100%); }
 
   .panel {

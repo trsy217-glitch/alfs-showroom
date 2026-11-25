@@ -33,6 +33,12 @@ export const FIXTURE = {
   centerTable: [-1.25, -0.95],
 }
 
+// 존 전담 매니저가 서 있는 자리 (at: [x, y, z], ry: 바라보는 방향, signAt: 바닥 명패 위치)
+export const STAFF_SPOTS = {
+  mineral: { at: [-5.9, 0, -4.1], ry: 1.2, signAt: [-5.56, -3.8], signRy: 1.15 },
+  enzyme: { at: [5.86, 0, -4.15], ry: -1.05, signAt: [5.2, -3.72], signRy: -1.1 },
+}
+
 export const ZONES = [
   {
     id: 'lobby',
@@ -48,33 +54,36 @@ export const ZONES = [
     no: '02',
     name: '오륜미네랄',
     sub: 'Signature 1,000ml',
-    pose: { pos: [-4.95, 1.22, -4.38], target: [-5.85, 1.1, -4.9] },
-    mobile: { pos: [-4.8, 1.2, -4.25], target: [-5.85, 1.12, -4.9] },
-    limits: { minDist: 0.8, maxDist: 2.8, minPitch: -0.05, maxPitch: 0.4, yawRange: 0.8 },
+    // 연단과 그 옆의 전담 매니저가 한 화면에 들어오는 2샷
+    pose: { pos: [-3.5, 1.5, -2.95], target: [-5.66, 1.1, -4.32] },
+    mobile: { pos: [-3.5, 1.5, -2.95], target: [-5.66, 1.1, -4.32] },
+    limits: { minDist: 1.2, maxDist: 3.6, minPitch: -0.05, maxPitch: 0.4, yawRange: 0.8 },
   },
   {
     id: 'enzyme',
     no: '03',
     name: '하루 1.3핏 · 클린바이옴',
     sub: '30 Days · 3 Days · Grapefruit',
-    pose: { pos: [3.15, 1.48, -3.0], target: [5.15, 1.12, -4.7] },
-    mobile: { pos: [3.5, 1.42, -3.3], target: [5.2, 1.1, -4.65] },
-    limits: { minDist: 0.8, maxDist: 3.0, minPitch: -0.05, maxPitch: 0.4, yawRange: 0.85 },
+    // 콘솔의 네 제품과 매니저가 함께 보이는 각도
+    pose: { pos: [2.9, 1.5, -2.6], target: [5.12, 1.12, -5.35] },
+    mobile: { pos: [2.9, 1.5, -2.6], target: [5.12, 1.12, -5.26] },
+    limits: { minDist: 1.2, maxDist: 4.6, minPitch: -0.05, maxPitch: 0.4, yawRange: 0.85 },
   },
   {
     id: 'b2b',
     no: '04',
     name: 'B2B 파트너 라운지',
     sub: 'Partners · Quotation',
-    pose: { pos: [-0.25, 1.72, 3.75], target: [4.35, 1.3, 1.75] },
-    mobile: { pos: [-0.4, 1.66, 4.0], target: [4.4, 1.25, 1.9] },
-    limits: { minDist: 1.3, maxDist: 4.2, minPitch: 0.0, maxPitch: 0.45, yawRange: 0.9 },
+    // 라운지 테이블과 파트너 보드를 함께 보는 화면
+    pose: { pos: [-0.8, 1.8, 3.4], target: [3.4, 1.1, 0.7] },
+    mobile: { pos: [-0.35, 1.68, 3.85], target: [4.4, 1.26, 1.85] },
+    limits: { minDist: 1.5, maxDist: 5.0, minPitch: 0.0, maxPitch: 0.45, yawRange: 0.9 },
   },
 ]
 
 export const ZONE_BY_ID = Object.fromEntries(ZONES.map((z) => [z.id, z]))
 
-// 바닥 링 핫스팟 (존 이동)
+// 바닥 링 핫스팟 (존 이동) — 링·명패·발광면 어디를 눌러도 이동합니다.
 export const HOTSPOTS = [
   { id: 'mineral', no: '02', name: '오륜미네랄', at: [-2.55, -2.85] },
   { id: 'enzyme', no: '03', name: '하루 1.3핏', at: [2.55, -2.45] },

@@ -226,6 +226,25 @@ export function buildProducts(scene, M, register) {
         pickables.push(o)
       }
     })
+
+    // 보이지 않는 터치 판 — 병 사이 빈틈을 눌러도 제품이 열리도록
+    const bbox = new THREE.Box3().setFromObject(model)
+    const size = bbox.getSize(new THREE.Vector3())
+    const center = bbox.getCenter(new THREE.Vector3())
+    const hit = new THREE.Mesh(
+      new THREE.BoxGeometry(
+        Math.max(size.x * 1.18, 0.16),
+        Math.max(size.y * 1.14, 0.16),
+        Math.max(size.z * 1.18, 0.16),
+      ),
+      new THREE.MeshBasicMaterial({ color: 0xffffff }),
+    )
+    hit.position.copy(center)
+    hit.visible = false
+    hit.userData.pick = { kind: 'product', id: p.id }
+    hit.userData.productId = p.id
+    root.add(hit)
+    pickables.push(hit)
   }
 
   scene.add(root)

@@ -5,6 +5,7 @@ import { createMaterials } from './three/materials.js'
 import { buildArchitecture } from './three/architecture.js'
 import { buildFurniture } from './three/furniture.js'
 import { buildProducts } from './three/models.js'
+import { buildStaff } from './three/staff.js'
 import { CameraRig } from './three/rig.js'
 import { createUI } from './ui/ui.js'
 import { createIntro } from './ui/intro.js'
@@ -70,6 +71,8 @@ async function boot() {
 
   buildFurniture(scene, M, { register })
   buildProducts(scene, M, register)
+  const staff = buildStaff(scene, M, { register })
+  const staffModels = staff.root.children.filter((c) => c.type === 'Group' && c.userData.baseRy !== undefined)
   mark('fixtures')
 
   /* ---------------- 바닥 핫스팟 ---------------- */
@@ -99,7 +102,9 @@ async function boot() {
       const halo = new THREE.Mesh(new THREE.RingGeometry(0.56, 0.74, 64), haloMat.clone())
       halo.rotation.x = -Math.PI / 2
       halo.position.y = 0.012
+      halo.userData.pick = { kind: 'zone', id: h.id }
       g.add(halo)
+      register(halo)
 
       const glow = new THREE.Mesh(
         new THREE.CircleGeometry(0.74, 48),
@@ -107,7 +112,21 @@ async function boot() {
       )
       glow.rotation.x = -Math.PI / 2
       glow.position.y = 0.01
+      glow.userData.pick = { kind: 'zone', id: h.id }
       g.add(glow)
+      register(glow)
+
+      // 보이지 않는 넉넉한 터치 판 — 발광면 어디를 눌러도 존으로 들어갑니다.
+      const hit = new THREE.Mesh(
+        new THREE.CircleGeometry(1.05, 40),
+        new THREE.MeshBasicMaterial({ color: 0xc9a468 }),
+      )
+      hit.rotation.x = -Math.PI / 2
+      hit.position.y = 0.02
+      hit.visible = false
+      hit.userData.pick = { kind: 'zone', id: h.id }
+      g.add(hit)
+      register(hit)
 
       const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.6, 10), M.brass)
       stem.position.set(0, 0.3, -0.66)
@@ -258,6 +277,9 @@ async function boot() {
     if (!pick) return
     if (pick.kind === 'product') {
       focusProduct(pick.id)
+    } else if (pick.kind === 'staff') {
+      goZone(pick.id, { fromHotspot: true, keepPanel: true })
+      ui.openStaff(pick.id)
     } else if (pick.kind === 'zone') {
       goZone(pick.id, { fromHotspot: true })
       if (pick.id === 'b2b') ui.openB2B(partnerCode)
@@ -294,6 +316,9 @@ async function boot() {
           label = z ? `${z.no}. ${z.name}` : null
         } else if (pick.kind === 'b2b') {
           label = 'B2B 파트너 · 견적 상담'
+        } else if (pick.kind === 'staff') {
+          const z = ZONE_BY_ID[pick.id]
+          label = z ? `${z.name} 전담 매니저 · 눌러서 상담` : '전담 매니저 · 눌러서 상담'
         }
         ui.tip(label, cx, cy)
         lastHover = pick
@@ -325,6 +350,12 @@ async function boot() {
       warmFrames += 1
     }
     rig.update(dt)
+
+    for (let i = 0; i < staffModels.length; i++) {
+      const m = staffModels[i]
+      m.position.y = Math.sin(elapsed * 0.8 + i * 1.7) * 0.0035
+      m.rotation.y = m.userData.baseRy + Math.sin(elapsed * 0.45 + i * 2.1) * 0.01
+    }
 
     for (let i = 0; i < hotspotRings.length; i++) {
       const g = hotspotRings[i]
@@ -376,6 +407,7 @@ async function boot() {
     scene,
     renderer,
     products,
+    staff: staff.root,
     errors: () => window.__SHOWROOM_ERRORS__,
   }
 }

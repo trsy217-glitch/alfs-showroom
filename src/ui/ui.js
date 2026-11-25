@@ -1,4 +1,5 @@
 import { products, B2B, GENERAL_FOOD_NOTICE, SHOP, won, discountRate } from '../config/products.js'
+import { MANAGER_BY_ID } from '../config/staff.js'
 import { ZONES } from '../three/layout.js'
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
@@ -34,6 +35,10 @@ export function createUI({ onZone, onPanelClose }) {
 
     <div class="hint"><span>드래그 회전</span><span>스크롤 확대</span><span>존을 눌러 이동</span></div>
 
+    <button class="staff-chip" id="staffChip" type="button" hidden>
+      <span class="staff-chip-dot"></span>전담 매니저 상담
+    </button>
+
     <aside class="panel" id="panel" aria-hidden="true">
       <div id="panelContent"></div>
     </aside>
@@ -60,16 +65,20 @@ export function createUI({ onZone, onPanelClose }) {
   const panel = ui.querySelector('#panel')
   const panelContent = ui.querySelector('#panelContent')
   const caption = ui.querySelector('#caption')
+  const staffChip = ui.querySelector('#staffChip')
 
   /* ---------------- 존 이동 ---------------- */
   const railBtns = [...ui.querySelectorAll('.rail-btn')]
   railBtns.forEach((b) => b.addEventListener('click', () => onZone(b.dataset.zone)))
+  staffChip.addEventListener('click', () => openStaff(staffChip.dataset.zone))
   ui.querySelectorAll('.caps, .hint').forEach((el) => el.setAttribute('aria-hidden', 'true'))
 
   function setZone(id) {
     railBtns.forEach((b) => b.classList.toggle('on', b.dataset.zone === id))
     const z = ZONES.find((x) => x.id === id)
     if (z) showCaption(z.no, z.name)
+    staffChip.hidden = !MANAGER_BY_ID[id]
+    staffChip.dataset.zone = id
   }
 
   let capTimer = null
@@ -149,6 +158,36 @@ export function createUI({ onZone, onPanelClose }) {
     `)
   }
 
+  /* ---------------- 전담 매니저 카드 ---------------- */
+  function openStaff(id) {
+    const m = MANAGER_BY_ID[id]
+    if (!m) return
+    const zone = ZONES.find((z) => z.id === m.zone)
+    openPanel(`
+      <div class="panel-hero staff-hero">
+        <button class="panel-close" type="button" aria-label="닫기">✕</button>
+        <div class="staff-hero-inner">
+          <span class="staff-eyebrow">AL.F.S · SHOWROOM ATTENDANT</span>
+          <span class="staff-mark">전담 매니저</span>
+          <span class="staff-zone">${zone ? `${zone.no} · ${esc(zone.name)}` : ''}</span>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="panel-eyebrow">${esc(m.role)}</div>
+        <h2 class="panel-title">${esc(m.title)}</h2>
+        <p class="panel-desc">${esc(m.lead)}</p>
+        <dl class="facts">
+          ${m.points.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}
+        </dl>
+        <p class="panel-notice">${esc(m.notice)}</p>
+        <div class="actions">
+          <a class="btn btn-primary" href="${m.cta.href}" target="_blank" rel="noopener">${esc(m.cta.label)} <small>${esc(m.cta.sub)}</small></a>
+          <a class="btn btn-ghost" href="${SHOP.kakao}" target="_blank" rel="noopener">카카오톡으로 상담</a>
+        </div>
+      </div>
+    `)
+  }
+
   function openB2B(partnerCode) {
     const [base, hash] = SHOP.partner.split('#')
     const applyHref = partnerCode
@@ -222,6 +261,7 @@ export function createUI({ onZone, onPanelClose }) {
     setPartner,
     openProduct,
     openB2B,
+    openStaff,
     close,
     tip,
     isOpen: () => isOpen,

@@ -292,14 +292,15 @@ export function buildFurniture(scene, M, { register } = {}) {
     root.add(sh)
 
     const seats = [
-      [tx - 0.15, tz - 1.5, 0.12],
-      [tx - 1.5, tz - 0.15, Math.PI / 2 - 0.15],
-      [tx + 1.35, tz - 0.95, -Math.PI / 2 + 0.5],
+      [tx - 0.15, tz - 1.5],
+      [tx - 1.5, tz - 0.15],
+      [tx + 1.35, tz - 0.95],
     ]
-    for (const [x, z, ry] of seats) {
+    for (const [x, z] of seats) {
       const c = chair(M)
       c.position.set(x, 0, z)
-      c.rotation.y = ry + Math.PI
+      // 좌판(+Z)이 항상 테이블 중심을 향하도록 — 등받이는 바깥쪽
+      c.rotation.y = Math.atan2(tx - x, tz - z)
       root.add(c)
       const s = circleShadow(M, 0.42, 0.42)
       s.position.set(x, 0.005, z)
