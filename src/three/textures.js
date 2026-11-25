@@ -562,23 +562,29 @@ export function hotspotLabelTexture(no, name) {
   return toTexture(c)
 }
 
-export function engraveTexture(name, sub) {
+export function engraveTexture(name, sub, dark = false) {
   const W = 512
   const H = 160
   const c = makeCanvas(W, H)
   const g = c.getContext('2d')
-  g.fillStyle = '#c9a469'
-  g.fillRect(0, 0, W, H)
-  g.fillStyle = 'rgba(60,44,24,0.14)'
-  g.fillRect(0, 0, W, 4)
-  g.fillRect(0, H - 4, W, 4)
+  if (dark) {
+    g.fillStyle = '#2b241c'
+    g.fillRect(0, 0, W, H)
+    g.fillStyle = '#c9a469'
+  } else {
+    g.fillStyle = '#c9a469'
+    g.fillRect(0, 0, W, H)
+    g.fillStyle = 'rgba(60,44,24,0.14)'
+    g.fillRect(0, 0, W, 4)
+    g.fillRect(0, H - 4, W, 4)
+  }
   g.textAlign = 'center'
   g.textBaseline = 'middle'
-  g.fillStyle = 'rgba(48,34,18,0.82)'
-  g.font = '500 52px ALFSans, sans-serif'
+  g.fillStyle = dark ? 'rgba(242,234,217,0.95)' : 'rgba(48,34,18,0.82)'
+  g.font = '500 50px ALFSans, sans-serif'
   tracked(g, name, W / 2, 60, 4)
-  g.fillStyle = 'rgba(48,34,18,0.58)'
-  g.font = '400 30px ALFSans, sans-serif'
+  g.fillStyle = dark ? 'rgba(201,164,105,0.9)' : 'rgba(48,34,18,0.58)'
+  g.font = '400 28px ALFSans, sans-serif'
   tracked(g, sub, W / 2, 116, 6)
   return toTexture(c)
 }

@@ -155,17 +155,11 @@ export function buildFurniture(scene, M, { register } = {}) {
     const riser = new THREE.Mesh(new RoundedBoxGeometry(0.34, 0.14, 0.34, 3, 0.01), M.frost)
     riser.position.y = 0.9
     riser.castShadow = false
-    const riserGlow = new THREE.Mesh(
-      new THREE.PlaneGeometry(0.3, 0.3),
-      new THREE.MeshBasicMaterial({ color: 0xffe2b8, transparent: true, opacity: 0.55, depthWrite: false }),
-    )
-    riserGlow.rotation.x = -Math.PI / 2
-    riserGlow.position.y = 0.835
-    g.add(base, body, cap, riser, riserGlow)
+    g.add(base, body, cap, riser)
 
     const plaque = new THREE.Mesh(
       new THREE.PlaneGeometry(0.3, 0.094),
-      new THREE.MeshStandardMaterial({ map: engraveTexture('오륜미네랄', '1,000ml'), roughness: 0.42, metalness: 0.65, envMapIntensity: 1.1 }),
+      new THREE.MeshStandardMaterial({ map: engraveTexture('오륜미네랄', '1,000ml', true), roughness: 0.5, metalness: 0.2, envMapIntensity: 1.1 }),
     )
     plaque.position.set(0, 0.6, 0.276)
     g.add(plaque)
@@ -544,12 +538,12 @@ export function buildFurniture(scene, M, { register } = {}) {
     rail.position.set(0, -fh / 2 - 0.5, 0.12)
     g.add(rail)
 
-    g.position.set(4.3, 1.62, 3.35)
-    g.rotation.y = -0.55
+    g.position.set(4.6, 1.62, 2.2)
+    g.rotation.y = -0.8
     root.add(g)
     const sh = shadowPlane(M, 2.2, 0.9, 0.32)
-    sh.position.set(4.3, 0.005, 3.55)
-    sh.rotation.z = -0.55
+    sh.position.set(4.6, 0.005, 2.45)
+    sh.rotation.z = -0.8
     root.add(sh)
 
     // 벽감 안 사이드보드 위 샘플 병
@@ -572,9 +566,9 @@ export function buildFurniture(scene, M, { register } = {}) {
       const m = new THREE.Mesh(
         new THREE.PlaneGeometry(0.66, 0.206),
         new THREE.MeshStandardMaterial({
-          map: engraveTexture(p.name, p.sub),
-          roughness: 0.4,
-          metalness: 0.7,
+          map: engraveTexture(p.name, p.sub, true),
+          roughness: 0.5,
+          metalness: 0.2,
           envMapIntensity: 1.1,
         }),
       )

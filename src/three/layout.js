@@ -26,7 +26,7 @@ export const FIXTURE = {
   enzymeConsole: [5.9, -4.3],
   lobbyPedestal: [-2.0, 3.9],
   bench: [2.05, 4.55],
-  partnerTable: [3.75, 0.75],
+  partnerTable: [3.35, -0.25],
   brandBench: [0, -7.8],
   artPanel: [-6.16, 1.5],
   partnerBoard: [6.0, 2.6],
@@ -47,7 +47,7 @@ export const ZONES = [
     no: '02',
     name: '오륜미네랄',
     sub: 'Signature 1,000ml',
-    pose: { pos: [-3.85, 1.3, -3.8], target: [-5.85, 1.16, -4.9] },
+    pose: { pos: [-4.62, 1.3, -4.08], target: [-5.85, 1.2, -4.9] },
     limits: { minDist: 0.8, maxDist: 2.8, minPitch: -0.05, maxPitch: 0.4, yawRange: 0.8 },
   },
   {
@@ -63,7 +63,7 @@ export const ZONES = [
     no: '04',
     name: 'B2B 파트너 라운지',
     sub: 'Partners · Quotation',
-    pose: { pos: [1.5, 1.55, 4.85], target: [4.3, 1.15, 2.5] },
+    pose: { pos: [1.15, 1.5, 3.5], target: [4.15, 1.25, 1.35] },
     limits: { minDist: 1.3, maxDist: 4.2, minPitch: 0.0, maxPitch: 0.45, yawRange: 0.9 },
   },
 ]
@@ -74,7 +74,7 @@ export const ZONE_BY_ID = Object.fromEntries(ZONES.map((z) => [z.id, z]))
 export const HOTSPOTS = [
   { id: 'mineral', no: '02', name: '오륜미네랄', at: [-2.55, -2.85] },
   { id: 'enzyme', no: '03', name: '하루 1.3핏', at: [2.55, -2.45] },
-  { id: 'b2b', no: '04', name: 'B2B 라운지', at: [1.85, 3.1] },
+  { id: 'b2b', no: '04', name: 'B2B 라운지', at: [2.2, 2.3] },
 ]
 
 // 제품 클로즈업 카메라 (제품 anchor 기준)

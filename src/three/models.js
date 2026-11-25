@@ -214,7 +214,8 @@ export function buildProducts(scene, M, register) {
 
   for (const p of products) {
     const model = builders[p.model]()
-    const h = model.userData.height || 0.2
+    if (p.id === 'oryun') model.scale.setScalar(1.22)
+    const h = (model.userData.height || 0.2) * (p.id === 'oryun' ? 1.22 : 1)
     model.position.set(p.anchor[0], p.anchor[1] - h / 2, p.anchor[2])
     root.add(model)
 
