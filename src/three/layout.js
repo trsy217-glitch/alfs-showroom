@@ -1,32 +1,91 @@
-// ─────────────────────────────────────────────────────────────
-// 05 파트너 라운지 배치 값 — 라운지 존 · 충돌 박스 · 카메라 프리셋이
-// 같은 숫자를 함께 씁니다. (가구를 옮기면 세 곳이 같이 따라옵니다)
-//  · 2026-11-17 소영 님 지시: "라운지가 너무 넓다" → 소파·테이블·책장·데스크를
-//    한쪽 코너에 모아 아늑한 크기로 줄였습니다. (기존보다 약 30% 축소)
-// ─────────────────────────────────────────────────────────────
-export const LOUNGE = {
-  // 곡선 소파 — 중심 좌표와 축소 배율
-  sofa: { x: 9.4, z: 1.0, rot: -0.52, scale: 0.78, yScale: 0.9 },
-  // 원목 커피테이블
-  table: { x: 8.7, z: 2.5, scale: 0.82 },
-  // 울 러그
-  rug: { x: 9.0, z: 2.6, w: 5.4, d: 4.6, rot: 0.05 },
-  // 창가 오크 데스크 + 노트북
-  desk: { x: 10.85, z: 5.4, rot: -0.12 },
-  // 오른벽 오크 책장 3칸
-  shelfX: 12.52,
-  shelfZ: [-1.25, 0.55, 2.35],
-  // 스탠드 조명 · 화분 · 사이드 테이블 · 액자
-  lamp: [11.9, 3.5],
-  plantTall: [6.9, 7.2],
-  plantSmall: [12.05, -1.0],
-  sideTable: [11.9, -2.5],
-  art: [4.6, 10.6],
-  slat: [12.6, -4.2],
-  // 라운지 바닥 표시(존 입구)
-  marker: [5.6, 3.2],
+// 쇼룸의 좌표계와 카메라 프리셋을 한곳에서 관리합니다. (1 unit = 1m)
+
+export const ROOM = {
+  width: 16, // x: -8 ~ 8
+  depth: 22, // z: -12 ~ 10
+  height: 4.8,
+  wall: 0.5,
 }
 
-// 라운지가 바라보는 방향 (곡선 소파가 앉은 사람 기준으로 향하는 쪽)
-export const LOUNGE_FRONT = [Math.sin(LOUNGE.sofa.rot), Math.cos(LOUNGE.sofa.rot)]
-// → [-0.497, 0.868] : 방 안쪽(-x)과 입구 쪽(+z)을 함께 바라봅니다
+export const ARCHES = {
+  back: [{ x: 0, width: 3.4, spring: 2.5 }],
+  left: [
+    { z: -7.0, width: 2.5, spring: 2.25 },
+    { z: 1.1, width: 2.1, spring: 2.35 },
+  ],
+  right: [
+    { z: -6.3, width: 3.2, spring: 2.35 },
+    { z: 2.9, width: 2.9, spring: 2.45 },
+  ],
+  front: [{ x: 0, width: 4.6, spring: 2.05 }],
+}
+
+// 주요 집기 위치
+export const FIXTURE = {
+  mineralPlinth: [-8.32, -7.0], // x, z  (벽감 안)
+  mineralVase: [-7.55, 9.6],
+  enzymeConsole: [8.5, -6.3], // x, z
+  lobbyPedestal: [-2.5, 6.5],
+  bench: [2.9, 7.1],
+  partnerTable: [5.1, 3.0],
+  brandBench: [0, -11.1],
+}
+
+export const ZONES = [
+  {
+    id: 'lobby',
+    no: '01',
+    name: '아틀리에 로비',
+    sub: 'Brand Wall · Collection',
+    pose: { pos: [0.9, 3.35, 9.0], target: [0, 1.55, -5.0] },
+    /* 로비는 자유 시점 */
+    limits: { minDist: 2.6, maxDist: 9.5, minPitch: 0.02, maxPitch: 0.55 },
+  },
+  {
+    id: 'mineral',
+    no: '02',
+    name: '오륜미네랄',
+    sub: 'Signature 1,000ml',
+    pose: { pos: [-6.2, 1.45, -5.7], target: [-8.3, 1.2, -7.0] },
+    limits: { minDist: 0.85, maxDist: 3.4, minPitch: -0.05, maxPitch: 0.42 },
+  },
+  {
+    id: 'enzyme',
+    no: '03',
+    name: '하루 1.3핏 · 클린바이옴',
+    sub: '30 Days · 3 Days · Grapefruit',
+    pose: { pos: [6.15, 1.45, -4.75], target: [8.4, 1.12, -6.3] },
+    limits: { minDist: 0.85, maxDist: 3.4, minPitch: -0.05, maxPitch: 0.42 },
+  },
+  {
+    id: 'b2b',
+    no: '04',
+    name: 'B2B 파트너 라운지',
+    sub: 'Partners · Quotation',
+    pose: { pos: [1.9, 1.98, 6.1], target: [5.35, 1.0, 3.0] },
+    limits: { minDist: 1.5, maxDist: 5.0, minPitch: 0.0, maxPitch: 0.5 },
+  },
+]
+
+export const ZONE_BY_ID = Object.fromEntries(ZONES.map((z) => [z.id, z]))
+
+// 바닥 링 핫스팟 (존 이동)
+export const HOTSPOTS = [
+  { id: 'mineral', no: '02', name: '오륜미네랄', at: [-4.4, -4.4] },
+  { id: 'enzyme', no: '03', name: '하루 1.3핏', at: [4.5, -3.9] },
+  { id: 'b2b', no: '04', name: 'B2B 라운지', at: [3.3, 5.2] },
+]
+
+// 제품 클로즈업 카메라 (제품 anchor 기준)
+export function productPose(product) {
+  const a = product.anchor
+  const v = product.view
+  const len = Math.hypot(v[0], v[2]) || 1
+  const dist = 1.2
+  const dx = (v[0] / len) * dist
+  const dz = (v[2] / len) * dist
+  return {
+    pos: [a[0] + dx, a[1] + 0.16, a[2] + dz],
+    target: [a[0], a[1] - 0.02, a[2]],
+  }
+}
