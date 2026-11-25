@@ -17,7 +17,7 @@ function buildEnvironment(renderer) {
   return rt.texture
 }
 
-export function createStage(container) {
+export function createStage(container, opts = {}) {
   const renderer = new THREE.WebGLRenderer({
     antialias: true,
     powerPreference: 'high-performance',
@@ -25,12 +25,14 @@ export function createStage(container) {
     stencil: false,
   })
   const mobile = window.matchMedia('(max-width: 900px)').matches
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, mobile ? 1.8 : 2))
+  const quality = opts.quality || (mobile ? 'low' : 'high')
+  const shadows = quality !== 'low'
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, quality === 'low' ? 1.35 : 2))
   renderer.setSize(container.clientWidth || window.innerWidth, container.clientHeight || window.innerHeight)
   renderer.outputColorSpace = THREE.SRGBColorSpace
   renderer.toneMapping = THREE.ACESFilmicToneMapping
   renderer.toneMappingExposure = 1.0
-  renderer.shadowMap.enabled = true
+  renderer.shadowMap.enabled = shadows
   renderer.shadowMap.type = THREE.PCFSoftShadowMap
   renderer.shadowMap.autoUpdate = false
   renderer.shadowMap.needsUpdate = true
@@ -53,25 +55,26 @@ export function createStage(container) {
 
   const spotDefs = [
     // 오륜미네랄 (그림자)
-    { pos: [-3.5, 3.75, -3.9], target: [-5.85, 1.2, -4.9], angle: 0.3, penumbra: 0.55, intensity: 200, shadow: true },
+    { pos: [-3.5, 3.75, -3.9], target: [-5.85, 1.2, -4.9], angle: 0.3, penumbra: 0.55, intensity: 200, shadow: true, key: true },
     // 효소세상 (그림자)
-    { pos: [3.7, 3.75, -3.2], target: [5.9, 1.15, -4.3], angle: 0.3, penumbra: 0.55, intensity: 220, shadow: true },
+    { pos: [3.7, 3.75, -3.2], target: [5.9, 1.15, -4.3], angle: 0.3, penumbra: 0.55, intensity: 220, shadow: true, key: true },
     // 브랜드 월 + 센터
-    { pos: [0, 3.8, -4.4], target: [0, 1.5, -8.6], angle: 0.42, penumbra: 0.8, intensity: 210, shadow: false },
+    { pos: [0, 3.8, -4.4], target: [0, 1.5, -8.6], angle: 0.42, penumbra: 0.8, intensity: 210, shadow: false, key: true },
     // 라운지 · B2B 보드
-    { pos: [4.4, 3.6, 2.6], target: [4.6, 1.0, 2.6], angle: 0.65, penumbra: 0.9, intensity: 175, shadow: true },
+    { pos: [4.4, 3.6, 2.6], target: [4.6, 1.0, 2.6], angle: 0.65, penumbra: 0.9, intensity: 175, shadow: true, key: true },
     // 센터 테이블
-    { pos: [-1.0, 3.75, -0.4], target: [-1.25, 0.6, -0.95], angle: 0.34, penumbra: 0.85, intensity: 120, shadow: false },
+    { pos: [-1.0, 3.75, -0.4], target: [-1.25, 0.6, -0.95], angle: 0.34, penumbra: 0.85, intensity: 120, shadow: false, key: true },
   ]
 
   const spots = []
   for (const d of spotDefs) {
+    if (quality === 'low' && !d.key) continue
     const s = new THREE.SpotLight(0xffdcb0, d.intensity, 0, d.angle, d.penumbra, 2)
     s.position.set(...d.pos)
     s.target.position.set(...d.target)
     scene.add(s.target)
-    s.castShadow = d.shadow
-    if (d.shadow) {
+    s.castShadow = shadows && d.shadow
+    if (s.castShadow) {
       s.shadow.mapSize.set(1024, 1024)
       s.shadow.bias = -0.0009
       s.shadow.normalBias = 0.022
@@ -100,5 +103,5 @@ export function createStage(container) {
   }
   resize()
 
-  return { renderer, scene, camera, resize, spots, mobile }
+  return { renderer, scene, camera, resize, spots, mobile, quality }
 }

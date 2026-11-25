@@ -13,6 +13,7 @@ import { engraveTexture } from './three/textures.js'
 
 const params = new URLSearchParams(window.location.search)
 const partnerCode = (params.get('p') || '').trim()
+const qualityParam = (params.get('q') || '').trim()
 
 /* ------------------------------------------------------------------ */
 /* 글꼴 — 라벨 텍스처를 그리기 전에 먼저 준비합니다.                    */
@@ -39,7 +40,7 @@ async function boot() {
   const mark = (name) => timing.push([name, Math.round(performance.now())])
   mark('boot')
   const container = document.getElementById('stage')
-  const stage = createStage(container)
+  const stage = createStage(container, { quality: qualityParam || undefined })
   const { renderer, scene, camera } = stage
   mark('stage')
 
@@ -330,6 +331,10 @@ async function boot() {
 
   renderer.render(scene, camera)
   mark('first-render')
+  renderer.render(scene, camera)
+  mark('second-render')
+  timing.push(['programs', renderer.info.programs ? renderer.info.programs.length : -1])
+  timing.push(['quality', stage.quality])
   window.__SHOWROOM_TIMING__ = timing
   requestAnimationFrame(() => {
     const bootEl = document.getElementById('boot')
