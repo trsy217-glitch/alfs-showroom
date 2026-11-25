@@ -55,15 +55,15 @@ export function createStage(container, opts = {}) {
 
   const spotDefs = [
     // 오륜미네랄 (그림자)
-    { pos: [-3.1, 3.95, -3.4], target: [-5.85, 1.35, -4.9], angle: 0.44, penumbra: 0.98, intensity: 130, shadow: true, key: true },
+    { pos: [-3.4, 3.95, -3.6], target: [-5.85, 1.35, -4.9], angle: 0.5, penumbra: 0.65, intensity: 190, shadow: true, key: true },
     // 효소세상 (그림자)
-    { pos: [3.3, 3.95, -2.8], target: [5.9, 1.3, -4.3], angle: 0.44, penumbra: 0.98, intensity: 150, shadow: true, key: true },
+    { pos: [4.1, 3.95, -3.7], target: [5.9, 1.25, -4.7], angle: 0.62, penumbra: 0.6, intensity: 210, shadow: true, key: true },
     // 브랜드 월 + 센터
-    { pos: [0, 3.9, -3.8], target: [0, 1.7, -8.6], angle: 0.52, penumbra: 0.95, intensity: 150, shadow: false, key: true },
+    { pos: [0, 3.9, -3.8], target: [0, 1.7, -8.6], angle: 0.55, penumbra: 0.7, intensity: 200, shadow: false, key: true },
     // 라운지 · B2B 보드
-    { pos: [4.3, 3.7, 2.4], target: [4.3, 1.1, 1.9], angle: 0.7, penumbra: 0.95, intensity: 125, shadow: true, key: true },
+    { pos: [4.3, 3.7, 2.4], target: [4.3, 1.1, 1.9], angle: 0.8, penumbra: 0.7, intensity: 170, shadow: true, key: true },
     // 센터 테이블
-    { pos: [-1.0, 3.8, -0.2], target: [-1.25, 0.7, -0.95], angle: 0.42, penumbra: 0.95, intensity: 85, shadow: false, key: true },
+    { pos: [-1.0, 3.8, -0.2], target: [-1.25, 0.7, -0.95], angle: 0.45, penumbra: 0.7, intensity: 110, shadow: false, key: true },
   ]
 
   const spots = []

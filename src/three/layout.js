@@ -55,7 +55,7 @@ export const ZONES = [
     no: '03',
     name: '하루 1.3핏 · 클린바이옴',
     sub: '30 Days · 3 Days · Grapefruit',
-    pose: { pos: [4.55, 1.32, -3.42], target: [5.9, 1.15, -4.3] },
+    pose: { pos: [4.25, 1.34, -3.1], target: [5.9, 1.15, -4.55] },
     limits: { minDist: 0.8, maxDist: 3.0, minPitch: -0.05, maxPitch: 0.4, yawRange: 0.85 },
   },
   {
