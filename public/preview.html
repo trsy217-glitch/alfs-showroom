@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>Showroom viewport preview</title>
+<style>html,body{margin:0;padding:0;background:#0b0908;overflow:hidden}iframe{display:block;border:0;background:#12100e}</style></head>
+<body><script>
+var q=new URLSearchParams(location.search);
+var w=parseInt(q.get('w')||'390',10), h=parseInt(q.get('h')||'844',10);
+var f=document.createElement('iframe'); f.width=w; f.height=h; f.style.width=w+'px'; f.style.height=h+'px';
+f.src='/?qa='+Date.now(); document.body.appendChild(f);
+</script></body></html>
