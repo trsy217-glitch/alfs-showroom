@@ -26,7 +26,7 @@ export const FIXTURE = {
   enzymeConsole: [5.9, -4.3],
   lobbyPedestal: [-2.0, 3.9],
   bench: [2.05, 4.55],
-  partnerTable: [3.75, 0.95],
+  partnerTable: [3.75, 0.75],
   brandBench: [0, -7.8],
   artPanel: [-6.16, 1.5],
   partnerBoard: [6.0, 2.6],
@@ -63,7 +63,7 @@ export const ZONES = [
     no: '04',
     name: 'B2B 파트너 라운지',
     sub: 'Partners · Quotation',
-    pose: { pos: [0.85, 1.62, 4.25], target: [3.7, 0.9, 1.6] },
+    pose: { pos: [1.5, 1.55, 4.85], target: [4.3, 1.15, 2.5] },
     limits: { minDist: 1.3, maxDist: 4.2, minPitch: 0.0, maxPitch: 0.45, yawRange: 0.9 },
   },
 ]

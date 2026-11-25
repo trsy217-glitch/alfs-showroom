@@ -67,11 +67,11 @@ export function createMaterials(renderer) {
       color: 0xe4d3b9,
     }),
     ceiling: new THREE.MeshStandardMaterial({
-      color: 0x43372c,
+      color: 0x4f4133,
       roughness: 0.95,
       metalness: 0,
       envMapIntensity: 0.12,
-      emissive: 0x1b130c,
+      emissive: 0x221a12,
       emissiveIntensity: 0.9,
     }),
     brass: new THREE.MeshStandardMaterial({

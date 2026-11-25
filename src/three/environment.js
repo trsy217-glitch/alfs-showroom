@@ -59,7 +59,7 @@ export function createStage(container) {
     // 브랜드 월 + 센터
     { pos: [0, 3.8, -4.4], target: [0, 1.5, -8.6], angle: 0.42, penumbra: 0.8, intensity: 210, shadow: false },
     // 라운지 · B2B 보드
-    { pos: [3.9, 3.65, 1.9], target: [4.9, 0.95, 2.2], angle: 0.6, penumbra: 0.9, intensity: 170, shadow: true },
+    { pos: [4.4, 3.6, 2.6], target: [4.6, 1.0, 2.6], angle: 0.65, penumbra: 0.9, intensity: 175, shadow: true },
     // 센터 테이블
     { pos: [-1.0, 3.75, -0.4], target: [-1.25, 0.6, -0.95], angle: 0.34, penumbra: 0.85, intensity: 120, shadow: false },
   ]

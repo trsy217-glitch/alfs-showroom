@@ -435,11 +435,11 @@ export function brandPlaqueTexture() {
   g.clearRect(0, 0, W, H)
 
   const gold = g.createLinearGradient(0, 180, 0, 560)
-  gold.addColorStop(0, '#f0d6a6')
-  gold.addColorStop(0.4, '#c9a468')
-  gold.addColorStop(0.62, '#9c7a45')
-  gold.addColorStop(0.8, '#d8b67e')
-  gold.addColorStop(1, '#8c6a3a')
+  gold.addColorStop(0, '#e2c088')
+  gold.addColorStop(0.35, '#a9824c')
+  gold.addColorStop(0.6, '#6f5230')
+  gold.addColorStop(0.82, '#b08a52')
+  gold.addColorStop(1, '#5b4126')
 
   g.textAlign = 'center'
   g.textBaseline = 'middle'
@@ -454,10 +454,10 @@ export function brandPlaqueTexture() {
   g.fillStyle = line
   g.fillRect(W * 0.2, 452, W * 0.6, 2)
 
-  g.fillStyle = 'rgba(206,174,116,0.9)'
+  g.fillStyle = 'rgba(120,92,54,0.95)'
   g.font = '400 44px ALFSerif, serif'
   tracked(g, 'P R I V A T E   S H O W R O O M', W / 2, 530, 8)
-  g.fillStyle = 'rgba(206,174,116,0.55)'
+  g.fillStyle = 'rgba(120,92,54,0.7)'
   g.font = '400 30px ALFSans, sans-serif'
   tracked(g, 'SEOUL · WELLNESS ATELIER', W / 2, 610, 7)
 

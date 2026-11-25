@@ -305,9 +305,9 @@ export function buildFurniture(scene, M, { register } = {}) {
     root.add(sh)
 
     const seats = [
-      [tx, tz - 1.55, 0],
-      [tx - 1.5, tz + 0.25, Math.PI / 2 - 0.25],
-      [tx + 1.5, tz + 0.25, -Math.PI / 2 + 0.25],
+      [tx - 0.1, tz - 1.5, 0.15],
+      [tx - 1.45, tz + 0.2, Math.PI / 2 - 0.2],
+      [tx + 1.45, tz + 0.15, -Math.PI / 2 + 0.2],
     ]
     for (const [x, z, ry] of seats) {
       const c = chair(M)
@@ -497,41 +497,90 @@ export function buildFurniture(scene, M, { register } = {}) {
     root.add(v)
   }
 
-  /* ---------- B2B 파트너 보드 (오른쪽 벽감) ---------- */
+  /* ---------- B2B 파트너 보드 (이젤) ---------- */
   {
     const boardTex = b2bBoardTexture()
+    const g = new THREE.Group()
     const board = new THREE.Mesh(
-      new THREE.PlaneGeometry(2.15, 1.38),
-      new THREE.MeshStandardMaterial({ map: boardTex, roughness: 0.55, metalness: 0.15, emissive: 0x120c06, envMapIntensity: 0.9 }),
+      new THREE.PlaneGeometry(1.9, 1.22),
+      new THREE.MeshStandardMaterial({
+        map: boardTex,
+        roughness: 0.55,
+        metalness: 0.15,
+        emissive: 0x0f0a05,
+        envMapIntensity: 0.9,
+        side: THREE.DoubleSide,
+      }),
     )
-    board.rotation.y = -Math.PI / 2
-    board.position.set(6.0, 2.05, 2.6)
     board.userData.pick = { kind: 'b2b' }
-    root.add(board)
+    g.add(board)
     pickables.push(board)
 
-    const frameW = 2.25
-    const frameH = 1.48
-    const parts = [
-      [0.05, frameH, 0.03, 6.04, 2.05, 2.6 - frameW / 2],
-      [0.05, frameH, 0.03, 6.04, 2.05, 2.6 + frameW / 2],
-      [0.05, 0.03, frameW, 6.04, 2.05 - frameH / 2, 2.6],
-      [0.05, 0.03, frameW, 6.04, 2.05 + frameH / 2, 2.6],
+    const fw = 1.98
+    const fh = 1.3
+    const frame = [
+      [0.05, fh, 0.04, 0, 0, -fw / 2],
+      [0.05, fh, 0.04, 0, 0, fw / 2],
+      [0.05, 0.04, fw, 0, fh / 2, 0],
+      [0.05, 0.04, fw, 0, -fh / 2, 0],
     ]
-    for (const [w, h, d, x, y, z] of parts) {
+    for (const [w, h, d, x, y, z] of frame) {
       const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), M.brass)
       m.position.set(x, y, z)
       m.castShadow = true
-      root.add(m)
+      g.add(m)
     }
-    // 보드 아래 콘솔
-    const cons = rbox(0.4, 0.06, 1.9, 0.01, M.walnutLong)
-    cons.position.set(5.9, 0.9, 2.6)
-    root.add(cons)
-    for (const z of [2.6 - 0.8, 2.6 + 0.8]) {
-      const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.012, 0.87, 10), M.brass)
-      leg.position.set(5.9, 0.44, z)
-      root.add(leg)
+    for (const sx of [-0.62, 0.62]) {
+      const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.02, 1.0, 12), M.brass)
+      leg.position.set(sx, -fh / 2 - 0.42, 0.1)
+      leg.rotation.x = 0.16
+      leg.castShadow = true
+      g.add(leg)
+      const foot = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.02, 16), M.brassDark)
+      foot.position.set(sx, -fh / 2 - 0.9, 0.2)
+      g.add(foot)
+    }
+    const rail = new THREE.Mesh(new THREE.BoxGeometry(fw * 0.9, 0.03, 0.03), M.brassDark)
+    rail.position.set(0, -fh / 2 - 0.5, 0.12)
+    g.add(rail)
+
+    g.position.set(4.3, 1.62, 3.35)
+    g.rotation.y = -0.55
+    root.add(g)
+    const sh = shadowPlane(M, 2.2, 0.9, 0.32)
+    sh.position.set(4.3, 0.005, 3.55)
+    sh.rotation.z = -0.55
+    root.add(sh)
+
+    // 벽감 안 사이드보드 위 샘플 병
+    for (let i = 0; i < 4; i++) {
+      const b = cleanBottle(M)
+      b.position.set(5.9, 0.93, 2.0 + i * 0.28)
+      b.scale.setScalar(1.15)
+      root.add(b)
+    }
+  }
+
+  /* ---------- 벽 명패 ---------- */
+  {
+    const plaques = [
+      { name: '오륜미네랄', sub: 'SIGNATURE 1,000ML', x: -5.49, y: 1.62, z: -2.9, ry: Math.PI / 2 },
+      { name: '하루 1.3핏', sub: 'CLEANSE PROGRAM', x: 5.49, y: 1.62, z: -2.1, ry: -Math.PI / 2 },
+      { name: 'B2B 파트너', sub: 'PARTNER LOUNGE', x: 5.49, y: 1.55, z: 4.35, ry: -Math.PI / 2 },
+    ]
+    for (const p of plaques) {
+      const m = new THREE.Mesh(
+        new THREE.PlaneGeometry(0.66, 0.206),
+        new THREE.MeshStandardMaterial({
+          map: engraveTexture(p.name, p.sub),
+          roughness: 0.4,
+          metalness: 0.7,
+          envMapIntensity: 1.1,
+        }),
+      )
+      m.position.set(p.x, p.y, p.z)
+      m.rotation.y = p.ry
+      root.add(m)
     }
   }
 
