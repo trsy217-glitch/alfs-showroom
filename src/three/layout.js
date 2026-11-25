@@ -23,7 +23,7 @@ export const ARCHES = {
 // 주요 집기 위치 (x, z)
 export const FIXTURE = {
   mineralPlinth: [-5.85, -4.9],
-  enzymeConsole: [5.9, -4.3],
+  enzymeConsole: [5.12, -5.6],
   lobbyPedestal: [-2.0, 3.9],
   bench: [2.05, 4.55],
   partnerTable: [3.35, -0.25],
