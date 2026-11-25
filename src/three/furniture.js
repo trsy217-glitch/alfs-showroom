@@ -509,10 +509,10 @@ export function buildFurniture(scene, M, { register } = {}) {
     const fw = 1.78
     const fh = 1.16
     const frame = [
-      [0.05, fh, 0.05, -fw / 2, 0, 0],
-      [0.05, fh, 0.05, fw / 2, 0, 0],
-      [fw, 0.05, 0.05, 0, fh / 2, 0],
-      [fw, 0.05, 0.05, 0, -fh / 2, 0],
+      [0.05, fh, 0.05, -fw / 2, 0, -0.04],
+      [0.05, fh, 0.05, fw / 2, 0, -0.04],
+      [fw, 0.05, 0.05, 0, fh / 2, -0.04],
+      [fw, 0.05, 0.05, 0, -fh / 2, -0.04],
     ]
     for (const [w, h, d, x, y, z] of frame) {
       const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), M.brass)
