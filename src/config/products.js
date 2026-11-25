@@ -26,7 +26,7 @@ export const products = [
     listPrice: null,
     photo: '/images/cutout/mineral-1000.webp',
     model: 'mineral',
-    anchor: [-5.85, 1.14, -4.9],
+    anchor: [-5.85, 1.075, -4.9],
     view: [1, 0.1, 0.42],
     zoom: 1.62,
     summary:

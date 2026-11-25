@@ -150,12 +150,11 @@ export function buildFurniture(scene, M, { register } = {}) {
     base.position.y = 0.01
     const body = rbox(0.54, 0.78, 0.54, 0.015, M.stone)
     body.position.y = 0.41
-    const cap = rbox(0.58, 0.03, 0.58, 0.008, M.brass)
-    cap.position.y = 0.815
-    const riser = new THREE.Mesh(new RoundedBoxGeometry(0.36, 0.05, 0.36, 3, 0.008), M.frost)
-    riser.position.y = 0.855
-    riser.castShadow = false
-    g.add(base, body, cap, riser)
+    const trim = rbox(0.6, 0.02, 0.6, 0.006, M.brass)
+    trim.position.y = 0.815
+    const top = rbox(0.56, 0.05, 0.56, 0.008, M.stone)
+    top.position.y = 0.85
+    g.add(base, body, trim, top)
 
     const plaque = new THREE.Mesh(
       new THREE.PlaneGeometry(0.3, 0.094),
