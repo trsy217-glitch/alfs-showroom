@@ -48,7 +48,7 @@ export const ZONES = [
     no: '02',
     name: '오륜미네랄',
     sub: 'Signature 1,000ml',
-    pose: { pos: [-4.62, 1.3, -4.08], target: [-5.85, 1.2, -4.9] },
+    pose: { pos: [-4.95, 1.22, -4.38], target: [-5.85, 1.1, -4.9] },
     mobile: { pos: [-4.8, 1.2, -4.25], target: [-5.85, 1.12, -4.9] },
     limits: { minDist: 0.8, maxDist: 2.8, minPitch: -0.05, maxPitch: 0.4, yawRange: 0.8 },
   },

@@ -202,7 +202,7 @@ export function buildArchitecture(scene, M) {
   for (const spec of walls) {
     const group = new THREE.Group()
     const mesh = new THREE.Mesh(wallGeometry(spec.width, H, spec.arches, T), M.wall)
-    mesh.castShadow = true
+    mesh.castShadow = false
     mesh.receiveShadow = true
     group.add(mesh)
 
