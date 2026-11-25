@@ -82,8 +82,8 @@ html, body {
   content: '';
   position: absolute;
   left: 0; top: 0; bottom: 0;
-  width: 380px;
-  background: linear-gradient(90deg, rgba(10, 8, 5, 0.78) 0%, rgba(10, 8, 5, 0.55) 40%, rgba(10, 8, 5, 0.18) 75%, rgba(10, 8, 5, 0) 100%);
+  width: 430px;
+  background: linear-gradient(90deg, rgba(10, 8, 5, 0.86) 0%, rgba(10, 8, 5, 0.72) 38%, rgba(10, 8, 5, 0.42) 72%, rgba(10, 8, 5, 0) 100%);
   pointer-events: none;
 }
 #ui::after {
@@ -175,7 +175,7 @@ html, body {
   padding: 0;
   cursor: pointer;
   text-align: left;
-  color: var(--cream-faint);
+  color: rgba(242, 234, 217, 0.52);
   transition: color 0.5s var(--ease);
 }
 .rail-no {
@@ -185,7 +185,7 @@ html, body {
   color: var(--gold-dim);
   transition: color 0.5s var(--ease);
 }
-.rail-name { font-size: 12.5px; letter-spacing: 0.06em; line-height: 1.35; font-weight: 400; text-shadow: 0 1px 10px rgba(0, 0, 0, 0.8); }
+.rail-name { font-size: 12.5px; letter-spacing: 0.06em; line-height: 1.35; font-weight: 400; text-shadow: 0 1px 12px rgba(0, 0, 0, 0.9); }
 .rail-name small {
   display: block;
   font-size: 9.5px;

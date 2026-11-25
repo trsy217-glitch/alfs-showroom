@@ -114,17 +114,19 @@ async function boot() {
       g.add(stem)
 
       const plate = new THREE.Mesh(
-        new THREE.PlaneGeometry(0.54, 0.168),
+        new THREE.PlaneGeometry(0.62, 0.193),
         new THREE.MeshStandardMaterial({
           map: engraveTexture(`${h.no}  ${h.name}`, 'TOUCH TO ENTER'),
           transparent: true,
-          roughness: 0.5,
-          metalness: 0.3,
+          roughness: 0.42,
+          metalness: 0.35,
+          emissive: 0x1a1208,
+          emissiveIntensity: 0.5,
           side: THREE.DoubleSide,
-          envMapIntensity: 0.7,
+          envMapIntensity: 1.1,
         }),
       )
-      plate.position.set(0, 0.56, -0.66)
+      plate.position.set(0, 0.58, -0.7)
       plate.rotation.x = -0.3
       plate.userData.pick = { kind: 'zone', id: h.id }
       g.add(plate)

@@ -294,13 +294,6 @@ export function buildArchitecture(scene, M) {
     g.rotation.y = rotY
     return g
   }
-  root.add(sconceAt(-W / 2 + 0.02, -2.2, -Math.PI / 2))
-  root.add(sconceAt(-W / 2 + 0.02, 3.9, -Math.PI / 2))
-  root.add(sconceAt(W / 2 - 0.02, -1.2, Math.PI / 2))
-  root.add(sconceAt(W / 2 - 0.02, 4.2, Math.PI / 2))
-  root.add(sconceAt(-3.2, Z0 + 0.02, 0))
-  root.add(sconceAt(3.2, Z0 + 0.02, 0))
-
   scene.add(root)
   return root
 }
