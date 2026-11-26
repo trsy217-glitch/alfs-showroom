@@ -785,11 +785,15 @@ html, body {
 .tab-pane.on { display: block; animation: fadein 0.35s var(--ease); }
 @keyframes fadein { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 .inspect-foot {
+  position: sticky;
+  bottom: 0;
   display: flex;
   flex-direction: column;
   gap: 9px;
-  padding: 0 24px 22px;
+  padding: 14px 24px 22px;
   margin-top: 16px;
+  background: linear-gradient(180deg, rgba(20, 17, 13, 0) 0%, rgba(20, 17, 13, 0.93) 26%, rgba(20, 17, 13, 0.98) 100%);
+  backdrop-filter: blur(6px);
 }
 .manual-slot { margin: 16px 0 18px; }
 .manual-frame {
@@ -1051,7 +1055,7 @@ html, body {
   .inspect-head { padding: 16px 18px 0; }
   .inspect-head .panel-title { font-size: 21px; }
   .tab-body { padding: 14px 18px 0; }
-  .inspect-foot { padding: 0 18px 18px; }
+  .inspect-foot { padding: 12px 18px 18px; }
   .manual-frame { min-height: 92px; }
 
   .chat-hero { height: 158px; }
