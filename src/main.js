@@ -6,7 +6,7 @@ import { buildArchitecture } from './three/architecture.js'
 import { buildFurniture } from './three/furniture.js'
 import { buildProducts } from './three/models.js'
 import { buildStaff } from './three/staff.js'
-import { CameraRig } from './three/rig.js'
+import { CameraRig, CAMERA_BOUNDS } from './three/rig.js'
 import { ProductInspector } from './three/inspector.js'
 import { createUI } from './ui/ui.js'
 import { createIntro } from './ui/intro.js'
@@ -189,14 +189,68 @@ async function boot() {
     dust = { points, pos, vel, geo }
   }
 
+  /* ---------------- 바닥 터치 목적지 링 ---------------- */
+  const destination = (() => {
+    const group = new THREE.Group()
+    group.visible = false
+    group.renderOrder = 2
+    const ringMat = new THREE.MeshBasicMaterial({
+      color: 0xe8c88f,
+      transparent: true,
+      opacity: 0,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+    })
+    const ring = new THREE.Mesh(new THREE.RingGeometry(0.27, 0.39, 64), ringMat)
+    ring.rotation.x = -Math.PI / 2
+    const coreMat = new THREE.MeshBasicMaterial({
+      color: 0xffe3b0,
+      transparent: true,
+      opacity: 0,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+    })
+    const core = new THREE.Mesh(new THREE.CircleGeometry(0.27, 48), coreMat)
+    core.rotation.x = -Math.PI / 2
+    group.add(ring, core)
+    scene.add(group)
+    return {
+      group,
+      duration: 1.9,
+      t: 0,
+      active: false,
+      show(x, z) {
+        group.position.set(x, 0.022, z)
+        group.visible = true
+        this.t = 0
+        this.active = true
+      },
+      hide() {
+        this.active = false
+        group.visible = false
+      },
+      update(dt) {
+        if (!this.active) return
+        this.t += dt
+        const k = Math.min(1, this.t / this.duration)
+        group.scale.setScalar(0.72 + k * 0.5)
+        const fade = k < 0.22 ? k / 0.22 : 1 - (k - 0.22) / 0.78
+        ringMat.opacity = Math.max(0, fade)
+        coreMat.opacity = 0.09 * Math.max(0, fade)
+        if (k >= 1) this.hide()
+      },
+    }
+  })()
+
   /* ---------------- 카메라 ---------------- */
   const rig = new CameraRig(camera, renderer.domElement)
-  rig.setPose({ pos: [0.7, 2.6, 5.8], target: [-0.1, 1.5, -4.4] }, { instant: true })
+  rig.setPose({ pos: [0.7, 2.6, 5.4], target: [-0.1, 1.5, -4.4] }, { instant: true })
   rig.setLimits(ZONE_BY_ID.lobby.limits)
 
-  // 자유 이동(산책) 충돌 범위 — 큰 집기만 부드럽게 피해 갑니다.
+  // 자유 이동(산책) 충돌 범위 — 벽에서 1m 안쪽, 큰 집기만 부드럽게 피해 갑니다.
   rig.setWalkBounds(
-    { minX: -4.85, maxX: 4.85, minZ: -7.75, maxZ: 5.85 },
+    CAMERA_BOUNDS,
     [
       { x: -5.5, z: -4.9, r: 0.95 },
       { x: 5.12, z: -6.5, r: 0.85 },
@@ -268,9 +322,6 @@ async function boot() {
     ui.setZone(p.zone)
   }
 
-  const padMove = { f: false, b: false, l: false, r: false }
-  const padTurn = { '-1': false, '1': false }
-
   const ui = createUI({
     onZone: (id) => goZone(id),
     onPartnerShop: () => {
@@ -278,14 +329,6 @@ async function boot() {
       ui.openB2B(partnerCode)
     },
     onOpenProduct: (id) => inspectProduct(id),
-    onMove: (state) => {
-      Object.assign(padMove, state)
-      if (state.f || state.b || state.l || state.r) enterWalk()
-    },
-    onTurn: (state) => {
-      Object.assign(padTurn, state)
-      if (state['-1'] || state['1']) enterWalk()
-    },
     onPanelClose: (restore, mode) => {
       if (mode === 'inspect') {
         inspector.close()
@@ -313,8 +356,9 @@ async function boot() {
 
   intro.onEnter(() => {
     entered = true
-    rig.setPose({ pos: [1.05, 2.8, 5.95], target: [0, 1.45, -4.2] }, { instant: true })
+    rig.setPose({ pos: [1.05, 2.7, 5.42], target: [0, 1.45, -4.2] }, { instant: true })
     goZone('lobby')
+    if (!hasHover) ui.showTouchHint()
   })
 
   /* ---------------- 키보드 · 이동 ---------------- */
@@ -343,6 +387,8 @@ async function boot() {
   let downAt = 0
   let downX = 0
   let downY = 0
+  let gesturePointers = 0
+  let tapOk = false
   let hoverRaf = 0
   let lastHover = null
   let inspectingDrag = false
@@ -362,10 +408,31 @@ async function boot() {
     return null
   }
 
+  // 화면 좌표 → 바닥(y=0) 위의 지점. 쇼룸 밖을 가리키면 null.
+  const floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0)
+  const floorHit = new THREE.Vector3()
+  function floorPointAt(clientX, clientY) {
+    const rect = renderer.domElement.getBoundingClientRect()
+    ndc.x = ((clientX - rect.left) / rect.width) * 2 - 1
+    ndc.y = -((clientY - rect.top) / rect.height) * 2 + 1
+    raycaster.setFromCamera(ndc, camera)
+    if (!raycaster.ray.intersectPlane(floorPlane, floorHit)) return null
+    const b = rig.bounds
+    if (floorHit.x < b.minX - 2 || floorHit.x > b.maxX + 2) return null
+    if (floorHit.z < b.minZ - 2 || floorHit.z > b.maxZ + 2) return null
+    return { x: floorHit.x, z: floorHit.z }
+  }
+
   renderer.domElement.addEventListener('pointerdown', (e) => {
-    downAt = performance.now()
-    downX = e.clientX
-    downY = e.clientY
+    gesturePointers += 1
+    if (gesturePointers === 1) {
+      downAt = performance.now()
+      downX = e.clientX
+      downY = e.clientY
+      tapOk = true
+    } else {
+      tapOk = false // 두 손가락 이상은 탭이 아닙니다
+    }
     if (inspector.isOpen) {
       inspectPointers.set(e.pointerId, { x: e.clientX, y: e.clientY })
       if (inspectPointers.size === 1) {
@@ -449,13 +516,25 @@ async function boot() {
     inspectPointers.delete(e.pointerId)
     if (inspectPointers.size < 2) inspectPinch = 0
     if (inspectPointers.size === 0) inspectingDrag = false
+    gesturePointers = Math.max(0, gesturePointers - 1)
+    const isTap = tapOk
+    if (gesturePointers === 0) tapOk = false
     const dist = Math.hypot(e.clientX - downX, e.clientY - downY)
     const dt = performance.now() - downAt
-    if (dist > 10 || dt > 900) return
+    if (!isTap || dist > 10 || dt > 900) return
     if (inspector.isOpen) return
     if (!entered) return
     const pick = pickAt(e.clientX, e.clientY)
-    if (!pick) return
+    if (!pick) {
+      // 바닥을 누르면 그 지점까지 걸어서 이동합니다.
+      if (ui.isOpen()) return
+      const pt = floorPointAt(e.clientX, e.clientY)
+      if (!pt) return
+      enterWalk()
+      rig.glideTo(pt)
+      destination.show(rig.goalPos.x, rig.goalPos.z)
+      return
+    }
     if (pick.kind === 'product') {
       inspectProduct(pick.id)
     } else if (pick.kind === 'staff') {
@@ -489,6 +568,8 @@ async function boot() {
   renderer.domElement.addEventListener('pointercancel', (e) => {
     inspectPointers.delete(e.pointerId)
     if (inspectPointers.size < 2) inspectPinch = 0
+    gesturePointers = Math.max(0, gesturePointers - 1)
+    if (gesturePointers === 0) tapOk = false
   })
 
   renderer.domElement.addEventListener('pointerleave', () => {
@@ -510,15 +591,12 @@ async function boot() {
     const dt = Math.min(clock.getDelta(), 0.06)
     elapsed += dt
 
-    // 이동 입력 (키보드 + 화면 패드)
+    // 이동 입력 (키보드 — 화면 방향키 없이도 동작)
     if (walkMode && !inspector.isOpen) {
       const fwd =
-        (keys.has('w') || keys.has('arrowup') || padMove.f ? 1 : 0) -
-        (keys.has('s') || keys.has('arrowdown') || padMove.b ? 1 : 0)
-      const strafe = (keys.has('d') || padMove.r ? 1 : 0) - (keys.has('a') || padMove.l ? 1 : 0)
-      const turn =
-        (keys.has('q') || keys.has('arrowleft') || padTurn['-1'] ? 1 : 0) -
-        (keys.has('e') || keys.has('arrowright') || padTurn['1'] ? 1 : 0)
+        (keys.has('w') || keys.has('arrowup') ? 1 : 0) - (keys.has('s') || keys.has('arrowdown') ? 1 : 0)
+      const strafe = (keys.has('d') ? 1 : 0) - (keys.has('a') ? 1 : 0)
+      const turn = (keys.has('q') || keys.has('arrowleft') ? 1 : 0) - (keys.has('e') || keys.has('arrowright') ? 1 : 0)
       if (fwd || strafe) rig.moveBy(fwd * SPEED * dt, strafe * SPEED * dt)
       if (turn) rig.turnBy(turn * TURN * dt)
     }
@@ -529,6 +607,7 @@ async function boot() {
     }
     rig.update(dt)
     inspector.update(dt)
+    destination.update(dt)
 
     for (let i = 0; i < staffModels.length; i++) {
       const m = staffModels[i]
@@ -590,6 +669,7 @@ async function boot() {
     products,
     staff: staff.root,
     walk: () => walkMode,
+    destination,
     errors: () => window.__SHOWROOM_ERRORS__,
   }
 }

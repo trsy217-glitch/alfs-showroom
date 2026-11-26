@@ -5,7 +5,7 @@ import { ZONES } from '../three/layout.js'
 
 const esc = (s) => String(s).replace(/[&<>\"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
 
-export function createUI({ onZone, onPanelClose, onPartnerShop, onMove, onTurn, onOpenProduct }) {
+export function createUI({ onZone, onPanelClose, onPartnerShop, onOpenProduct }) {
   const ui = document.getElementById('ui')
   const zoneBtns = ZONES.map(
     (z) => `
@@ -43,25 +43,11 @@ export function createUI({ onZone, onPanelClose, onPartnerShop, onMove, onTurn, 
       <span class="caps-name"></span>
     </div>
 
-    <div class="hint"><span>드래그 회전</span><span>WASD 이동</span><span>Q/E 방향</span><span>휠 확대</span></div>
+    <div class="hint"><span>드래그로 둘러보기</span><span>바닥을 누르면 이동</span><span>휠 앞뒤</span><span>WASD</span></div>
 
     <button class="staff-chip" id="staffChip" type="button" hidden>
       <span class="staff-chip-dot"></span>전담 매니저 상담
     </button>
-
-    <div class="navpad" id="navpad" aria-label="이동 조작">
-      <div class="navpad-pad">
-        <button class="np np-f" data-move="f" type="button" aria-label="앞으로">▲</button>
-        <button class="np np-l" data-move="l" type="button" aria-label="왼쪽으로">◀</button>
-        <span class="np-core">이동</span>
-        <button class="np np-r" data-move="r" type="button" aria-label="오른쪽으로">▶</button>
-        <button class="np np-b" data-move="b" type="button" aria-label="뒤로">▼</button>
-      </div>
-      <div class="navpad-turn">
-        <button class="np np-turn" data-turn="-1" type="button" aria-label="왼쪽으로 돌기">↺</button>
-        <button class="np np-turn" data-turn="1" type="button" aria-label="오른쪽으로 돌기">↻</button>
-      </div>
-    </div>
 
     <aside class="panel" id="panel" aria-hidden="true">
       <div id="panelContent"></div>
@@ -83,6 +69,12 @@ export function createUI({ onZone, onPanelClose, onPartnerShop, onMove, onTurn, 
       background:rgba(20,17,13,.82);border:1px solid rgba(195,160,107,.35);padding:7px 11px;opacity:0;transform:translate(-50%,-160%);
       transition:opacity .25s;white-space:nowrap;backdrop-filter:blur(6px);z-index:6}
     .tooltip.on{opacity:1}
+    .touch-hint{position:absolute;left:50%;bottom:calc(152px + env(safe-area-inset-bottom, 0px));transform:translate(-50%,10px);
+      padding:9px 15px;font-size:10.5px;letter-spacing:.06em;white-space:nowrap;border-radius:999px;
+      color:rgba(242,234,217,.86);background:rgba(20,17,13,.78);border:1px solid rgba(195,160,107,.32);
+      backdrop-filter:blur(8px);opacity:0;transition:opacity .6s var(--ease),transform .6s var(--ease);pointer-events:none;z-index:5}
+    .touch-hint.on{opacity:1;transform:translate(-50%,0)}
+    .touch-hint b{font-weight:400;color:var(--gold)}
   `
   document.head.appendChild(style)
 
@@ -102,59 +94,7 @@ export function createUI({ onZone, onPanelClose, onPartnerShop, onMove, onTurn, 
   staffChip.addEventListener('click', () => openStaffChat(staffChip.dataset.zone))
   ui.querySelectorAll('.caps, .hint').forEach((el) => el.setAttribute('aria-hidden', 'true'))
 
-  /* ---------------- 이동 패드 ---------------- */
-  const moveState = { f: false, b: false, l: false, r: false }
-  const turnState = { '-1': false, '1': false }
-
-  function bindHold(el, onDown, onUp) {
-    const start = (e) => {
-      e.preventDefault()
-      el.classList.add('down')
-      try {
-        el.setPointerCapture(e.pointerId)
-      } catch {}
-      onDown()
-    }
-    const end = () => {
-      if (!el.classList.contains('down')) return
-      el.classList.remove('down')
-      onUp()
-    }
-    el.addEventListener('pointerdown', start)
-    el.addEventListener('pointerup', end)
-    el.addEventListener('pointercancel', end)
-    el.addEventListener('lostpointercapture', end)
-  }
-
-  ui.querySelectorAll('[data-move]').forEach((el) => {
-    const dir = el.dataset.move
-    bindHold(
-      el,
-      () => {
-        moveState[dir] = true
-        onMove && onMove(moveState)
-      },
-      () => {
-        moveState[dir] = false
-        onMove && onMove(moveState)
-      },
-    )
-  })
-  ui.querySelectorAll('[data-turn]').forEach((el) => {
-    const dir = el.dataset.turn
-    bindHold(
-      el,
-      () => {
-        turnState[dir] = true
-        onTurn && onTurn(turnState)
-      },
-      () => {
-        turnState[dir] = false
-        onTurn && onTurn(turnState)
-      },
-    )
-  })
-
+  /* ---------------- 이동 (화면 버튼 없이 터치·마우스) ---------------- */
   function setZone(id) {
     railBtns.forEach((b) => b.classList.toggle('on', b.dataset.zone === id))
     const z = ZONES.find((x) => x.id === id)
@@ -500,9 +440,27 @@ export function createUI({ onZone, onPanelClose, onPartnerShop, onMove, onTurn, 
 
   function setWalkUI(on) {
     rail.classList.toggle('walking', on)
-    ui.querySelector('#navpad').classList.toggle('active', on)
     const chip = ui.querySelector('.hint')
     if (chip) chip.classList.toggle('walking', on)
+  }
+
+  // 터치 기기에서 처음 한 번 — 화면 어디를 눌러 걷고, 드래그로 둘러보는지 알려 줍니다.
+  let touchHint = null
+  function showTouchHint() {
+    if (touchHint) return
+    const el = document.createElement('div')
+    el.className = 'touch-hint'
+    el.innerHTML = '<b>바닥을 누르면</b> 그 자리로 이동 · <b>드래그</b>로 둘러보기'
+    ui.appendChild(el)
+    touchHint = el
+    requestAnimationFrame(() => el.classList.add('on'))
+    setTimeout(() => {
+      el.classList.remove('on')
+      setTimeout(() => {
+        el.remove()
+        if (touchHint === el) touchHint = null
+      }, 800)
+    }, 6500)
   }
 
   return {
@@ -515,6 +473,7 @@ export function createUI({ onZone, onPanelClose, onPartnerShop, onMove, onTurn, 
     close,
     tip,
     setWalkUI,
+    showTouchHint,
     isOpen: () => isOpen,
     mode: () => mode,
     rail: railBtns,

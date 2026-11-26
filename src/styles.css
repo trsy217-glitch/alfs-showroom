@@ -44,14 +44,15 @@ html, body {
   overscroll-behavior: none;
 }
 
-#app { position: fixed; inset: 0; }
+#app { position: fixed; inset: 0; touch-action: none; overscroll-behavior: none; }
 
 #stage {
   position: absolute;
   inset: 0;
   touch-action: none;
+  overscroll-behavior: none;
 }
-#stage canvas { display: block; width: 100%; height: 100%; }
+#stage canvas { display: block; width: 100%; height: 100%; touch-action: none; overscroll-behavior: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 
 /* a whisper of grain over the render */
 #stage::after {
@@ -244,7 +245,7 @@ html, body {
 .hint {
   position: absolute;
   right: 34px;
-  bottom: 150px;
+  bottom: 26px;
   flex-direction: column;
   align-items: flex-end;
   gap: 7px;
@@ -613,7 +614,6 @@ html, body {
   .rail-btn.on { color: var(--cream); background: rgba(195, 160, 107, 0.1); }
 
   .hint { display: none; }
-  .navpad { opacity: 0.92; }
   .staff-chip {
     left: 12px;
     bottom: calc(86px + env(safe-area-inset-bottom, 0px));
@@ -665,63 +665,7 @@ html, body {
 .rail-btn.rail-partner .rail-name { color: rgba(242, 234, 217, 0.78); }
 .rail-btn.rail-partner:hover .rail-name { color: var(--gold); }
 
-/* ---------------- 이동 패드 ---------------- */
-.navpad {
-  position: absolute;
-  right: 34px;
-  bottom: 24px;
-  display: flex;
-  align-items: flex-end;
-  gap: 8px;
-  pointer-events: auto;
-  opacity: 0.72;
-  transition: opacity 0.45s var(--ease), transform 0.45s var(--ease);
-}
-.navpad:hover, .navpad.active { opacity: 1; }
-.navpad-pad {
-  display: grid;
-  grid-template-columns: 32px 32px 32px;
-  grid-template-rows: 32px 32px 32px;
-  gap: 4px;
-}
-.np-f { grid-column: 2; grid-row: 1; }
-.np-l { grid-column: 1; grid-row: 2; }
-.np-r { grid-column: 3; grid-row: 2; }
-.np-b { grid-column: 2; grid-row: 3; }
-.np-core {
-  grid-column: 2; grid-row: 2;
-  display: grid;
-  place-items: center;
-  font-size: 8px;
-  letter-spacing: 0.12em;
-  color: rgba(242, 234, 217, 0.34);
-  border: 1px solid rgba(195, 160, 107, 0.14);
-  border-radius: 50%;
-}
-.np {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  border: 1px solid rgba(195, 160, 107, 0.32);
-  border-radius: 50%;
-  background: rgba(18, 15, 11, 0.55);
-  color: rgba(242, 234, 217, 0.82);
-  font-size: 11px;
-  line-height: 1;
-  cursor: pointer;
-  backdrop-filter: blur(8px);
-  touch-action: none;
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-tap-highlight-color: transparent;
-  transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.12s;
-}
-.np:hover { border-color: var(--gold); color: var(--gold); }
-.np.down { background: var(--gold); border-color: var(--gold); color: #17130e; transform: scale(0.94); }
-.navpad-turn { display: flex; flex-direction: column; gap: 4px; }
-.navpad-turn .np { width: 30px; height: 30px; font-size: 13px; }
+/* ---------------- 이동 안내 (화면 버튼 없이 드래그·탭으로 조작) ---------------- */
 
 /* ---------------- 공중 살펴보기 패널 ---------------- */
 .panel.panel-inspect { width: 374px; }
@@ -1023,7 +967,7 @@ html, body {
 }
 
 @media (max-width: 900px) {
-  .caps { left: auto; right: 14px; bottom: calc(210px + env(safe-area-inset-bottom, 0px)); transform: translateY(10px); }
+  .caps { left: auto; right: 14px; bottom: calc(112px + env(safe-area-inset-bottom, 0px)); transform: translateY(10px); }
   .caps.on { transform: none; }
   .rail-label, .rail-short { display: none; }
   .rail-btn { grid-template-columns: 1fr; }
@@ -1033,17 +977,6 @@ html, body {
   .rail-no { font-size: 8.5px; }
   .rail { gap: 0; }
   .rail-btn.rail-partner { margin-top: 0; }
-
-  .navpad {
-    left: 12px;
-    right: auto;
-    bottom: calc(94px + env(safe-area-inset-bottom, 0px));
-    gap: 6px;
-    opacity: 0.9;
-  }
-  .navpad-pad { grid-template-columns: 34px 34px 34px; grid-template-rows: 34px 34px 34px; gap: 3px; }
-  .np { width: 34px; height: 34px; }
-  .navpad-turn .np { width: 32px; height: 32px; }
 
   .staff-chip {
     left: auto;
@@ -1074,9 +1007,6 @@ html, body {
 
 @media (max-height: 700px) and (min-width: 901px) {
   .rail { gap: 16px; }
-  .navpad { bottom: 66px; }
-  .navpad-pad { grid-template-columns: 28px 28px 28px; grid-template-rows: 28px 28px 28px; }
-  .np { width: 28px; height: 28px; font-size: 10px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -48,8 +48,8 @@ export function createIntro() {
       btn.disabled = false
       btn.textContent = '입장하기'
       note.textContent = window.matchMedia('(hover: none)').matches
-        ? '왼쪽 이동 패드로 걸어 다니고, 제품을 눌러 공중에서 살펴보세요.'
-        : 'WASD로 걷고 Q/E로 방향을 돌립니다. 제품을 누르면 공중에서 살펴볼 수 있어요.'
+        ? '바닥을 누르면 그 자리로 걸어가고, 드래그하면 둘러볼 수 있어요.'
+        : '바닥을 누르면 그 자리로 걷고, 드래그로 둘러봅니다. 제품을 누르면 공중에서 살펴볼 수 있어요.'
     },
   }
 }

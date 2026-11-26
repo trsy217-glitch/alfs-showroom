@@ -47,8 +47,8 @@ export const ZONES = [
     name: '아틀리에 로비',
     short: '로비',
     sub: 'Brand Wall · Collection',
-    pose: { pos: [0.3, 2.45, 5.6], target: [-0.15, 1.26, -4.5] },
-    mobile: { pos: [-0.1, 1.98, 6.0], target: [-0.75, 1.12, -4.4] },
+    pose: { pos: [0.3, 2.45, 5.45], target: [-0.15, 1.26, -4.5] },
+    mobile: { pos: [-0.1, 1.98, 5.45], target: [-0.75, 1.12, -4.4] },
     limits: { minDist: 2.0, maxDist: 7.0, minPitch: 0.0, maxPitch: 0.45, yawRange: 0.7 },
   },
   {
