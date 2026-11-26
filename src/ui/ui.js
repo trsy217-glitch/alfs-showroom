@@ -78,7 +78,7 @@ export function createUI({ onZone, onPanelClose, onPartnerShop, onMove, onTurn, 
     .caps.on{opacity:1;transform:translate(-50%,0)}
     .caps-no{font-family:var(--serif);font-size:11px;letter-spacing:.2em;color:var(--gold)}
     .caps-name{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:rgba(242,234,217,.62)}
-    @media (max-width:900px){.caps{bottom:80px}.caps-name{font-size:9.5px;letter-spacing:.12em}}
+    @media (max-width:900px){.caps{bottom:150px;left:auto;right:14px;transform:translateY(10px)}.caps.on{transform:none}.caps-name{font-size:9.5px;letter-spacing:.12em}}
     .tooltip{position:fixed;left:0;top:0;pointer-events:none;font-size:10.5px;letter-spacing:.12em;color:#f2ead9;
       background:rgba(20,17,13,.82);border:1px solid rgba(195,160,107,.35);padding:7px 11px;opacity:0;transform:translate(-50%,-160%);
       transition:opacity .25s;white-space:nowrap;backdrop-filter:blur(6px);z-index:6}
