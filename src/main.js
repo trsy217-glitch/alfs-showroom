@@ -7,9 +7,10 @@ import { buildFurniture } from './three/furniture.js'
 import { buildProducts } from './three/models.js'
 import { buildStaff } from './three/staff.js'
 import { CameraRig } from './three/rig.js'
+import { ProductInspector } from './three/inspector.js'
 import { createUI } from './ui/ui.js'
 import { createIntro } from './ui/intro.js'
-import { ZONE_BY_ID, HOTSPOTS, productPose } from './three/layout.js'
+import { ZONE_BY_ID, HOTSPOTS } from './three/layout.js'
 import { products } from './config/products.js'
 import { engraveTexture } from './three/textures.js'
 
@@ -70,10 +71,12 @@ async function boot() {
   const register = (m) => pickables.push(m)
 
   buildFurniture(scene, M, { register })
-  buildProducts(scene, M, register)
+  const productBuild = buildProducts(scene, M, register)
   const staff = buildStaff(scene, M, { register })
   const staffModels = staff.root.children.filter((c) => c.type === 'Group' && c.userData.baseRy !== undefined)
   mark('fixtures')
+
+  const inspector = new ProductInspector({ scene, camera, models: productBuild.models })
 
   /* ---------------- 바닥 핫스팟 ---------------- */
   const hotspotRings = []
@@ -117,10 +120,7 @@ async function boot() {
       register(glow)
 
       // 보이지 않는 넉넉한 터치 판 — 발광면 어디를 눌러도 존으로 들어갑니다.
-      const hit = new THREE.Mesh(
-        new THREE.CircleGeometry(1.05, 40),
-        new THREE.MeshBasicMaterial({ color: 0xc9a468 }),
-      )
+      const hit = new THREE.Mesh(new THREE.CircleGeometry(1.05, 40), new THREE.MeshBasicMaterial({ color: 0xc9a468 }))
       hit.rotation.x = -Math.PI / 2
       hit.position.y = 0.02
       hit.visible = false
@@ -194,42 +194,117 @@ async function boot() {
   rig.setPose({ pos: [0.7, 2.6, 5.8], target: [-0.1, 1.5, -4.4] }, { instant: true })
   rig.setLimits(ZONE_BY_ID.lobby.limits)
 
+  // 자유 이동(산책) 충돌 범위 — 큰 집기만 부드럽게 피해 갑니다.
+  rig.setWalkBounds(
+    { minX: -4.85, maxX: 4.85, minZ: -7.75, maxZ: 5.85 },
+    [
+      { x: -5.5, z: -4.9, r: 0.95 },
+      { x: 5.12, z: -6.5, r: 0.85 },
+      { x: 5.12, z: -5.75, r: 0.75 },
+      { x: 5.12, z: -5.0, r: 0.8 },
+      { x: 5.12, z: -4.4, r: 0.7 },
+      { x: 3.35, z: -0.25, r: 1.2 },
+      { x: -1.25, z: -0.95, r: 1.0 },
+      { x: -2.0, z: 3.9, r: 0.7 },
+      { x: 2.05, z: 4.55, r: 0.95 },
+      { x: -3.55, z: -6.5, r: 1.0 },
+      { x: 0, z: -7.8, r: 1.25 },
+    ],
+  )
+
   let currentZone = 'lobby'
+  let walkMode = false
   let entered = false
 
   /* ---------------- UI ---------------- */
+  function exitWalk() {
+    if (!walkMode) return
+    walkMode = false
+    rig.setWalk(false)
+    ui.setWalkUI(false)
+  }
+
+  function enterWalk() {
+    if (walkMode || !entered || inspector.isOpen) return
+    walkMode = true
+    rig.setWalk(true)
+    ui.setWalkUI(true)
+  }
+
+  function showZoneHotspots(id) {
+    for (const g of hotspotRings) g.visible = g.userData.zone !== id
+  }
+
   function goZone(id, { fromHotspot = false, keepPanel = false } = {}) {
     const zone = ZONE_BY_ID[id]
     if (!zone) return
+    exitWalk()
+    closeInspect()
+    if (rig.enabled === false) rig.enabled = true
     currentZone = id
     rig.setLimits(zone.limits)
     const portrait = camera.aspect < 0.8
     const pose = portrait && zone.mobile ? zone.mobile : zone.pose
     rig.setPose(pose, { duration: fromHotspot ? 1.35 : 1.7 })
     ui.setZone(id)
-    for (const g of hotspotRings) g.visible = g.userData.zone !== id
+    showZoneHotspots(id)
     if (!keepPanel && ui.isOpen()) ui.close(false)
   }
 
-  function focusProduct(id) {
+  function closeInspect() {
+    if (inspector.isOpen) inspector.close()
+    rig.enabled = true
+  }
+
+  function inspectProduct(id) {
     const p = products.find((x) => x.id === id)
     if (!p) return
+    exitWalk()
     for (const g of hotspotRings) g.visible = false
-    rig.setLimits({ minDist: 0.45, maxDist: 2.2, minPitch: -0.15, maxPitch: 0.42, yawRange: 0.7 })
-    rig.setPose(productPose(p, camera.aspect < 0.8 ? 'mobile' : 'desktop'), { duration: 1.3 })
-    ui.openProduct(id)
+    rig.enabled = false
+    inspector.open(id)
+    ui.tip(null)
+    ui.openInspect(id)
     ui.setZone(p.zone)
-    currentZone = p.zone
   }
+
+  const padMove = { f: false, b: false, l: false, r: false }
+  const padTurn = { '-1': false, '1': false }
 
   const ui = createUI({
     onZone: (id) => goZone(id),
-    onPanelClose: (restore = true) => {
+    onPartnerShop: () => {
+      goZone('b2b', { keepPanel: true })
+      ui.openB2B(partnerCode)
+    },
+    onOpenProduct: (id) => inspectProduct(id),
+    onMove: (state) => {
+      Object.assign(padMove, state)
+      if (state.f || state.b || state.l || state.r) enterWalk()
+    },
+    onTurn: (state) => {
+      Object.assign(padTurn, state)
+      if (state['-1'] || state['1']) enterWalk()
+    },
+    onPanelClose: (restore, mode) => {
+      if (mode === 'inspect') {
+        inspector.close()
+        rig.enabled = true
+        showZoneHotspots(currentZone)
+        if (restore) {
+          const z = ZONE_BY_ID[currentZone]
+          if (z) {
+            rig.setLimits(z.limits)
+            rig.setPose(camera.aspect < 0.8 && z.mobile ? z.mobile : z.pose, { duration: 1.1 })
+          }
+        }
+        return
+      }
       if (!restore) return
       const z = ZONE_BY_ID[currentZone]
       if (z) {
         rig.setLimits(z.limits)
-        rig.setPose(z.pose, { duration: 1.2 })
+        rig.setPose(camera.aspect < 0.8 && z.mobile ? z.mobile : z.pose, { duration: 1.2 })
       }
     },
   })
@@ -242,6 +317,26 @@ async function boot() {
     goZone('lobby')
   })
 
+  /* ---------------- 키보드 · 이동 ---------------- */
+  const keys = new Set()
+  const MOVE_KEYS = ['arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'w', 'a', 's', 'd', 'q', 'e']
+  window.addEventListener('keydown', (e) => {
+    const k = e.key.toLowerCase()
+    if (!MOVE_KEYS.includes(k)) return
+    const tag = e.target && e.target.tagName
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return
+    keys.add(k)
+    enterWalk()
+    e.preventDefault()
+  })
+  window.addEventListener('keyup', (e) => keys.delete(e.key.toLowerCase()))
+  window.addEventListener('blur', () => keys.clear())
+
+  ui.rail.forEach((b) => {
+    // 레일에서 존을 고르면 산책 모드를 나갑니다 (goZone 이 처리).
+    b.addEventListener('click', () => keys.clear())
+  })
+
   /* ---------------- 클릭 · 호버 ---------------- */
   const raycaster = new THREE.Raycaster()
   const ndc = new THREE.Vector2()
@@ -250,6 +345,10 @@ async function boot() {
   let downY = 0
   let hoverRaf = 0
   let lastHover = null
+  let inspectingDrag = false
+  let lastInspect = { x: 0, y: 0 }
+  const inspectPointers = new Map()
+  let inspectPinch = 0
 
   function pickAt(clientX, clientY) {
     const rect = renderer.domElement.getBoundingClientRect()
@@ -267,29 +366,37 @@ async function boot() {
     downAt = performance.now()
     downX = e.clientX
     downY = e.clientY
-  })
-
-  renderer.domElement.addEventListener('pointerup', (e) => {
-    const dist = Math.hypot(e.clientX - downX, e.clientY - downY)
-    const dt = performance.now() - downAt
-    if (dist > 8 || dt > 850) return
-    const pick = pickAt(e.clientX, e.clientY)
-    if (!pick) return
-    if (pick.kind === 'product') {
-      focusProduct(pick.id)
-    } else if (pick.kind === 'staff') {
-      goZone(pick.id, { fromHotspot: true, keepPanel: true })
-      ui.openStaff(pick.id)
-    } else if (pick.kind === 'zone') {
-      goZone(pick.id, { fromHotspot: true })
-      if (pick.id === 'b2b') ui.openB2B(partnerCode)
-    } else if (pick.kind === 'b2b') {
-      goZone('b2b', { fromHotspot: true, keepPanel: true })
-      ui.openB2B(partnerCode)
+    if (inspector.isOpen) {
+      inspectPointers.set(e.pointerId, { x: e.clientX, y: e.clientY })
+      if (inspectPointers.size === 1) {
+        inspectingDrag = true
+        lastInspect = { x: e.clientX, y: e.clientY }
+      } else if (inspectPointers.size === 2) {
+        inspectingDrag = false
+        const [a, b] = [...inspectPointers.values()]
+        inspectPinch = Math.hypot(a.x - b.x, a.y - b.y)
+      }
     }
   })
 
   renderer.domElement.addEventListener('pointermove', (e) => {
+    if (inspector.isOpen) {
+      if (inspectPointers.has(e.pointerId)) inspectPointers.set(e.pointerId, { x: e.clientX, y: e.clientY })
+      if (inspectPointers.size === 2) {
+        const [a, b] = [...inspectPointers.values()]
+        const d = Math.hypot(a.x - b.x, a.y - b.y)
+        if (inspectPinch > 4 && d > 4) inspector.zoomBy(d / inspectPinch)
+        inspectPinch = d
+        return
+      }
+      if (inspectingDrag || e.buttons) {
+        const dx = e.clientX - lastInspect.x
+        const dy = e.clientY - lastInspect.y
+        lastInspect = { x: e.clientX, y: e.clientY }
+        inspector.rotateBy(dx, dy)
+      }
+      return
+    }
     if (!hasHover) return
     if (rig.dragging) {
       if (lastHover) {
@@ -303,6 +410,10 @@ async function boot() {
     const cy = e.clientY
     hoverRaf = requestAnimationFrame(() => {
       hoverRaf = 0
+      if (inspector.isOpen) {
+        ui.tip(null)
+        return
+      }
       const pick = pickAt(cx, cy)
       const canvas = renderer.domElement
       if (pick) {
@@ -314,6 +425,8 @@ async function boot() {
         } else if (pick.kind === 'zone') {
           const z = ZONE_BY_ID[pick.id]
           label = z ? `${z.no}. ${z.name}` : null
+        } else if (pick.kind === 'routine') {
+          label = '나의 건강최적 루틴관리 시스템 · 눌러서 보기'
         } else if (pick.kind === 'b2b') {
           label = 'B2B 파트너 · 견적 상담'
         } else if (pick.kind === 'staff') {
@@ -332,24 +445,90 @@ async function boot() {
     })
   })
 
+  renderer.domElement.addEventListener('pointerup', (e) => {
+    inspectPointers.delete(e.pointerId)
+    if (inspectPointers.size < 2) inspectPinch = 0
+    if (inspectPointers.size === 0) inspectingDrag = false
+    const dist = Math.hypot(e.clientX - downX, e.clientY - downY)
+    const dt = performance.now() - downAt
+    if (dist > 10 || dt > 900) return
+    if (inspector.isOpen) return
+    if (!entered) return
+    const pick = pickAt(e.clientX, e.clientY)
+    if (!pick) return
+    if (pick.kind === 'product') {
+      inspectProduct(pick.id)
+    } else if (pick.kind === 'staff') {
+      ui.tip(null)
+      goZone(pick.id, { fromHotspot: true, keepPanel: true })
+      ui.openStaffChat(pick.id)
+    } else if (pick.kind === 'routine') {
+      ui.tip(null)
+      goZone('routine', { fromHotspot: true, keepPanel: true })
+      ui.openRoutine()
+    } else if (pick.kind === 'zone') {
+      ui.tip(null)
+      goZone(pick.id, { fromHotspot: true })
+      if (pick.id === 'b2b') ui.openB2B(partnerCode)
+    } else if (pick.kind === 'b2b') {
+      goZone('b2b', { fromHotspot: true, keepPanel: true })
+      ui.openB2B(partnerCode)
+    }
+  })
+
+  renderer.domElement.addEventListener(
+    'wheel',
+    (e) => {
+      if (!inspector.isOpen) return
+      e.preventDefault()
+      inspector.zoomBy(Math.exp(-e.deltaY * 0.0012))
+    },
+    { passive: false },
+  )
+
+  renderer.domElement.addEventListener('pointercancel', (e) => {
+    inspectPointers.delete(e.pointerId)
+    if (inspectPointers.size < 2) inspectPinch = 0
+  })
+
   renderer.domElement.addEventListener('pointerleave', () => {
     ui.tip(null)
     lastHover = null
+    inspectingDrag = false
+    inspectPointers.clear()
+    inspectPinch = 0
   })
 
   /* ---------------- 루프 ---------------- */
   const clock = new THREE.Clock()
   let elapsed = 0
+  const SPEED = 2.4
+  const TURN = 1.6
 
   let warmFrames = 0
   function tick() {
     const dt = Math.min(clock.getDelta(), 0.06)
     elapsed += dt
+
+    // 이동 입력 (키보드 + 화면 패드)
+    if (walkMode && !inspector.isOpen) {
+      const fwd =
+        (keys.has('w') || keys.has('arrowup') || padMove.f ? 1 : 0) -
+        (keys.has('s') || keys.has('arrowdown') || padMove.b ? 1 : 0)
+      const strafe = (keys.has('d') || padMove.r ? 1 : 0) - (keys.has('a') || padMove.l ? 1 : 0)
+      const turn =
+        (keys.has('q') || keys.has('arrowleft') || padTurn['-1'] ? 1 : 0) -
+        (keys.has('e') || keys.has('arrowright') || padTurn['1'] ? 1 : 0)
+      if (fwd || strafe) rig.moveBy(fwd * SPEED * dt, strafe * SPEED * dt)
+      if (turn) rig.turnBy(turn * TURN * dt)
+    }
+
     if (warmFrames < 3) {
       renderer.shadowMap.needsUpdate = true
       warmFrames += 1
     }
     rig.update(dt)
+    inspector.update(dt)
 
     for (let i = 0; i < staffModels.length; i++) {
       const m = staffModels[i]
@@ -401,13 +580,16 @@ async function boot() {
 
   window.__SHOWROOM__ = {
     goZone,
-    focusProduct,
+    inspectProduct,
+    ui,
     rig,
+    inspector,
     camera,
     scene,
     renderer,
     products,
     staff: staff.root,
+    walk: () => walkMode,
     errors: () => window.__SHOWROOM_ERRORS__,
   }
 }

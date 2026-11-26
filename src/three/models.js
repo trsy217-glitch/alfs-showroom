@@ -203,6 +203,7 @@ export function singleBottle(M) {
 export function buildProducts(scene, M, register) {
   const root = new THREE.Group()
   const pickables = []
+  const models = {}
 
   const builders = {
     mineral: () => mineralBottle(M),
@@ -217,7 +218,9 @@ export function buildProducts(scene, M, register) {
     if (p.id === 'oryun') model.scale.setScalar(1.22)
     const h = (model.userData.height || 0.2) * (p.id === 'oryun' ? 1.22 : 1)
     model.position.set(p.anchor[0], p.anchor[1] - h / 2, p.anchor[2])
+    model.userData.productId = p.id
     root.add(model)
+    models[p.id] = model
 
     model.traverse((o) => {
       if (o.isMesh) {
@@ -249,5 +252,5 @@ export function buildProducts(scene, M, register) {
 
   scene.add(root)
   if (register) pickables.forEach(register)
-  return { root, pickables }
+  return { root, pickables, models }
 }

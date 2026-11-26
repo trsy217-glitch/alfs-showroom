@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js'
 import { FIXTURE } from './layout.js'
-import { engraveTexture, b2bBoardTexture, artTexture } from './textures.js'
+import { engraveTexture, b2bBoardTexture, artTexture, routineBoardTexture } from './textures.js'
 
 function rbox(w, h, d, r, mat) {
   const g = new RoundedBoxGeometry(w, h, d, 3, r)
@@ -141,6 +141,7 @@ function pendant(M, radius, drop) {
 export function buildFurniture(scene, M, { register } = {}) {
   const root = new THREE.Group()
   const pickables = []
+  const lights = []
 
   /* ---------- 02 오륜미네랄 연단 ---------- */
   {
@@ -542,12 +543,112 @@ export function buildFurniture(scene, M, { register } = {}) {
 
   }
 
+  /* ---------- 05 나의 건강최적 루틴관리 시스템 (키오스크) ---------- */
+  {
+    const [x, z] = FIXTURE.routineKiosk
+    const g = new THREE.Group()
+    const pick = (mesh) => {
+      mesh.userData.pick = { kind: 'routine' }
+      pickables.push(mesh)
+      return mesh
+    }
+
+    const base = rbox(1.34, 0.05, 0.52, 0.01, M.brassDark)
+    base.position.y = 0.025
+    g.add(base)
+
+    const body = rbox(1.26, 0.8, 0.46, 0.015, M.walnutLong)
+    body.position.y = 0.44
+    g.add(body)
+    pick(body)
+
+    const band = rbox(1.3, 0.02, 0.48, 0.006, M.brass)
+    band.position.y = 0.845
+    g.add(band)
+
+    const top = rbox(1.3, 0.045, 0.5, 0.008, M.stone)
+    top.position.y = 0.878
+    g.add(top)
+
+    // 화면 패널 (살짝 뒤로 젖힌 각도)
+    const screenGroup = new THREE.Group()
+    screenGroup.position.set(0, 1.16, -0.02)
+    screenGroup.rotation.x = -0.2
+    g.add(screenGroup)
+
+    const screen = new THREE.Mesh(
+      new THREE.PlaneGeometry(1.12, 0.71),
+      new THREE.MeshStandardMaterial({
+        map: routineBoardTexture(),
+        roughness: 0.42,
+        metalness: 0.06,
+        emissive: 0x201810,
+        emissiveIntensity: 0.55,
+        envMapIntensity: 0.7,
+      }),
+    )
+    screen.position.z = 0.026
+    screenGroup.add(screen)
+    pick(screen)
+
+    const backPanel = rbox(1.2, 0.8, 0.045, 0.008, M.stoneDark)
+    screenGroup.add(backPanel)
+
+    const fw = 1.2
+    const fh = 0.8
+    for (const [w, h, d, px, py] of [
+      [0.028, fh, 0.04, -fw / 2, 0],
+      [0.028, fh, 0.04, fw / 2, 0],
+      [fw, 0.028, 0.04, 0, fh / 2],
+      [fw, 0.028, 0.04, 0, -fh / 2],
+    ]) {
+      const bar = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), M.brass)
+      bar.position.set(px, py, 0.03)
+      bar.castShadow = true
+      screenGroup.add(bar)
+    }
+
+    // 화면 아래 명패
+    const plaque = new THREE.Mesh(
+      new THREE.PlaneGeometry(0.5, 0.156),
+      new THREE.MeshStandardMaterial({
+        map: engraveTexture('루틴관리', 'ROUTINE SYSTEM'),
+        roughness: 0.5,
+        metalness: 0.2,
+      }),
+    )
+    plaque.position.set(0, 0.93, 0.255)
+    g.add(plaque)
+
+    // 카운터 위 작은 루틴 카드 3장
+    for (let i = 0; i < 3; i++) {
+      const card = rbox(0.16, 0.075, 0.012, 0.003, M.linen)
+      card.position.set(-0.42 + i * 0.19, 0.94, 0.16)
+      card.rotation.x = -0.15
+      g.add(card)
+    }
+
+    const sh = shadowPlane(M, 1.7, 0.9, 0.5)
+    sh.position.set(x, 0.006, z)
+    root.add(sh)
+
+    g.position.set(x, 0, z)
+    g.rotation.y = 0.38
+    root.add(g)
+
+    const keyLight = new THREE.PointLight(0xffd9a8, 9, 3.2, 2)
+    keyLight.position.set(x, 1.9, z + 0.5)
+    root.add(keyLight)
+    lights.push(keyLight)
+  }
+
   /* ---------- 벽 명패 ---------- */
   {
     const plaques = [
       { name: '오륜미네랄', sub: 'SIGNATURE 1,000ML', x: -5.49, y: 1.62, z: -2.9, ry: Math.PI / 2 },
       { name: '하루 1.3핏', sub: 'CLEANSE PROGRAM', x: 5.49, y: 1.62, z: -2.1, ry: -Math.PI / 2 },
       { name: 'B2B 파트너', sub: 'PARTNER LOUNGE', x: 5.49, y: 1.55, z: 4.35, ry: -Math.PI / 2 },
+      { name: '나의 건강최적', sub: 'ROUTINE SYSTEM', x: -3.55, y: 2.5, z: -8.44, ry: 0 },
     ]
     for (const p of plaques) {
       const m = new THREE.Mesh(
@@ -566,7 +667,6 @@ export function buildFurniture(scene, M, { register } = {}) {
   }
 
   /* ---------- 펜던트 ---------- */
-  const lights = []
   const pendants = [
     { x: FIXTURE.lobbyPedestal[0], z: FIXTURE.lobbyPedestal[1], drop: 1.32, r: 0.26, i: 14 },
     { x: FIXTURE.partnerTable[0], z: FIXTURE.partnerTable[1], drop: 1.3, r: 0.27, i: 18 },

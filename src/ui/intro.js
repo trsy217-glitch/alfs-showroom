@@ -10,7 +10,7 @@ export function createIntro() {
       <div class="intro-rule"></div>
       <p class="intro-ko">
         서울 상암의 웰니스 아틀리에에서 준비한 <b>프라이빗 3D 쇼룸</b>입니다.<br />
-        오륜미네랄과 하루 1.3핏 · 클린바이옴을 공간에서 살펴보세요.
+        오륜미네랄과 하루 1.3핏 · 클린바이옴,<br />나의 건강최적 루틴관리 시스템을 공간에서 살펴보세요.
       </p>
       <button class="intro-enter" type="button" id="enterBtn" disabled>쇼룸 준비 중</button>
       <p class="intro-note" id="introNote">조명과 진열을 준비하고 있습니다. 잠시만 기다려 주세요.</p>
@@ -48,8 +48,8 @@ export function createIntro() {
       btn.disabled = false
       btn.textContent = '입장하기'
       note.textContent = window.matchMedia('(hover: none)').matches
-        ? '손가락으로 돌려 보고, 진열된 제품을 눌러 보세요.'
-        : '마우스 드래그로 둘러보고, 진열된 제품을 눌러 보세요.'
+        ? '왼쪽 이동 패드로 걸어 다니고, 제품을 눌러 공중에서 살펴보세요.'
+        : 'WASD로 걷고 Q/E로 방향을 돌립니다. 제품을 누르면 공중에서 살펴볼 수 있어요.'
     },
   }
 }

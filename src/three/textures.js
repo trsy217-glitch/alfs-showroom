@@ -527,6 +527,91 @@ export function b2bBoardTexture() {
   return toTexture(c)
 }
 
+
+export function routineBoardTexture() {
+  const W = 1200
+  const H = 760
+  const c = makeCanvas(W, H)
+  const g = c.getContext('2d')
+
+  const bg = g.createLinearGradient(0, 0, W, H)
+  bg.addColorStop(0, '#1c1712')
+  bg.addColorStop(0.55, '#231c15')
+  bg.addColorStop(1, '#17120e')
+  g.fillStyle = bg
+  g.fillRect(0, 0, W, H)
+
+  g.strokeStyle = 'rgba(201,164,104,0.5)'
+  g.lineWidth = 2
+  g.strokeRect(26, 26, W - 52, H - 52)
+
+  g.textAlign = 'center'
+  g.textBaseline = 'middle'
+  g.fillStyle = '#c9a468'
+  g.font = '400 21px ALFSans, sans-serif'
+  tracked(g, 'A L . F . S   ·   R O U T I N E   S Y S T E M', W / 2, 92, 2)
+
+  g.fillStyle = '#f2ead9'
+  g.font = '400 58px ALFSerif, serif'
+  tracked(g, '나의 건강최적 루틴관리', W / 2, 168, 2)
+
+  g.fillStyle = 'rgba(242,234,217,0.5)'
+  g.font = '400 22px ALFSans, sans-serif'
+  tracked(g, '하루 세 번, 챙기기 쉬운 순서로', W / 2, 224, 4)
+
+  const cols = [
+    { x: 70, label: '아침', en: 'MORNING', name: '오륜미네랄', how: '원액을 물에 10~30배 희석', tag: '1,000ml' },
+    { x: 424, label: '점심', en: 'LUNCH', name: '클린바이옴', how: '물 300~500ml에 한 병 희석', tag: '100ml · 1병' },
+    { x: 778, label: '저녁', en: 'EVENING', name: '하루 1.3핏', how: '엔자임밀 파우치를 물에 풀어', tag: '30일 프로그램' },
+  ]
+  for (const col of cols) {
+    g.fillStyle = 'rgba(242,234,217,0.045)'
+    g.fillRect(col.x, 276, 352, 330)
+    g.strokeStyle = 'rgba(201,164,104,0.28)'
+    g.lineWidth = 1
+    g.strokeRect(col.x + 0.5, 276.5, 351, 329)
+
+    g.textAlign = 'left'
+    g.fillStyle = '#c9a468'
+    g.font = '400 20px ALFSans, sans-serif'
+    tracked(g, col.en, col.x + 30, 318, 5)
+
+    g.fillStyle = '#f2ead9'
+    g.font = '400 54px ALFSerif, serif'
+    g.fillText(col.label, col.x + 30, 384)
+
+    g.strokeStyle = 'rgba(201,164,104,0.3)'
+    g.beginPath()
+    g.moveTo(col.x + 30, 420)
+    g.lineTo(col.x + 120, 420)
+    g.stroke()
+
+    g.fillStyle = '#e9d7b4'
+    g.font = '500 33px ALFSans, sans-serif'
+    g.fillText(col.name, col.x + 30, 468)
+
+    g.fillStyle = 'rgba(242,234,217,0.55)'
+    g.font = '400 23px ALFSans, sans-serif'
+    g.fillText(col.how, col.x + 30, 512)
+    if (col.tag) {
+      g.fillStyle = 'rgba(201,164,104,0.8)'
+      g.font = '400 20px ALFSans, sans-serif'
+      g.fillText(col.tag, col.x + 30, 558)
+    }
+    g.textAlign = 'center'
+  }
+
+  g.fillStyle = 'rgba(242,234,217,0.42)'
+  g.font = '400 21px ALFSans, sans-serif'
+  tracked(g, '내 시간에 맞춰 순서를 바꿔도 됩니다 · 일반식품', W / 2, 660, 3)
+
+  g.fillStyle = 'rgba(201,164,104,0.9)'
+  g.font = '400 22px ALFSans, sans-serif'
+  tracked(g, 'alfs.kr/diagnosis', W / 2, 704, 3)
+
+  return toTexture(c)
+}
+
 export function hotspotLabelTexture(no, name) {
   const W = 640
   const H = 220

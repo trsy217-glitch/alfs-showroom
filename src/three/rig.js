@@ -15,6 +15,10 @@ export class CameraRig {
     this.baseYaw = 0
     this.limits = { minDist: 1, maxDist: 10, minPitch: 0.02, maxPitch: 0.6, yawRange: 1.15 }
     this.enabled = true
+    this.walk = false
+    this.savedLimits = null
+    this.bounds = null
+    this.colliders = []
     this.dragging = false
     this.moved = 0
     this.tween = null
@@ -100,6 +104,70 @@ export class CameraRig {
     this.limits.yawRange = range
   }
 
+  /* ---------------- 자유 이동(산책) 모드 ---------------- */
+  setWalk(on) {
+    if (this.walk === on) return
+    this.walk = on
+    this.tween = null
+    if (on) {
+      this.savedLimits = { ...this.limits }
+      this.limits = { minDist: 1.25, maxDist: 3.6, minPitch: -0.02, maxPitch: 0.46, yawRange: Math.PI * 4 }
+      this.baseYaw = this.yaw
+      this.goal.yaw = this.yaw
+      this.goal.pitch = clamp(this.goal.pitch, 0.03, 0.14)
+      this.goal.dist = 1.55
+      this.goal.target.y = 1.38
+    } else if (this.savedLimits) {
+      this.limits = { ...this.savedLimits }
+      this.savedLimits = null
+    }
+  }
+
+  setWalkBounds(bounds, colliders = []) {
+    this.bounds = bounds
+    this.colliders = colliders
+  }
+
+  // forward / right 는 이번 프레임에 이동할 거리(m)
+  moveBy(forward, right) {
+    const y = this.goal.yaw
+    const fx = -Math.sin(y)
+    const fz = -Math.cos(y)
+    const rx = Math.cos(y)
+    const rz = -Math.sin(y)
+    let nx = this.goal.target.x + fx * forward + rx * right
+    let nz = this.goal.target.z + fz * forward + rz * right
+
+    const b = this.bounds
+    if (b) {
+      nx = clamp(nx, b.minX, b.maxX)
+      nz = clamp(nz, b.minZ, b.maxZ)
+    }
+    for (const c of this.colliders) {
+      const dx = nx - c.x
+      const dz = nz - c.z
+      const d = Math.hypot(dx, dz)
+      if (d < c.r) {
+        if (d < 0.0001) {
+          nx = c.x + c.r
+        } else {
+          nx = c.x + (dx / d) * c.r
+          nz = c.z + (dz / d) * c.r
+        }
+      }
+    }
+
+    this.goal.target.x = nx
+    this.goal.target.z = nz
+    this.goal.target.y = 1.38
+    this.tween = null
+  }
+
+  turnBy(rad) {
+    this.goal.yaw += rad
+    this.tween = null
+  }
+
   onDown(e) {
     if (!this.enabled) return
     this.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY })
@@ -136,7 +204,8 @@ export class CameraRig {
     if (!this.dragging) return
     this.moved += Math.abs(dx) + Math.abs(dy)
     if (this.moved > 3) this.tween = null
-    this.goal.yaw = clamp(this.goal.yaw - dx * 0.0042, this.baseYaw - this.limits.yawRange, this.baseYaw + this.limits.yawRange)
+    const range = this.walk ? Math.PI * 4 : this.limits.yawRange
+    this.goal.yaw = clamp(this.goal.yaw - dx * 0.0042, this.baseYaw - range, this.baseYaw + range)
     this.goal.pitch = clamp(this.goal.pitch - dy * 0.0032, this.limits.minPitch, this.limits.maxPitch)
   }
 
